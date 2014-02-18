@@ -1,1 +1,13 @@
-target/
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+#all dot prefix file and directory
+.*
+.*/
+
+#eclipse target directory
+/target
