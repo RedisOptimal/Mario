@@ -67,13 +67,17 @@ public class ZookeeperConfigFactory {
 	 * @param metaString
 	 * @throws JSONException 
 	 */
-	public void addInstance(String zookeeperName, String metaString) throws JSONException {
-		ZookeeperClientConfig newConfig = new ZookeeperClientConfig(zookeeperName, metaString);
+	public void updateInstance(String zookeeperName, String metaString) throws JSONException {
 		synchronized (zookeeperConfigMap) {
 			ZookeeperClientConfig oldConfig = zookeeperConfigMap.get(zookeeperName);
 			if (oldConfig == null) {
-				// Update config map
-				zookeeperConfigMap.put(zookeeperName, newConfig);
+				// Not exists
+				zookeeperConfigMap.put(zookeeperName, new ZookeeperClientConfig(zookeeperName, metaString));
+			} else {
+				// TODO 更小粒度的判断
+				if (!metaString.equals(oldConfig.getMetaString())) {
+					zookeeperConfigMap.put(zookeeperName, new ZookeeperClientConfig(zookeeperName, metaString));
+				}
 			}
 		}
 	}
@@ -83,6 +87,11 @@ public class ZookeeperConfigFactory {
 			zookeeperConfigFactory = new ZookeeperConfigFactory();
 		}
 		return zookeeperConfigFactory;
+	}
+	
+	@Override
+	protected void finalize() {
+		clear();
 	}
 
 }
