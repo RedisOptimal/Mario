@@ -34,8 +34,8 @@ public final class ZookeeperClientFactory {
 			.getLogger(ZookeeperClientFactory.class.getName());
 
 	private Map<String, ZookeeperClient> zookeeperMap;
-	private ZookeeperClientConfigFactory zookeeperClientConfigFactory = 
-								ZookeeperClientConfigFactory.getFactory();
+	private ZookeeperConfigFactory zookeeperClientConfigFactory = 
+								ZookeeperConfigFactory.getFactory();
 	
 	// used for singleton
 	private static ZookeeperClientFactory zookeeperClientFactory = null;

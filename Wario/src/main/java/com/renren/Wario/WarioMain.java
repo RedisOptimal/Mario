@@ -18,9 +18,6 @@ package com.renren.Wario;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.renren.zookeeper.Accessor;
-import com.renren.zookeeper.ZkConfig;
-
 public class WarioMain {
 	private static Logger logger = LogManager
 			.getLogger(WarioMain.class.getName());

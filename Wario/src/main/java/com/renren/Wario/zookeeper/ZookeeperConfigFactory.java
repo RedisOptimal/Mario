@@ -22,6 +22,7 @@ import javax.naming.OperationNotSupportedException;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 
 /**
  * This is a singleton factory class.
@@ -29,17 +30,18 @@ import org.apache.log4j.Logger;
  * @author zhe.yuan
  *
  */
-public class ZookeeperClientConfigFactory {
+public class ZookeeperConfigFactory {
 	
 	private static Logger logger = LogManager
-			.getLogger(ZookeeperClientConfigFactory.class.getName());
-
+			.getLogger(ZookeeperConfigFactory.class.getName());
+	
+	// Map<zookeeperName, config>
 	private Map<String, ZookeeperClientConfig> zookeeperConfigMap;
 	
 	// used for singleton
-	private static ZookeeperClientConfigFactory zookeeperClientConfigFactory = null;
+	private static ZookeeperConfigFactory zookeeperClientConfigFactory = null;
 	
-	private ZookeeperClientConfigFactory() {
+	private ZookeeperConfigFactory() {
 		zookeeperConfigMap = new TreeMap<String, ZookeeperClientConfig>();
 	}
 	
@@ -63,21 +65,22 @@ public class ZookeeperClientConfigFactory {
 	 * 	}
 	 * @param zookeeperName
 	 * @param metaString
+	 * @throws JSONException 
 	 */
-	public void addInstance(String zookeeperName, String metaString) {
+	public void addInstance(String zookeeperName, String metaString) throws JSONException {
 		ZookeeperClientConfig newConfig = new ZookeeperClientConfig(zookeeperName, metaString);
 		synchronized (zookeeperConfigMap) {
 			ZookeeperClientConfig oldConfig = zookeeperConfigMap.get(zookeeperName);
-			if (oldConfig == null || !oldConfig.equals(newConfig)) {
+			if (oldConfig == null) {
 				// Update config map
 				zookeeperConfigMap.put(zookeeperName, newConfig);
 			}
 		}
 	}
 	
-	public synchronized static ZookeeperClientConfigFactory getFactory() {
+	public synchronized static ZookeeperConfigFactory getFactory() {
 		if (zookeeperClientConfigFactory == null) {
-			zookeeperClientConfigFactory = new ZookeeperClientConfigFactory();
+			zookeeperClientConfigFactory = new ZookeeperConfigFactory();
 		}
 		return zookeeperClientConfigFactory;
 	}

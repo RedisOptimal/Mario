@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.renren.Wario.zookeeper.ZookeeperClientConfigFactory;
+import com.renren.Wario.zookeeper.ZookeeperConfigFactory;
 import com.renren.Wario.zookeeper.ZookeeperClientFactory;
 
 public class PluginManager {
@@ -61,7 +61,7 @@ public class PluginManager {
 	// used for singleton
 	private static PluginManager pluginManager = null;
 
-	private ZookeeperClientConfigFactory zookeeperClientConfigFactory = ZookeeperClientConfigFactory.getFactory();
+	private ZookeeperConfigFactory zookeeperClientConfigFactory = ZookeeperConfigFactory.getFactory();
 	
 	private class DoProcess implements Runnable {
 		private Set<IAlertPlugin> alertPlugins = null;
@@ -106,7 +106,10 @@ public class PluginManager {
 					} catch (IOException e) {
 						logger.error("Error in load config." + e.toString());
 						e.printStackTrace();
-					}
+					} catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
 				}
 			}
 		}
@@ -165,8 +168,9 @@ public class PluginManager {
 	 * }
 	 * @param path
 	 * @throws IOException 
+	 * @throws JSONException 
 	 */
-	public void loadConfig() throws IOException {
+	public void loadConfig() throws IOException, JSONException {
 		File serverFile = new File(configPathPrefix + serverConfigName);
 		File pluginFile = new File(configPathPrefix + pluginConfigName);
 		InputStreamReader in = null;
@@ -245,7 +249,7 @@ public class PluginManager {
 		return null;
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, JSONException {
 		PluginManager pluginManager = new PluginManager();
 		pluginManager.loadConfig();
 

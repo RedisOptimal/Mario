@@ -1,5 +1,5 @@
 {
-	"Zookeeper1":{connectString:"localhost:2181",sessionTimeout:5000},
-	"Zookeeper2":{connectString:"localhost:2181",sessionTimeout:4000},
-	"Test1":{connectString:"xcstestzookeeper.n.xiaonei.com:2181",sessionTimeout:100}
+	"Zookeeper1":{serverIPList:["localhost:2181","localhost:2182"],sessionTimeout:5000},
+	"Zookeeper2":{serverIPList:["localhost:2181","localhost:2182"],sessionTimeout:4000},
+	"Test1":{serverIPList:["localhost:2181","localhost:2181"],sessionTimeout:100}
 }

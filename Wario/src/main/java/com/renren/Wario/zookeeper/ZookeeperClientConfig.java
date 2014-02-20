@@ -15,38 +15,45 @@
  */
 package com.renren.Wario.zookeeper;
 
-import java.util.Comparator;
-
-import javax.naming.OperationNotSupportedException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author zhe
- *
- */
-public class ZookeeperClientConfig implements Comparable<ZookeeperClientConfig>, Comparator<ZookeeperClientConfig> {
-	
+public class ZookeeperClientConfig {	
 	private static Logger logger = LogManager.getLogger(ZookeeperClientConfig.class
 			.getName());
 	
 	private final String zookeeperName;
-	private final String connectString;
+	private final Map<String, ZookeeperClient> clientMap;
 	private final int sessionTimeout;
 	private final String metaString;
 	/**
 	 *
 	 * @param metaString
+	 * @throws JSONException 
 	 */
 	
-	public ZookeeperClientConfig(String zookeeperString, String metaString) {
+	public ZookeeperClientConfig(String zookeeperString, String metaString) throws JSONException {
+	    logger.info(zookeeperString + " init with " + metaString);
 		this.metaString = metaString;
 		this.zookeeperName = zookeeperString;
 		JSONObject jsonObject = new JSONObject(metaString);
-		connectString = jsonObject.getString("connectString");
-		sessionTimeout = jsonObject.getInt("sessionTimeout");
+        sessionTimeout = jsonObject.getInt("sessionTimeout");
+		JSONArray serverIPArray = jsonObject.getJSONArray("serverIPList");
+		clientMap = new TreeMap<String, ZookeeperClient>();
+		
+		for (int i = 0;i < serverIPArray.length(); ++i) {
+		    ZookeeperClient tmpClient = new ZookeeperClient(serverIPArray.getString(i), sessionTimeout);
+		    clientMap.put(serverIPArray.getString(i), tmpClient);
+		}
 	}
 	
 	@Override
@@ -62,13 +69,6 @@ public class ZookeeperClientConfig implements Comparable<ZookeeperClientConfig>,
 	}
 
 	/**
-	 * @return the connectString
-	 */
-	public String getConnectString() {
-		return connectString;
-	}
-
-	/**
 	 * @return the sessionTimeout
 	 */
 	public int getSessionTimeout() {
@@ -81,34 +81,16 @@ public class ZookeeperClientConfig implements Comparable<ZookeeperClientConfig>,
 	public String getMetaString() {
 		return metaString;
 	}
-
-	@Override
-	public boolean equals(Object o) {
-		return (this.compareTo((ZookeeperClientConfig) o) == 0);
+	
+	public Set<String> getConnectString() {
+	    return clientMap.keySet();
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
 	@Override
-	public int compare(ZookeeperClientConfig o1, ZookeeperClientConfig o2) {
-		return o1.compareTo(o2);
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	@Override
-	public int compareTo(ZookeeperClientConfig o) {
-		if (this.getZookeeperName().equals(o.getZookeeperName())) {
-			if (this.getConnectString().equals(o.getConnectString())) {
-				return this.getSessionTimeout() - o.getSessionTimeout();
-			} else {
-				return this.getConnectString().compareTo(o.getConnectString());
-			}
-		} else {
-			return this.getZookeeperName().compareTo(o.getZookeeperName());
-		}
+	public boolean equals(Object o) {
+	    // TODO 实现clientMap集合判断
+	    ZookeeperClientConfig o2 = (ZookeeperClientConfig) o;
+	    return (this.getSessionTimeout() == o2.getSessionTimeout()) && this.getMetaString().equals(o2.getMetaString());
 	}
 	
 }
