@@ -39,7 +39,7 @@ public class ZookeeperConfigFactory {
 	private Map<String, ZookeeperClientConfig> zookeeperConfigMap;
 	
 	// used for singleton
-	private static ZookeeperConfigFactory zookeeperClientConfigFactory = null;
+	private static ZookeeperConfigFactory zookeeperConfigFactory = null;
 	
 	private ZookeeperConfigFactory() {
 		zookeeperConfigMap = new TreeMap<String, ZookeeperClientConfig>();
@@ -60,7 +60,7 @@ public class ZookeeperConfigFactory {
 	/**
 	 * metaString's format as fellow : 
 	 *	{
-	 * 		connectString:"localhost:2181,localhost:2182,localhost:2183",
+	 * 		serverIPList:["localhost:2181","localhost:2182"],
 	 * 		sessionTimeout:"5000"
 	 * 	}
 	 * @param zookeeperName
@@ -79,10 +79,10 @@ public class ZookeeperConfigFactory {
 	}
 	
 	public synchronized static ZookeeperConfigFactory getFactory() {
-		if (zookeeperClientConfigFactory == null) {
-			zookeeperClientConfigFactory = new ZookeeperConfigFactory();
+		if (zookeeperConfigFactory == null) {
+			zookeeperConfigFactory = new ZookeeperConfigFactory();
 		}
-		return zookeeperClientConfigFactory;
+		return zookeeperConfigFactory;
 	}
 
 }
