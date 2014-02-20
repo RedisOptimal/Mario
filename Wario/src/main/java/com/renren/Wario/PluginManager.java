@@ -32,7 +32,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.renren.Wario.zookeeper.ZookeeperConfigFactory;
-import com.renren.Wario.zookeeper.ZookeeperClientFactory;
 
 public class PluginManager {
 	
@@ -44,7 +43,7 @@ public class PluginManager {
 	private final Long MinThreadSleepTime = 20L;
 
 	private final Long UpdateConfigInterval = 300L;
-	// Config path variable
+	// Configuration variable
 	private final String configPathPrefix;
 	private final String serverConfigName = "server.json";
 	private final String pluginConfigName = "plugin.json";
@@ -61,7 +60,7 @@ public class PluginManager {
 	// used for singleton
 	private static PluginManager pluginManager = null;
 
-	private ZookeeperConfigFactory zookeeperClientConfigFactory = ZookeeperConfigFactory.getFactory();
+	private ZookeeperConfigFactory zookeeperConfigFactory = ZookeeperConfigFactory.getFactory();
 	
 	private class DoProcess implements Runnable {
 		private Set<IAlertPlugin> alertPlugins = null;
@@ -87,7 +86,7 @@ public class PluginManager {
 						try {
 							onPorcess.run();
 						} catch (Throwable e) {
-							logger.warn("Exception when background run : " + e.toString());
+							logger.warn("Exception when background runing : " + e.toString());
 						}
 					}
 				}
@@ -162,7 +161,7 @@ public class PluginManager {
 	 * Config file format as fellow :
 	 * {
 	 * 	"ZookeeperTest":{
-	 * 		connectString:"localhost:2181,localhost:2182,localhost:2183",
+	 * 		serverIPList:["localhost:2181","localhost:2182"],
 	 * 		sessionTimeout:"5000"
 	 * 	}
 	 * }
@@ -187,7 +186,8 @@ public class PluginManager {
 			while (iterator.hasNext()) {
 				String zookeeperName = (String) iterator.next();
 				String metaString = jsonObject.getJSONObject(zookeeperName).toString();
-				zookeeperClientConfigFactory.addInstance(zookeeperName, metaString);
+				System.err.println(zookeeperName + " : " + metaString);
+				zookeeperConfigFactory.updateInstance(zookeeperName, metaString);
 			}
 			logger.info("Old server config : " + serverConfigText + " New server config : " + text);
 			serverConfigText = text;

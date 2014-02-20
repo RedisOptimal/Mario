@@ -113,6 +113,7 @@ public class ZookeeperClient implements Comparable<ZookeeperClient>, Comparator<
 	        zk = new ZooKeeper(connectString, sessionTimeout,
 	                    new SessionWatcher(countDownLatch));
 	        try {
+	        	// BUG await的用法不对
 	            countDownLatch.await(20, TimeUnit.SECONDS);
 	            this.isAvailable = true;
 	        } catch (InterruptedException e) {
