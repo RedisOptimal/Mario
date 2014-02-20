@@ -68,12 +68,15 @@ public class ZookeeperConfigFactory {
 	 * @throws JSONException 
 	 */
 	public void updateInstance(String zookeeperName, String metaString) throws JSONException {
+
 		synchronized (zookeeperConfigMap) {
 			ZookeeperClientConfig oldConfig = zookeeperConfigMap.get(zookeeperName);
 			if (oldConfig == null) {
+				logger.warn("Insert " + zookeeperName + " with " + metaString);
 				// Not exists
 				zookeeperConfigMap.put(zookeeperName, new ZookeeperClientConfig(zookeeperName, metaString));
 			} else {
+				logger.warn("Update " + zookeeperName + " with " + metaString);
 				// TODO 更小粒度的判断
 				if (!metaString.equals(oldConfig.getMetaString())) {
 					zookeeperConfigMap.put(zookeeperName, new ZookeeperClientConfig(zookeeperName, metaString));
