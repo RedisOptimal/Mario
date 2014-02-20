@@ -37,11 +37,11 @@ public class ZookeeperClientConfig {
      * @throws JSONException
      */
 
-    public ZookeeperClientConfig(String zookeeperString, String metaString)
+    public ZookeeperClientConfig(String zookeeperName, String metaString)
         throws JSONException{
-        logger.info(zookeeperString + " init with " + metaString);
+        logger.info(zookeeperName + " init with " + metaString);
         this.metaString = metaString;
-        this.zookeeperName = zookeeperString;
+        this.zookeeperName = zookeeperName;
         JSONObject jsonObject = new JSONObject(metaString);
         sessionTimeout = jsonObject.getInt("sessionTimeout");
         JSONArray serverIPArray = jsonObject.getJSONArray("serverIPList");
@@ -92,7 +92,8 @@ public class ZookeeperClientConfig {
         return clientMap.keySet();
     }
 
-    public Map.Entry<String, ZookeeperClient> getClientMap() {
+    @SuppressWarnings("unchecked")
+	public Map.Entry<String, ZookeeperClient> getClientMap() {
         return (Entry<String, ZookeeperClient>) clientMap.entrySet();
     }
     
