@@ -59,8 +59,7 @@ public class ZookeeperClient implements Comparable<ZookeeperClient>, Comparator<
                         try {
                             countDownLatch = new CountDownLatch(1);
                             zk.close();
-                            zk =
-                                    new ZooKeeper(
+                            zk = new ZooKeeper(
                                         ZookeeperClient.this.getConnectString(),
                                         ZookeeperClient.this.getSessionTimeout(),
                                         new SessionWatcher(countDownLatch));
@@ -107,21 +106,16 @@ public class ZookeeperClient implements Comparable<ZookeeperClient>, Comparator<
     }
 
     public void Init() throws IOException {
-        if (zk != null) {
-            try {
-                zk.close();
-                zk = null;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
         int retryTimes = 0;
         while (!this.isAvailable) {
             final CountDownLatch countDownLatch = new CountDownLatch(1);
-            zk =
-                    new ZooKeeper(connectString, sessionTimeout,
-                        new SessionWatcher(countDownLatch));
+            
             try {
+                if (zk != null) {
+                    zk.close();
+                }
+                zk = new ZooKeeper(connectString, sessionTimeout,
+                            new SessionWatcher(countDownLatch));
                 if (!countDownLatch.await(20, TimeUnit.SECONDS)) {
                     logger.error("Can't connect zookeeper "
                                  + ZookeeperClient.this.getConnectString());
