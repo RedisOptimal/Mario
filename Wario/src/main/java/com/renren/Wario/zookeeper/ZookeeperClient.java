@@ -32,7 +32,7 @@ public class ZookeeperClient implements Comparable<ZookeeperClient>, Comparator<
     private static Logger logger =
             LogManager.getLogger(ZookeeperClient.class.getName());
 
-    private final int maxRetryTimes = 5;
+    private final int maxRetryTimes = 3;
     private ZooKeeper zk = null;
     private final String connectString;
     private final int sessionTimeout;

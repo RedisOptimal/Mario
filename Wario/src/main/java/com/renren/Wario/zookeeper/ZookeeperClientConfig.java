@@ -48,17 +48,16 @@ public class ZookeeperClientConfig {
         clientMap = new TreeMap<String, ZookeeperClient>();
 
         for (int i = 0; i < serverIPArray.length(); ++i) {
-            ZookeeperClient tmpClient =
-                    new ZookeeperClient(serverIPArray.getString(i),
-                        sessionTimeout);
             try {
+                ZookeeperClient tmpClient = new ZookeeperClient(serverIPArray.getString(i),
+                        sessionTimeout);
                 tmpClient.Init();
+                clientMap.put(serverIPArray.getString(i), tmpClient);
             } catch (IOException e) {
                 logger.error("Zookeeper client " + serverIPArray.getString(i)
                              + ". First initial failed with " + e.toString());
                 e.printStackTrace();
             }
-            clientMap.put(serverIPArray.getString(i), tmpClient);
         }
     }
 
