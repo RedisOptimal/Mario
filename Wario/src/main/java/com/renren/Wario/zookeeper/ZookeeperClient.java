@@ -53,40 +53,48 @@ public class ZookeeperClient implements Comparable<ZookeeperClient>, Comparator<
                     countDownLatch.countDown();
                 } else if (event.getState().equals(KeeperState.Expired)
                            || event.getState().equals(KeeperState.Disconnected)) {
-                	ZookeeperClient.this.isAvailable = false;
-                	int retryTimes = 0;
-                	while (!ZookeeperClient.this.isAvailable) {
-	                    try {
-	                        countDownLatch = new CountDownLatch(1);
-	                        zk.close();
-	                        zk = new ZooKeeper(
-	                                    ZookeeperClient.this.getConnectString(),
-	                                    ZookeeperClient.this.getSessionTimeout(),
-	                                    new SessionWatcher(countDownLatch));
-	                        countDownLatch.await(20, TimeUnit.SECONDS);
-	                        ZookeeperClient.this.isAvailable = true;
-	                    } catch (IOException e) {
-	                        logger.error("Can't connect zookeeper "
-	                                     + ZookeeperClient.this.getConnectString()
-	                                     + " with : " + e.toString());
-	                        e.printStackTrace();
-	        	            retryTimes++;
-	        	        	if (retryTimes > maxRetryTimes) {
-	        	        		logger.error("Can't connect zookeeper " + ZookeeperClient.this.connectString + ", maybe wrong address or zookeeper have down.");
-	        	        		break;
-	        	        	}
-	                    } catch (InterruptedException e) {
-	                        logger.error("Connect zookeeper "
-	                                     + ZookeeperClient.this.getConnectString()
-	                                     + " timeout : " + e.toString());
-	                        e.printStackTrace();
-	        	            retryTimes++;
-	        	        	if (retryTimes > maxRetryTimes) {
-	        	        		logger.error("Can't connect zookeeper " + ZookeeperClient.this.connectString + ", maybe wrong address or zookeeper have down.");
-	        	        		break;
-	        	        	}
-	                    }
-	                }
+                    ZookeeperClient.this.isAvailable = false;
+                    int retryTimes = 0;
+                    while (!ZookeeperClient.this.isAvailable) {
+                        try {
+                            countDownLatch = new CountDownLatch(1);
+                            zk.close();
+                            zk =
+                                    new ZooKeeper(
+                                        ZookeeperClient.this.getConnectString(),
+                                        ZookeeperClient.this.getSessionTimeout(),
+                                        new SessionWatcher(countDownLatch));
+                            if (!countDownLatch.await(20, TimeUnit.SECONDS)) {
+                                logger.error("Can't connect zookeeper "
+                                             + ZookeeperClient.this.getConnectString());
+
+                                retryTimes++;
+                                if (retryTimes > maxRetryTimes) {
+                                    logger.error("Can't connect zookeeper "
+                                                 + ZookeeperClient.this.connectString
+                                                 + ", maybe wrong address or zookeeper have down.");
+                                    throw new IOException(
+                                        "Can't connect zookeeper, maybe wrong address or zookeeper have down.");
+                                }
+                            } else {
+                                ZookeeperClient.this.isAvailable = true;
+                            }
+                        } catch (IOException e) {
+                            logger.error("Can't connect zookeeper "
+                                         + ZookeeperClient.this.getConnectString()
+                                         + " with : " + e.toString());
+                            e.printStackTrace();
+                            retryTimes++;
+                            if (retryTimes > maxRetryTimes) {
+                                logger.error("Can't connect zookeeper "
+                                             + ZookeeperClient.this.connectString
+                                             + ", maybe wrong address or zookeeper have down.");
+                                break;
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         }
@@ -109,24 +117,29 @@ public class ZookeeperClient implements Comparable<ZookeeperClient>, Comparator<
         }
         int retryTimes = 0;
         while (!this.isAvailable) {
-	        final CountDownLatch countDownLatch = new CountDownLatch(1);
-	        zk = new ZooKeeper(connectString, sessionTimeout,
-	                    new SessionWatcher(countDownLatch));
-	        try {
-	        	// BUG await的用法不对
-	            countDownLatch.await(20, TimeUnit.SECONDS);
-	            this.isAvailable = true;
-	        } catch (InterruptedException e) {
-	            logger.error("Can't connect zookeeper "
-	                         + ZookeeperClient.this.getConnectString() + " with : "
-	                         + e.toString());
-	            e.printStackTrace();
-	            retryTimes++;
-	        	if (retryTimes > maxRetryTimes) {
-	        		logger.error("Can't connect zookeeper " + ZookeeperClient.this.connectString + ", maybe wrong address or zookeeper have down.");
-	        		throw new IOException("Can't connect zookeeper, maybe wrong address or zookeeper have down.");
-	        	}
-	        }
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
+            zk =
+                    new ZooKeeper(connectString, sessionTimeout,
+                        new SessionWatcher(countDownLatch));
+            try {
+                if (!countDownLatch.await(20, TimeUnit.SECONDS)) {
+                    logger.error("Can't connect zookeeper "
+                                 + ZookeeperClient.this.getConnectString());
+
+                    retryTimes++;
+                    if (retryTimes > maxRetryTimes) {
+                        logger.error("Can't connect zookeeper "
+                                     + ZookeeperClient.this.connectString
+                                     + ", maybe wrong address or zookeeper have down.");
+                        throw new IOException(
+                            "Can't connect zookeeper, maybe wrong address or zookeeper have down.");
+                    }
+                } else {
+                    this.isAvailable = true;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -193,8 +206,8 @@ public class ZookeeperClient implements Comparable<ZookeeperClient>, Comparator<
             e.printStackTrace();
         }
     }
+
     /**
-     * 
      * @return zk客户端目前的状态
      */
     public States getClientState() {
@@ -203,7 +216,7 @@ public class ZookeeperClient implements Comparable<ZookeeperClient>, Comparator<
         }
         return null;
     }
-    
+
     @Override
     protected void finalize() throws Throwable {
         close();
