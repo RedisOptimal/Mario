@@ -10,4 +10,4 @@
 .*/
 
 #eclipse target directory
-/target
+**/target
