@@ -1,6 +1,15 @@
+/**
+ * Copyright 2014 Renren.com Licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
+ * or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package com.renren.Wario.zookeeper;
 
-import java.awt.image.RescaleOp;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +51,6 @@ public class ZooKeeperClient {
 		try {
 			zk.close();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -58,7 +66,6 @@ public class ZooKeeperClient {
 		try {
 			res = FourLetterWordMain.send4LetterWord(host, port, command);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return res;
@@ -67,7 +74,6 @@ public class ZooKeeperClient {
 	private class SessionWatcher implements Watcher {
 		
 		public void process(WatchedEvent event) {
-			// TODO Auto-generated method stub
 			if(event.getType() == EventType.None) {
 				if(event.getState().equals(KeeperState.SyncConnected)) {
 					countDownLatch.countDown();
@@ -94,11 +100,9 @@ public class ZooKeeperClient {
 					checkRetryTimes();
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				checkRetryTimes();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -116,7 +120,6 @@ public class ZooKeeperClient {
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		ZooKeeperClient zkClient = new ZooKeeperClient("localhost:2181", 3000);
 		
 		if(zkClient.isAvailable) {
