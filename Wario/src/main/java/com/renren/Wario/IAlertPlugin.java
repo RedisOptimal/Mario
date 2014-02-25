@@ -18,22 +18,22 @@ package com.renren.Wario;
 import java.io.IOException;
 import java.util.Comparator;
 
-import com.renren.Wario.zookeeper.ZookeeperClient;
-import com.renren.Wario.zookeeper.ZookeeperClientFactory;
+import com.renren.Wario.zookeeper.ZookeeperClientConfig;
+import com.renren.Wario.zookeeper.ZookeeperConfigFactory;
 
 public abstract class IAlertPlugin implements Runnable, Comparator<IAlertPlugin>, Comparable<IAlertPlugin> {
 	protected final String serviceName;
 	protected final String zookeeperName;
 	protected ISmsSender smsSender = null;
 	protected IMailSender mailSender = null;
-	protected ZookeeperClient zookeeperClient;
+	protected ZookeeperClientConfig zookeeperClient;
 	
 	public IAlertPlugin(String serviceName, String zookeeperName, ISmsSender smsSender, IMailSender mailSender) throws IOException {
 		this.serviceName = serviceName;
 		this.zookeeperName = zookeeperName;
 		this.smsSender = smsSender;
 		this.mailSender = mailSender;
-		zookeeperClient = ZookeeperClientFactory.getFactory().getInstance(zookeeperName);
+		zookeeperClient = ZookeeperConfigFactory.getFactory().getInstance(zookeeperName);
 	}
 
 	public abstract String toHtml();
