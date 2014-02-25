@@ -24,20 +24,21 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.client.FourLetterWordMain;
 
 public class ZooKeeperClient {
-	
-	private static Logger logger = LogManager.getLogger(ZooKeeperClient.class.getName());
-	
+
+	private static Logger logger = LogManager.getLogger(ZooKeeperClient.class
+			.getName());
+
 	private final int maxRetryTimes = 3;
 	private final long waitTime = 20;
-	
+
 	private ZooKeeper zk = null;
 	private String connectString = null;
 	private int sessionTimeout;
-	
+
 	private boolean isAvailable;
 	private int retryTimes;
 	private CountDownLatch countDownLatch = null;
-	
+
 	public ZooKeeperClient(String connectString, int sessionTimeout) {
 		this.connectString = connectString;
 		this.sessionTimeout = sessionTimeout;
@@ -45,7 +46,7 @@ public class ZooKeeperClient {
 
 		connect();
 	}
-	
+
 	public void close() {
 		isAvailable = false;
 		try {
@@ -54,15 +55,16 @@ public class ZooKeeperClient {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public boolean isAvailable() {
 		return isAvailable;
 	}
-	
+
 	public String doCommand(String command) {
 		String res = null;
 		String host = connectString.substring(0, connectString.indexOf(':'));
-		int port = Integer.parseInt(connectString.substring(connectString.indexOf(':') + 1));
+		int port = Integer.parseInt(connectString.substring(connectString
+				.indexOf(':') + 1));
 		try {
 			res = FourLetterWordMain.send4LetterWord(host, port, command);
 		} catch (IOException e) {
@@ -70,32 +72,36 @@ public class ZooKeeperClient {
 		}
 		return res;
 	}
-	
+
 	private class SessionWatcher implements Watcher {
-		
+
 		public void process(WatchedEvent event) {
-			if(event.getType() == EventType.None) {
-				if(event.getState().equals(KeeperState.SyncConnected)) {
+			if (event.getType() == EventType.None) {
+				if (event.getState().equals(KeeperState.SyncConnected)) {
 					countDownLatch.countDown();
-				} else if (event.getState().equals(KeeperState.Expired) || event.getState().equals(KeeperState.Disconnected)) {
+				} else if (event.getState().equals(KeeperState.Expired)
+						|| event.getState().equals(KeeperState.Disconnected)) {
 					isAvailable = false;
 					connect();
 				}
 			}
 		}
 	}
-	
+
 	private void connect() {
 		retryTimes = 0;
-		while(!isAvailable && retryTimes < maxRetryTimes) {
+		while (!isAvailable && retryTimes < maxRetryTimes) {
 			countDownLatch = new CountDownLatch(1);
 			try {
-				if(zk != null) {
+				if (zk != null) {
 					zk.close();
 				}
-				zk = new ZooKeeper(connectString, sessionTimeout, new SessionWatcher());
-				if(countDownLatch.await(waitTime, TimeUnit.SECONDS)) {
+				zk = new ZooKeeper(connectString, sessionTimeout,
+						new SessionWatcher());
+				if (countDownLatch.await(waitTime, TimeUnit.SECONDS)) {
 					isAvailable = true;
+					
+					System.err.println(connectString + " " + sessionTimeout + " connect successfully!");
 				} else {
 					checkRetryTimes();
 				}
@@ -106,28 +112,18 @@ public class ZooKeeperClient {
 				e.printStackTrace();
 			}
 		}
-		if(retryTimes >= maxRetryTimes) {
+		if (retryTimes >= maxRetryTimes) {
 			logger.error("Can't connect zookeeper, maybe wrong address or zookeeper have down.");
 		}
 	}
 
 	private void checkRetryTimes() {
-		retryTimes ++;
+		retryTimes++;
 		logger.error("Can't connect zookeeper " + connectString);
-		if(retryTimes >= maxRetryTimes) {
-			logger.error("Can't connect zookeeper " + connectString + ", maybe wrong address or zookeeper have down.");
+		if (retryTimes >= maxRetryTimes) {
+			logger.error("Can't connect zookeeper " + connectString
+					+ ", maybe wrong address or zookeeper have down.");
 		}
-	}
-	
-	public static void main(String[] args) {
-		ZooKeeperClient zkClient = new ZooKeeperClient("localhost:2181", 3000);
-		
-		if(zkClient.isAvailable) {
-			System.out.println(zkClient.doCommand("ruok"));
-			System.out.println(zkClient.doCommand("stat"));
-		}
-
-		//while(true);
 	}
 
 }

@@ -1,5 +1,5 @@
 {
-	"Zookeeper1":{serverIPList:["localhost:2181","localhost:2182"],sessionTimeout:5000},
-	"Zookeeper2":{serverIPList:["localhost:2181","localhost:2182"],sessionTimeout:4000},
-	"Test1":{serverIPList:["localhost:2181","localhost:2181"],sessionTimeout:100}
+	"Zookeeper1":{serverIPList:["localhost:21811","localhost:21812","localhost:21813","localhost:21814","localhost:21815"],sessionTimeout:5000},
+	"Zookeeper2":{serverIPList:["localhost:21811","localhost:21812","localhost:21813","localhost:21814","localhost:21815"],sessionTimeout:4000},
+	"Test1":{serverIPList:["localhost:2181"],sessionTimeout:1000}
 }
