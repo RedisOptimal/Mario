@@ -60,7 +60,11 @@ public class ZooKeeperClient {
 		return isAvailable;
 	}
 
-	private String doCommand(String command) {
+	public String getConnectionString() {
+		return connectString;
+	}
+
+	public String doCommand(String command) {
 		String res = null;
 		String host = connectString.substring(0, connectString.indexOf(':'));
 		int port = Integer.parseInt(connectString.substring(connectString
@@ -76,6 +80,10 @@ public class ZooKeeperClient {
 	private class SessionWatcher implements Watcher {
 
 		public void process(WatchedEvent event) {
+
+			System.out.println("Watcher process Type is " + event.getType()
+					+ " and State is " + event.getState());
+
 			if (event.getType() == EventType.None) {
 				if (event.getState().equals(KeeperState.SyncConnected)) {
 					countDownLatch.countDown();
@@ -100,15 +108,12 @@ public class ZooKeeperClient {
 						new SessionWatcher());
 				if (countDownLatch.await(waitTime, TimeUnit.SECONDS)) {
 					isAvailable = true;
-
-					System.err.println(connectString + " " + sessionTimeout
-							+ " connect successfully!");
 				} else {
 					checkRetryTimes();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
 				checkRetryTimes();
+				e.printStackTrace();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

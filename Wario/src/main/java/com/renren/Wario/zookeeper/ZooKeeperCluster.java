@@ -32,7 +32,7 @@ public class ZooKeeperCluster {
 	private int sessionTimeout;
 	private String zookeeperName = null;
 
-	private Map<String, ZooKeeperClient> clients = null;
+	public Map<String, ZooKeeperClient> clients = null;
 
 	public ZooKeeperCluster(String zookeeperName, JSONObject object) {
 		this.zookeeperName = zookeeperName;

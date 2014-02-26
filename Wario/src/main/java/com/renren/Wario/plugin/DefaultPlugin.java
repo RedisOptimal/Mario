@@ -17,12 +17,18 @@ package com.renren.Wario.plugin;
 
 public class DefaultPlugin extends IPlugin {
 
+	private final String number = "13888888888";
+	private final String address = "test@test.com";
+
 	@Override
 	public void run() {
-		
-		System.out.println(zookeeperName + " run DefaultPlugn.");
-		mailSender.sendMail("test@test.com", "Call successful");
-		msgSender.sendMessage("1388888888", "Call successful");
+
+		if (!client.isAvailable()) {
+			msgSender.sendMessage(number,
+					"Client " + client.getConnectionString() + " is down!");
+			mailSender.sendMail(address,
+					"Client " + client.getConnectionString() + " is down!");
+		}
 	}
 
 }

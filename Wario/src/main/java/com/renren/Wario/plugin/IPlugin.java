@@ -17,14 +17,21 @@ package com.renren.Wario.plugin;
 
 import com.renren.Wario.mailsender.IMailSender;
 import com.renren.Wario.msgsender.IMsgSender;
+import com.renren.Wario.zookeeper.ZooKeeperClient;
 import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public abstract class IPlugin {
-	
+
 	public String zookeeperName = null;
 	public ZooKeeperCluster cluster = null;
 	public IMsgSender msgSender = null;
 	public IMailSender mailSender = null;
-	
+
+	protected ZooKeeperClient client = null;
+
+	public void setClient(ZooKeeperClient client) {
+		this.client = client;
+	}
+
 	public abstract void run();
 }

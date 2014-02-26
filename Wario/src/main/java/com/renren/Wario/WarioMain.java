@@ -20,8 +20,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.naming.InitialContext;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -32,6 +30,7 @@ import com.renren.Wario.config.ConfigLoader;
 import com.renren.Wario.mailsender.IMailSender;
 import com.renren.Wario.msgsender.IMsgSender;
 import com.renren.Wario.plugin.IPlugin;
+import com.renren.Wario.zookeeper.ZooKeeperClient;
 import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public class WarioMain extends Thread {
@@ -63,7 +62,6 @@ public class WarioMain extends Thread {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		while (true) {
 
 			configLoader.loadConfig();
@@ -75,23 +73,28 @@ public class WarioMain extends Thread {
 			try {
 				sleep(10000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 
 	private void work() {
-		IPlugin plugin = null;
 		Iterator<Entry<String, IPlugin>> it = plugins.entrySet().iterator();
 
 		while (it.hasNext()) {
-			Map.Entry<String, IPlugin> entry = (Map.Entry<String, IPlugin>) it
-					.next();
+			Map.Entry<String, IPlugin> entry = it.next();
 
-			String pluginName = entry.getKey();
-			plugin = entry.getValue();
-
+			process(entry.getValue());
+		}
+	}
+	
+	private void process(IPlugin plugin) {
+		Iterator<Entry<String, ZooKeeperClient>> it = plugin.cluster.clients.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<String, ZooKeeperClient> entry = it.next();
+			
+			plugin.setClient(entry.getValue());
 			plugin.run();
 		}
 	}
@@ -140,7 +143,6 @@ public class WarioMain extends Thread {
 						plugins.put(messionName, plugin);
 					}
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -165,16 +167,12 @@ public class WarioMain extends Thread {
 					mailSenderPackage + mailSenderName).newInstance();
 
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return plugin;
