@@ -15,39 +15,13 @@
  */
 package com.renren.Wario;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.json.JSONObject;
-
-import com.renren.Wario.config.ConfigLoader;
-import com.renren.Wario.zookeeper.ZooKeeperCluster;
-
 public class Main {
-
-	private static Map<String, ZooKeeperCluster> clusters = new HashMap<String, ZooKeeperCluster>();
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		ConfigLoader configLoader = new ConfigLoader();
-		configLoader.loadConfig();
+		WarioMain warioMain = new WarioMain();
+		warioMain.init();
 		
-		Map<String, JSONObject> serverObjects = configLoader.getServerObjects();
-		
-		Iterator<Entry<String, JSONObject>> it = serverObjects.entrySet().iterator();
-		
-		while(it.hasNext()) {
-			Map.Entry<String, JSONObject> entry = (Map.Entry<String, JSONObject>)it.next();
-			String zookeeperName = (String)entry.getKey();
-			JSONObject object = serverObjects.get(zookeeperName);
-			ZooKeeperCluster zookeeperCluster = new ZooKeeperCluster(zookeeperName, object);
-			zookeeperCluster.init();
-			clusters.put(zookeeperName, zookeeperCluster);
-		}
-		
-		while(true);
+		warioMain.run();
 	}
 
 }
