@@ -44,8 +44,6 @@ public class ZooKeeperCluster {
 		clients.clear();
 		connectStrings = readJSONObject();
 		addCliens(connectStrings);
-		
-		System.err.println(zookeeperName + " init successfully!");
 	}
 	
 	public void updateClients(JSONObject object) {
@@ -54,6 +52,7 @@ public class ZooKeeperCluster {
 		Set<String> tmp = getIntersection(connectStrings, newConnectStrings);
 		deleteCliens(getDifference(connectStrings, tmp));
 		addCliens(getDifference(newConnectStrings, tmp));
+		connectStrings = newConnectStrings;
 	}
 	
 	private Set<String> getUnion(Set<String> a, Set<String> b) {
@@ -86,6 +85,7 @@ public class ZooKeeperCluster {
 			String connectString = it.next();
 			ZooKeeperClient zookeeperClient = new ZooKeeperClient(connectString, sessionTimeout);
 			clients.put(connectString, zookeeperClient);
+			System.err.println("Client add for " + zookeeperName + " : " + connectString);
 		}
 	}
 	
@@ -96,6 +96,7 @@ public class ZooKeeperCluster {
 			ZooKeeperClient zookeeperClient = clients.get(connectString);
 			zookeeperClient.close();
 			clients.remove(connectString);
+			System.err.println("Client delete for " + zookeeperName + " : " + connectString);
 		}
 	}
 	
