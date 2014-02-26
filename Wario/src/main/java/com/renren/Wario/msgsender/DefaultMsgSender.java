@@ -19,7 +19,7 @@ public class DefaultMsgSender implements IMsgSender {
 
 	@Override
 	public void sendMessage(String number, String message) {
-		// TODO Auto-generated method stub
+		
 		System.out.println(number + " : " + message);
 	}
 
