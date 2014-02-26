@@ -24,37 +24,52 @@ import javax.naming.InitialContext;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.renren.Wario.config.ConfigLoader;
+import com.renren.Wario.mailsender.IMailSender;
+import com.renren.Wario.msgsender.IMsgSender;
+import com.renren.Wario.plugin.IPlugin;
 import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public class WarioMain extends Thread {
 	
 	private static Logger logger = LogManager.getLogger(WarioMain.class.getName());
-
+	
+	private final String pluginPackage = "com.renren.Wario.plugin.";
+	private final String msgSenderPackage = "com.renren.Wario.msgsender.";
+	private final String mailSenderPackage = "com.renren.Wario.mailsender.";
+	
 	private ConfigLoader configLoader = null;
 	private Map<String, ZooKeeperCluster> clusters = null;
+	private Map<String, IPlugin> plugins = null;
 	
 	public WarioMain() {
 		configLoader = new ConfigLoader();
 		clusters = new HashMap<String, ZooKeeperCluster>();
+		plugins = new HashMap<String, IPlugin>();
 	}
 	
 	public void init() {
 		configLoader.loadConfig();
 		clusters.clear();
 		updateServerConfig(configLoader.serverObjects);
+		plugins.clear();
+		updatePluginConfig(configLoader.pluginObjects);
 	}
 
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		while(true) {
-			System.err.println("start...");
+			
 			configLoader.loadConfig();
 			updateServerConfig(configLoader.serverObjects);
-			System.err.println("end...");
+			updatePluginConfig(configLoader.pluginObjects);
+			
+			work();
+			
 			try {
 				sleep(10000);
 			} catch (InterruptedException e) {
@@ -64,25 +79,84 @@ public class WarioMain extends Thread {
 		}
 	}
 	
+	private void work() {
+		IPlugin plugin = null;
+		Iterator<Entry<String, IPlugin>> it = plugins.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<String, IPlugin> entry = (Map.Entry<String, IPlugin>)it.next();
+			
+			String pluginName = entry.getKey();
+			plugin = entry.getValue();
+			
+			plugin.run();
+		}
+	}
+	
 	private void updateServerConfig(Map<String, JSONObject> serverObjects){
-		ZooKeeperCluster zookeeperCluster = null;
+		ZooKeeperCluster cluster = null;
 		Iterator<Entry<String, JSONObject>> it = serverObjects.entrySet().iterator();
 		
 		while(it.hasNext()) {
 			Map.Entry<String, JSONObject> entry = (Map.Entry<String, JSONObject>)it.next();
 			
-			String zookeeperName = (String)entry.getKey();
-			JSONObject object = serverObjects.get(zookeeperName);
+			String zookeeperName = entry.getKey();
+			JSONObject object = entry.getValue();
 			
 			if(!clusters.containsKey(zookeeperName)) {
-				zookeeperCluster = new ZooKeeperCluster(zookeeperName, object);
-				zookeeperCluster.init();
-				clusters.put(zookeeperName, zookeeperCluster);
+				cluster = new ZooKeeperCluster(zookeeperName, object);
+				cluster.init();
+				clusters.put(zookeeperName, cluster);
 			} else {
-				zookeeperCluster = clusters.get(zookeeperName);
-				zookeeperCluster.updateClients(object);
+				cluster = clusters.get(zookeeperName);
+				cluster.updateClients(object);
 			}
 		}
 	}
 	
+	private void updatePluginConfig(Map<String, JSONObject> pluginObjects) {
+		IPlugin plugin = null;
+		Iterator<Entry<String, JSONObject>> it = pluginObjects.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<String, JSONObject> entry = (Map.Entry<String, JSONObject>)it.next();
+			
+			String pluginName = entry.getKey();
+			JSONObject object = entry.getValue();
+			
+			if(!plugins.containsKey(pluginName)) {
+				plugin = createPlugin(pluginName, object);
+				plugins.put(pluginName, plugin);
+			}
+		}
+	}
+	
+	private IPlugin createPlugin(String pluginName, JSONObject object) {
+		IPlugin plugin = null;
+		try {
+			String zookeeperName = object.getString("zookeeperName");
+			String msgSenderName = object.getString("msgSender");
+			String mailSenderName = object.getString("mailSender");
+			
+			plugin = (IPlugin)Class.forName(pluginPackage + pluginName).newInstance();
+			plugin.zookeeperName = zookeeperName;
+			plugin.cluster = clusters.get(zookeeperName);
+			plugin.msgSender = (IMsgSender)Class.forName(msgSenderPackage + msgSenderName).newInstance();
+			plugin.mailSender = (IMailSender)Class.forName(mailSenderPackage + mailSenderName).newInstance();
+			
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return plugin;
+	}
 }

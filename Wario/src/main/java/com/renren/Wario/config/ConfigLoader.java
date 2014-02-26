@@ -71,9 +71,9 @@ public class ConfigLoader {
 			Iterator<?> iterator = jsonObject.keys();
 			pluginObjects.clear();
 			while (iterator.hasNext()) {
-				String serviceName = (String) iterator.next();
-				pluginObjects.put(serviceName,
-						jsonObject.getJSONObject(serviceName));
+				String pluginName = (String) iterator.next();
+				pluginObjects.put(pluginName,
+						jsonObject.getJSONObject(pluginName));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
