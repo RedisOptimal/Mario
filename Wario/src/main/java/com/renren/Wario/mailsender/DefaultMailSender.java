@@ -19,7 +19,7 @@ public class DefaultMailSender implements IMailSender {
 
 	@Override
 	public void sendMail(String address, String message) {
-		// TODO Auto-generated method stub
+		
 		System.out.println(address + " : " + message);
 	}
 
