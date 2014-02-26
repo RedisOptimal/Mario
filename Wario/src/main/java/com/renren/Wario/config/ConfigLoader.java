@@ -35,21 +35,13 @@ public class ConfigLoader {
 
 	private String serverConfigText = null;
 	private String pluginConfigText = null;
-	
-	private Map<String, JSONObject> serverObjects = null;
-	private Map<String, JSONObject> pluginObjects = null;
-	
+
+	public Map<String, JSONObject> serverObjects = null;
+	public Map<String, JSONObject> pluginObjects = null;
+
 	public ConfigLoader() {
 		serverObjects = new HashMap<String, JSONObject>();
 		pluginObjects = new HashMap<String, JSONObject>();
-	}
-	
-	public Map<String, JSONObject> getServerObjects() {
-		return serverObjects;
-	}
-
-	public Map<String, JSONObject> getPluginObjects() {
-		return pluginObjects;
 	}
 
 	public void loadConfig() {
@@ -61,7 +53,8 @@ public class ConfigLoader {
 			serverObjects.clear();
 			while (iterator.hasNext()) {
 				String zookeeperName = (String) iterator.next();
-				serverObjects.put(zookeeperName, jsonObject.getJSONObject(zookeeperName));
+				serverObjects.put(zookeeperName,
+						jsonObject.getJSONObject(zookeeperName));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -76,9 +69,11 @@ public class ConfigLoader {
 					+ pluginConfigFile);
 			JSONObject jsonObject = new JSONObject(pluginConfigText);
 			Iterator<?> iterator = jsonObject.keys();
+			pluginObjects.clear();
 			while (iterator.hasNext()) {
 				String serviceName = (String) iterator.next();
-				pluginObjects.put(serviceName, jsonObject.getJSONObject(serviceName));
+				pluginObjects.put(serviceName,
+						jsonObject.getJSONObject(serviceName));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
