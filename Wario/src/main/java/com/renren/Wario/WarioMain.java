@@ -15,28 +15,74 @@
  */
 package com.renren.Wario;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.naming.InitialContext;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
-public class WarioMain {
-	private static Logger logger = LogManager
-			.getLogger(WarioMain.class.getName());
+import com.renren.Wario.config.ConfigLoader;
+import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
+public class WarioMain extends Thread {
 	
-	private PluginManager pluginManager = PluginManager.getInstance();
+	private static Logger logger = LogManager.getLogger(WarioMain.class.getName());
+
+	private ConfigLoader configLoader = null;
+	private Map<String, ZooKeeperCluster> clusters = null;
 	
-	private WarioMain() {
-		
+	public WarioMain() {
+		configLoader = new ConfigLoader();
+		clusters = new HashMap<String, ZooKeeperCluster>();
+	}
+	
+	public void init() {
+		configLoader.loadConfig();
+		clusters.clear();
+		updateServerConfig(configLoader.serverObjects);
 	}
 
-	/**
-	 * Main function.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		WarioMain mainInstance = new WarioMain();
-		
-		while (true);
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		while(true) {
+			System.err.println("start...");
+			configLoader.loadConfig();
+			updateServerConfig(configLoader.serverObjects);
+			System.err.println("end...");
+			try {
+				sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
-
+	
+	private void updateServerConfig(Map<String, JSONObject> serverObjects){
+		ZooKeeperCluster zookeeperCluster = null;
+		Iterator<Entry<String, JSONObject>> it = serverObjects.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<String, JSONObject> entry = (Map.Entry<String, JSONObject>)it.next();
+			
+			String zookeeperName = (String)entry.getKey();
+			JSONObject object = serverObjects.get(zookeeperName);
+			
+			if(!clusters.containsKey(zookeeperName)) {
+				zookeeperCluster = new ZooKeeperCluster(zookeeperName, object);
+				zookeeperCluster.init();
+				clusters.put(zookeeperName, zookeeperCluster);
+			} else {
+				zookeeperCluster = clusters.get(zookeeperName);
+				zookeeperCluster.updateClients(object);
+			}
+		}
+	}
+	
 }
