@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,11 +38,11 @@ public class ConfigLoader {
 	private String pluginConfigText = null;
 
 	public Map<String, JSONObject> serverObjects = null;
-	public Map<String, JSONObject> pluginObjects = null;
+	public Map<String, JSONArray> pluginObjects = null;
 
 	public ConfigLoader() {
 		serverObjects = new HashMap<String, JSONObject>();
-		pluginObjects = new HashMap<String, JSONObject>();
+		pluginObjects = new HashMap<String, JSONArray>();
 	}
 
 	public void loadConfig() {
@@ -73,7 +74,7 @@ public class ConfigLoader {
 			while (iterator.hasNext()) {
 				String pluginName = (String) iterator.next();
 				pluginObjects.put(pluginName,
-						jsonObject.getJSONObject(pluginName));
+						jsonObject.getJSONArray(pluginName));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
