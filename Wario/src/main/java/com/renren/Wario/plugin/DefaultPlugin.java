@@ -19,7 +19,7 @@ public class DefaultPlugin extends IPlugin {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		
 		System.out.println(zookeeperName + " run DefaultPlugn.");
 		mailSender.sendMail("test@test.com", "Call successful");
 		msgSender.sendMessage("1388888888", "Call successful");
