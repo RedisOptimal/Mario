@@ -24,6 +24,7 @@ import javax.naming.InitialContext;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,23 +35,24 @@ import com.renren.Wario.plugin.IPlugin;
 import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public class WarioMain extends Thread {
-	
-	private static Logger logger = LogManager.getLogger(WarioMain.class.getName());
-	
+
+	private static Logger logger = LogManager.getLogger(WarioMain.class
+			.getName());
+
 	private final String pluginPackage = "com.renren.Wario.plugin.";
 	private final String msgSenderPackage = "com.renren.Wario.msgsender.";
 	private final String mailSenderPackage = "com.renren.Wario.mailsender.";
-	
+
 	private ConfigLoader configLoader = null;
 	private Map<String, ZooKeeperCluster> clusters = null;
 	private Map<String, IPlugin> plugins = null;
-	
+
 	public WarioMain() {
 		configLoader = new ConfigLoader();
 		clusters = new HashMap<String, ZooKeeperCluster>();
 		plugins = new HashMap<String, IPlugin>();
 	}
-	
+
 	public void init() {
 		configLoader.loadConfig();
 		clusters.clear();
@@ -62,14 +64,14 @@ public class WarioMain extends Thread {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		while(true) {
-			
+		while (true) {
+
 			configLoader.loadConfig();
 			updateServerConfig(configLoader.serverObjects);
 			updatePluginConfig(configLoader.pluginObjects);
-			
+
 			work();
-			
+
 			try {
 				sleep(10000);
 			} catch (InterruptedException e) {
@@ -78,32 +80,35 @@ public class WarioMain extends Thread {
 			}
 		}
 	}
-	
+
 	private void work() {
 		IPlugin plugin = null;
 		Iterator<Entry<String, IPlugin>> it = plugins.entrySet().iterator();
-		
-		while(it.hasNext()) {
-			Map.Entry<String, IPlugin> entry = (Map.Entry<String, IPlugin>)it.next();
-			
+
+		while (it.hasNext()) {
+			Map.Entry<String, IPlugin> entry = (Map.Entry<String, IPlugin>) it
+					.next();
+
 			String pluginName = entry.getKey();
 			plugin = entry.getValue();
-			
+
 			plugin.run();
 		}
 	}
-	
-	private void updateServerConfig(Map<String, JSONObject> serverObjects){
+
+	private void updateServerConfig(Map<String, JSONObject> serverObjects) {
 		ZooKeeperCluster cluster = null;
-		Iterator<Entry<String, JSONObject>> it = serverObjects.entrySet().iterator();
-		
-		while(it.hasNext()) {
-			Map.Entry<String, JSONObject> entry = (Map.Entry<String, JSONObject>)it.next();
-			
+		Iterator<Entry<String, JSONObject>> it = serverObjects.entrySet()
+				.iterator();
+
+		while (it.hasNext()) {
+			Map.Entry<String, JSONObject> entry = (Map.Entry<String, JSONObject>) it
+					.next();
+
 			String zookeeperName = entry.getKey();
 			JSONObject object = entry.getValue();
-			
-			if(!clusters.containsKey(zookeeperName)) {
+
+			if (!clusters.containsKey(zookeeperName)) {
 				cluster = new ZooKeeperCluster(zookeeperName, object);
 				cluster.init();
 				clusters.put(zookeeperName, cluster);
@@ -113,37 +118,52 @@ public class WarioMain extends Thread {
 			}
 		}
 	}
-	
-	private void updatePluginConfig(Map<String, JSONObject> pluginObjects) {
+
+	private void updatePluginConfig(Map<String, JSONArray> pluginObjects) {
 		IPlugin plugin = null;
-		Iterator<Entry<String, JSONObject>> it = pluginObjects.entrySet().iterator();
-		
-		while(it.hasNext()) {
-			Map.Entry<String, JSONObject> entry = (Map.Entry<String, JSONObject>)it.next();
-			
+		Iterator<Entry<String, JSONArray>> it = pluginObjects.entrySet()
+				.iterator();
+
+		while (it.hasNext()) {
+			Map.Entry<String, JSONArray> entry = it.next();
+
 			String pluginName = entry.getKey();
-			JSONObject object = entry.getValue();
+			JSONArray arrary = entry.getValue();
 			
-			if(!plugins.containsKey(pluginName)) {
-				plugin = createPlugin(pluginName, object);
-				plugins.put(pluginName, plugin);
+			for(int i = 0; i < arrary.length(); ++ i) {
+				JSONObject object;
+				try {
+					object = arrary.getJSONObject(i);
+					String messionName = object.getString("messionName");
+					if (!plugins.containsKey(messionName)) {
+						plugin = createPlugin(pluginName, object);
+						plugins.put(messionName, plugin);
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+				
 		}
 	}
-	
+
 	private IPlugin createPlugin(String pluginName, JSONObject object) {
 		IPlugin plugin = null;
 		try {
 			String zookeeperName = object.getString("zookeeperName");
 			String msgSenderName = object.getString("msgSender");
 			String mailSenderName = object.getString("mailSender");
-			
-			plugin = (IPlugin)Class.forName(pluginPackage + pluginName).newInstance();
+
+			plugin = (IPlugin) Class.forName(pluginPackage + pluginName)
+					.newInstance();
 			plugin.zookeeperName = zookeeperName;
 			plugin.cluster = clusters.get(zookeeperName);
-			plugin.msgSender = (IMsgSender)Class.forName(msgSenderPackage + msgSenderName).newInstance();
-			plugin.mailSender = (IMailSender)Class.forName(mailSenderPackage + mailSenderName).newInstance();
-			
+			plugin.msgSender = (IMsgSender) Class.forName(
+					msgSenderPackage + msgSenderName).newInstance();
+			plugin.mailSender = (IMailSender) Class.forName(
+					mailSenderPackage + mailSenderName).newInstance();
+
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -156,7 +176,7 @@ public class WarioMain extends Thread {
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 		return plugin;
 	}
 }
