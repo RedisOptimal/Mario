@@ -26,14 +26,15 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 public class FileReader {
-	
-	private static Logger logger = LogManager.getLogger(FileReader.class.getName());
-	
+
+	private static Logger logger = LogManager.getLogger(FileReader.class
+			.getName());
+
 	public static String read(String path) throws IOException {
 		String text = "";
 		File file = new File(path);
 		InputStreamReader in = null;
-		BufferedReader reader = null;		
+		BufferedReader reader = null;
 		try {
 			in = new InputStreamReader(new FileInputStream(file));
 			reader = new BufferedReader(in);
@@ -41,7 +42,7 @@ public class FileReader {
 			while ((line = reader.readLine()) != null) {
 				text = text + line;
 			}
-			
+
 		} catch (FileNotFoundException e) {
 			logger.error("File not found. path = " + path);
 			e.printStackTrace();
@@ -54,16 +55,6 @@ public class FileReader {
 			}
 		}
 		return text;
-	}
-	
-	public static void main(String[] args) {
-		try {
-			System.out.println(FileReader.read("./conf/server.json"));
-			System.out.println(FileReader.read("./conf/plugin.json"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 	}
 
 }
