@@ -83,23 +83,41 @@ public class ZooKeeperCluster {
 		Iterator<String> it = connectStrings.iterator();
 		while (it.hasNext()) {
 			String connectString = it.next();
-			ZooKeeperClient zookeeperClient = new ZooKeeperClient(
-					connectString, sessionTimeout);
-			clients.put(connectString, zookeeperClient);
-			System.err.println("Client add for " + zookeeperName + " : "
-					+ connectString);
+			if (!clients.containsKey(connectString)) {
+				AddClient add = new AddClient(connectString, sessionTimeout);
+				new Thread(add).start();
+			}
 		}
+	}
+
+	private class AddClient implements Runnable {
+
+		private String connectString = null;
+		private int sessionTimeout;
+
+		public AddClient(String connectString, int sessionTimeout) {
+			this.connectString = connectString;
+			this.sessionTimeout = sessionTimeout;
+		}
+
+		@Override
+		public void run() {
+			ZooKeeperClient client = new ZooKeeperClient(connectString,
+					sessionTimeout);
+			clients.put(connectString, client);
+		}
+
 	}
 
 	private void deleteCliens(Set<String> connectStrings) {
 		Iterator<String> it = connectStrings.iterator();
 		while (it.hasNext()) {
 			String connectString = it.next();
-			ZooKeeperClient zookeeperClient = clients.get(connectString);
-			zookeeperClient.close();
-			clients.remove(connectString);
-			System.err.println("Client delete for " + zookeeperName + " : "
-					+ connectString);
+			if (clients.containsKey(connectString)) {
+				ZooKeeperClient zookeeperClient = clients.get(connectString);
+				zookeeperClient.close();
+				clients.remove(connectString);
+			}
 		}
 	}
 
@@ -117,7 +135,6 @@ public class ZooKeeperCluster {
 			e.printStackTrace();
 		}
 		return res;
-
 	}
 
 }
