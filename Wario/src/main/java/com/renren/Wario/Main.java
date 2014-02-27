@@ -21,7 +21,7 @@ public class Main {
 		WarioMain warioMain = new WarioMain();
 		warioMain.init();
 		
-		warioMain.run();
+		warioMain.start();
 	}
 
 }

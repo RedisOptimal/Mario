@@ -20,8 +20,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,9 +32,6 @@ import com.renren.Wario.zookeeper.ZooKeeperClient;
 import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public class WarioMain extends Thread {
-
-	private static Logger logger = LogManager.getLogger(WarioMain.class
-			.getName());
 
 	private final String pluginPackage = "com.renren.Wario.plugin.";
 	private final String msgSenderPackage = "com.renren.Wario.msgsender.";

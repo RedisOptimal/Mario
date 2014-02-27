@@ -1,12 +1,17 @@
 /**
- * Copyright 2014 Renren.com Licensed under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ *    Copyright 2014 Renren.com
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package com.renren.Wario.zookeeper;
 
@@ -21,7 +26,6 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.client.FourLetterWordMain;
 
 public class ZooKeeperClient {
 
@@ -64,22 +68,13 @@ public class ZooKeeperClient {
 		return connectString;
 	}
 
-	public String doCommand(String command) {
-		String res = null;
-		String host = connectString.substring(0, connectString.indexOf(':'));
-		int port = Integer.parseInt(connectString.substring(connectString
-				.indexOf(':') + 1));
-		try {
-			res = FourLetterWordMain.send4LetterWord(host, port, command);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return res;
-	}
-
 	private class SessionWatcher implements Watcher {
 
 		public void process(WatchedEvent event) {
+
+			logger.info("SessionWatcher: " + connectString + "|" + event.getType()
+					+ "|" + event.getState());
+
 			if (event.getType() == EventType.None) {
 				if (event.getState().equals(KeeperState.SyncConnected)) {
 					isAvailable = true;
@@ -114,17 +109,15 @@ public class ZooKeeperClient {
 			}
 		}
 		if (retryTimes >= maxRetryTimes) {
-			logger.error("Can't connect zookeeper, maybe wrong address or zookeeper have down.");
+			logger.error("Can't connect to zookeeper. connectString = "
+					+ connectString);
 		}
 	}
 
 	private void checkRetryTimes() {
 		retryTimes++;
-		logger.error("Can't connect zookeeper " + connectString);
-		if (retryTimes >= maxRetryTimes) {
-			logger.error("Can't connect zookeeper " + connectString
-					+ ", maybe wrong address or zookeeper have down.");
-		}
+		logger.error("Connect to zookeeper failed " + retryTimes
+				+ " time(s). connectString = " + connectString);
 	}
 
 }

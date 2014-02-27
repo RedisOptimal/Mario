@@ -28,7 +28,8 @@ import org.json.JSONObject;
 
 public class ConfigLoader {
 
-	Logger logger = LogManager.getLogger(ConfigLoader.class.getName());
+	private static Logger logger = LogManager.getLogger(ConfigLoader.class
+			.getName());
 
 	private final String configPathPrefix = "./conf/";
 	private final String serverConfigFile = "server.json";
