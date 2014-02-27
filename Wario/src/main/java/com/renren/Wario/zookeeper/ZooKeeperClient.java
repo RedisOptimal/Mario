@@ -80,12 +80,9 @@ public class ZooKeeperClient {
 	private class SessionWatcher implements Watcher {
 
 		public void process(WatchedEvent event) {
-
-			System.out.println("Watcher process Type is " + event.getType()
-					+ " and State is " + event.getState());
-
 			if (event.getType() == EventType.None) {
 				if (event.getState().equals(KeeperState.SyncConnected)) {
+					isAvailable = true;
 					countDownLatch.countDown();
 				} else if (event.getState().equals(KeeperState.Expired)
 						|| event.getState().equals(KeeperState.Disconnected)) {
@@ -106,9 +103,7 @@ public class ZooKeeperClient {
 				}
 				zk = new ZooKeeper(connectString, sessionTimeout,
 						new SessionWatcher());
-				if (countDownLatch.await(waitTime, TimeUnit.SECONDS)) {
-					isAvailable = true;
-				} else {
+				if (!countDownLatch.await(waitTime, TimeUnit.SECONDS)) {
 					checkRetryTimes();
 				}
 			} catch (IOException e) {
