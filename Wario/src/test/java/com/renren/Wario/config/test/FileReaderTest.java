@@ -63,7 +63,6 @@ public class FileReaderTest {
 			String fileContent = FileReader.read("tmp.txt");
 		} catch (IOException e) {
 			Assert.assertTrue(e instanceof FileNotFoundException);
-			e.printStackTrace();
 		}	
 		
 		try {
