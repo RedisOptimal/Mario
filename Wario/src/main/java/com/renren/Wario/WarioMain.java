@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +34,9 @@ import com.renren.Wario.zookeeper.ZooKeeperClient;
 import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public class WarioMain extends Thread {
+
+	private static Logger logger = LogManager.getLogger(WarioMain.class
+			.getName());
 
 	private final String pluginPackage = "com.renren.Wario.plugin.";
 	private final String msgSenderPackage = "com.renren.Wario.msgsender.";
@@ -63,32 +68,32 @@ public class WarioMain extends Thread {
 			updateServerConfig(configLoader.serverObjects);
 			updatePluginConfig(configLoader.pluginObjects);
 
-			work();
-
 			try {
 				sleep(10000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+
+			Iterator<Entry<String, IPlugin>> it = plugins.entrySet().iterator();
+
+			while (it.hasNext()) {
+				Map.Entry<String, IPlugin> entry = it.next();
+
+				processPlugin(entry.getValue());
+			}
 		}
 	}
 
-	private void work() {
-		Iterator<Entry<String, IPlugin>> it = plugins.entrySet().iterator();
+	private void processPlugin(IPlugin plugin) {
+		logger.info("Plugin " + plugin.getClass().getName().toString()
+				+ " runs at " + plugin.zookeeperName);
+
+		Iterator<Entry<String, ZooKeeperClient>> it = plugin.cluster.clients
+				.entrySet().iterator();
 
 		while (it.hasNext()) {
-			Map.Entry<String, IPlugin> entry = it.next();
-
-			process(entry.getValue());
-		}
-	}
-	
-	private void process(IPlugin plugin) {
-		Iterator<Entry<String, ZooKeeperClient>> it = plugin.cluster.clients.entrySet().iterator();
-		
-		while(it.hasNext()) {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();
-			
+
 			plugin.setClient(entry.getValue());
 			plugin.run();
 		}
@@ -127,8 +132,8 @@ public class WarioMain extends Thread {
 
 			String pluginName = entry.getKey();
 			JSONArray arrary = entry.getValue();
-			
-			for(int i = 0; i < arrary.length(); ++ i) {
+
+			for (int i = 0; i < arrary.length(); ++i) {
 				JSONObject object;
 				try {
 					object = arrary.getJSONObject(i);
@@ -141,7 +146,7 @@ public class WarioMain extends Thread {
 					e.printStackTrace();
 				}
 			}
-				
+
 		}
 	}
 

@@ -1,8 +1,5 @@
 {
 	"DefaultPlugin":[
-		{messionName:"Agent1",zookeeperName:"Zookeeper1",msgSender:"DefaultMsgSender",mailSender:"DefaultMailSender"},
-		{messionName:"Agent2",zookeeperName:"Zookeeper2",msgSender:"DefaultMsgSender",mailSender:"DefaultMailSender"},
-		{messionName:"Agent3",zookeeperName:"Zookeeper3",msgSender:"DefaultMsgSender",mailSender:"DefaultMailSender"},
-		{messionName:"Agent4",zookeeperName:"Test1",msgSender:"DefaultMsgSender",mailSender:"DefaultMailSender"}
+		{messionName:"Agent1",zookeeperName:"Zookeeper1",msgSender:"DefaultMsgSender",mailSender:"DefaultMailSender"}
 	]
 }

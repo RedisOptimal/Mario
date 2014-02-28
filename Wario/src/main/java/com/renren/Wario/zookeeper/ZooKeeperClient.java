@@ -34,13 +34,15 @@ public class ZooKeeperClient implements Watcher {
 	private ZooKeeper zk = null;
 	private String connectionString = null;
 	private int sessionTimeout;
-
+	public ZooKeeperState state = null;
+	
 	private boolean isAvailable;
 	private CountDownLatch countDownLatch = null;
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
+		this.state = new ZooKeeperState(connectionString);
 	}
 
 	public void createConnection() {

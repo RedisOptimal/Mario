@@ -23,27 +23,39 @@ import org.apache.zookeeper.client.FourLetterWordMain;
 public class ZooKeeperState {
 	private String host = null;
 	private int port;
-	
-	private String statText = null;
+
 	private String mode = null;
-	
-	public String getMode() {
-		update();
-		return mode;
-	}
-	
-	public ZooKeeperState(String connectString) {
-		String host = connectString.substring(0, connectString.indexOf(':'));
-		int port = Integer.parseInt(connectString.substring(connectString
+
+	public ZooKeeperState(String connectionString) {
+		String host = connectionString.substring(0,
+				connectionString.indexOf(':'));
+		int port = Integer.parseInt(connectionString.substring(connectionString
 				.indexOf(':') + 1));
 		this.host = host;
 		this.port = port;
+		mode = updateMode();
 	}
-	
-	private void update() {
+
+	public boolean isModeChanged() {
+		boolean res = false;
+		String newMode = updateMode();
+		if(newMode != null && !newMode.equals(mode)) {
+			res = true;
+			System.err.println(host + ":" + port + " : " + mode + " -> " + newMode);
+		}
+		mode = newMode;
+		return res;
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	private String updateMode() {
+		String mode = null;
 		try {
-			statText = cmd("stat");
-			
+			String statText = cmd("stat");
+
 			Scanner scanner = new Scanner(statText);
 			while (scanner.hasNext()) {
 				String line = scanner.nextLine();
@@ -55,14 +67,10 @@ public class ZooKeeperState {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return mode;
 	}
-	
+
 	private String cmd(String cmd) throws IOException {
 		return FourLetterWordMain.send4LetterWord(host, port, cmd);
-	}
-	
-	public static void main(String[] args) throws IOException {
-		ZooKeeperState state = new ZooKeeperState("localhost:21815");
-		System.out.println(state.getMode());
 	}
 }
