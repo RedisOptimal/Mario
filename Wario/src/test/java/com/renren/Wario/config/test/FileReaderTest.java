@@ -71,7 +71,7 @@ public class FileReaderTest {
 			Assert.assertTrue(fileContent.equals(fileContent1));
 			fileContent = FileReader.read("tmp.txt");
 			try {
-				Thread.sleep(20000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
