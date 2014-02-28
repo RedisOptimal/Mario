@@ -17,7 +17,6 @@ package com.renren.Wario.zookeeper;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -27,36 +26,65 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooKeeper;
 
-public class ZooKeeperClient {
+public class ZooKeeperClient implements Watcher {
 
 	private static Logger logger = LogManager.getLogger(ZooKeeperClient.class
 			.getName());
 
-	private final int maxRetryTimes = 3;
-	private final long waitTime = 20;
-
 	private ZooKeeper zk = null;
-	private String connectString = null;
+	private String connectionString = null;
 	private int sessionTimeout;
 
 	private boolean isAvailable;
-	private int retryTimes;
 	private CountDownLatch countDownLatch = null;
 
-	public ZooKeeperClient(String connectString, int sessionTimeout) {
-		this.connectString = connectString;
+	public ZooKeeperClient(String connectionString, int sessionTimeout) {
+		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
-		this.isAvailable = false;
-
-		connect();
 	}
 
-	public void close() {
-		isAvailable = false;
+	public void createConnection() {
+		releaseConnection();
+		countDownLatch = new CountDownLatch(1);
+
 		try {
-			zk.close();
-		} catch (InterruptedException e) {
+			zk = new ZooKeeper(connectionString, sessionTimeout, this);
+			countDownLatch.await();
+		} catch (IOException e) {
+			logger.error("Create connection failed! IOException occured!");
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			logger.error("InterruptedException occured!");
+			e.printStackTrace();
+		}
+	}
+
+	public void releaseConnection() {
+		if (zk != null) {
+			try {
+				zk.close();
+				isAvailable = false;
+			} catch (InterruptedException e) {
+				logger.error("InterruptedException occured!");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public void process(WatchedEvent event) {
+		logger.info("SessionWatcher: " + connectionString + "|"
+				+ event.getType() + "|" + event.getState());
+
+		if (event.getType() == EventType.None) {
+			if (event.getState().equals(KeeperState.SyncConnected)) {
+				isAvailable = true;
+				countDownLatch.countDown();
+			} else if (event.getState().equals(KeeperState.Expired)
+					|| event.getState().equals(KeeperState.Disconnected)) {
+				isAvailable = false;
+				createConnection();
+			}
 		}
 	}
 
@@ -65,59 +93,7 @@ public class ZooKeeperClient {
 	}
 
 	public String getConnectionString() {
-		return connectString;
-	}
-
-	private class SessionWatcher implements Watcher {
-
-		public void process(WatchedEvent event) {
-
-			logger.info("SessionWatcher: " + connectString + "|" + event.getType()
-					+ "|" + event.getState());
-
-			if (event.getType() == EventType.None) {
-				if (event.getState().equals(KeeperState.SyncConnected)) {
-					isAvailable = true;
-					countDownLatch.countDown();
-				} else if (event.getState().equals(KeeperState.Expired)
-						|| event.getState().equals(KeeperState.Disconnected)) {
-					isAvailable = false;
-					connect();
-				}
-			}
-		}
-	}
-
-	private void connect() {
-		retryTimes = 0;
-		while (!isAvailable && retryTimes < maxRetryTimes) {
-			countDownLatch = new CountDownLatch(1);
-			try {
-				if (zk != null) {
-					zk.close();
-				}
-				zk = new ZooKeeper(connectString, sessionTimeout,
-						new SessionWatcher());
-				if (!countDownLatch.await(waitTime, TimeUnit.SECONDS)) {
-					checkRetryTimes();
-				}
-			} catch (IOException e) {
-				checkRetryTimes();
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		if (retryTimes >= maxRetryTimes) {
-			logger.error("Can't connect to zookeeper. connectString = "
-					+ connectString);
-		}
-	}
-
-	private void checkRetryTimes() {
-		retryTimes++;
-		logger.error("Connect to zookeeper failed " + retryTimes
-				+ " time(s). connectString = " + connectString);
+		return connectionString;
 	}
 
 }

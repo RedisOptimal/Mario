@@ -104,7 +104,10 @@ public class ZooKeeperCluster {
 		public void run() {
 			ZooKeeperClient client = new ZooKeeperClient(connectString,
 					sessionTimeout);
-			clients.put(connectString, client);
+			synchronized (client) {
+				clients.put(connectString, client);
+			}
+			client.createConnection();
 		}
 
 	}
@@ -115,7 +118,7 @@ public class ZooKeeperCluster {
 			String connectString = it.next();
 			if (clients.containsKey(connectString)) {
 				ZooKeeperClient zookeeperClient = clients.get(connectString);
-				zookeeperClient.close();
+				zookeeperClient.releaseConnection();
 				clients.remove(connectString);
 			}
 		}
@@ -131,7 +134,6 @@ public class ZooKeeperCluster {
 			}
 			sessionTimeout = object.getInt("sessionTimeout");
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return res;
