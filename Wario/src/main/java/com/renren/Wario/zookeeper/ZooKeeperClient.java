@@ -32,11 +32,11 @@ public class ZooKeeperClient implements Watcher {
 			.getName());
 
 	private ZooKeeper zk = null;
-	private String connectionString = null;
-	private int sessionTimeout;
+	private final String connectionString;
+	private final int sessionTimeout;
 	public ZooKeeperState state = null;
 	
-	private boolean isAvailable;
+	private volatile boolean isAvailable;
 	private CountDownLatch countDownLatch = null;
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout) {
@@ -94,8 +94,19 @@ public class ZooKeeperClient implements Watcher {
 		return isAvailable;
 	}
 
+	/**
+	 * 
+	 * @return the connectionString
+	 */
 	public String getConnectionString() {
 		return connectionString;
+	}
+	
+	/**
+	 * @return the sessionTimeout
+	 */
+	public int getSessionTimeout() {
+		return sessionTimeout;
 	}
 
 }
