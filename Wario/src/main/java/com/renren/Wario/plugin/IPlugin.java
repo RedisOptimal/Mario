@@ -20,7 +20,7 @@ import com.renren.Wario.msgsender.IMsgSender;
 import com.renren.Wario.zookeeper.ZooKeeperClient;
 import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
-public abstract class IPlugin {
+public abstract class IPlugin implements Runnable {
 
 	public String zookeeperName = null;
 	public ZooKeeperCluster cluster = null;
@@ -32,6 +32,4 @@ public abstract class IPlugin {
 	public void setClient(ZooKeeperClient client) {
 		this.client = client;
 	}
-
-	public abstract void run();
 }

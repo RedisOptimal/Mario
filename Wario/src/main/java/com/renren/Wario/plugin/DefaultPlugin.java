@@ -22,7 +22,6 @@ public class DefaultPlugin extends IPlugin {
 
 	@Override
 	public void run() {
-
 		if (!client.isAvailable()) {
 			msgSender.sendMessage(number,
 					"Client " + client.getConnectionString() + " is down!");
@@ -30,5 +29,4 @@ public class DefaultPlugin extends IPlugin {
 					"Client " + client.getConnectionString() + " is down!");
 		}
 	}
-
 }
