@@ -62,10 +62,10 @@ public class ZooKeeperClient implements Watcher {
 	}
 
 	public void releaseConnection() {
+		isAvailable = false;
 		if (zk != null) {
 			try {
 				zk.close();
-				isAvailable = false;
 			} catch (InterruptedException e) {
 				logger.error("InterruptedException occured!");
 				e.printStackTrace();
