@@ -84,8 +84,6 @@ public class FileReaderTest {
 		} finally {
 			new File("tmp.txt").delete();
 		}
-		
-		
 	}
 	
 }
