@@ -1,5 +1,0 @@
-{
-	"com.renren.Wario.Plugin1":{zookeeperName:"Zookeeper1",smsSender:"defaultSmsSender",mailSender:"defaultMailSender"},
-	"com.renren.Wario.Plugin2":{zookeeperName:"Zookeeper2",smsSender:"defaultSmsSender",mailSender:"defaultMailSender"},
-	"com.renren.Wario.Plugin3":{zookeeperName:"Test1",smsSender:"defaultSmsSender",mailSender:"defaultMailSender"}
-}

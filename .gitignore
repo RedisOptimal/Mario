@@ -11,3 +11,12 @@
 
 #eclipse target directory
 **/target
+**/bin
+
+#log4j log file
+*.log
+*.log.*
+
+#zkdata derectory
+**/zkdata
+
