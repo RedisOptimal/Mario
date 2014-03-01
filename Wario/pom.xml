@@ -29,7 +29,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<downloadSources>true</downloadSources>
-                    <downloadJavadocs>true</downloadJavadocs>
+					<downloadJavadocs>true</downloadJavadocs>
 					<source>1.6</source>
 					<target>1.6</target>
 					<fork>true</fork>
@@ -63,6 +63,11 @@
 		</plugins>
 	</build>
 	<dependencies>
+		<dependency>
+			<groupId>com.esotericsoftware.reflectasm</groupId>
+			<artifactId>reflectasm</artifactId>
+			<version>1.09</version>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
