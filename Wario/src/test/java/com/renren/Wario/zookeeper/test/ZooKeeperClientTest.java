@@ -27,11 +27,16 @@ import com.renren.Wario.zookeeper.ZooKeeperClient;
 
 public class ZooKeeperClientTest {
 	private static class ZooKeeperBackgroundServer extends Thread {
+		private final String port;
+
+		public ZooKeeperBackgroundServer(String port) {
+			this.port = port;
+		}
 
 		@Override
 		public void run() {
 			String[] args = new String[2];
-			args[0] = "2181";
+			args[0] = port;
 			args[1] = "./zk_test_data/zkdata" + this.getId();
 			QuorumPeerMain.main(args);
 		}
@@ -46,8 +51,25 @@ public class ZooKeeperClientTest {
 		PropertyConfigurator
 				.configure(System.getProperty("user.dir") + File.separator
 						+ "conf" + File.separator + "log4j.properties");
+	}
+
+	@Test
+	public void generalTest() {
+		final ZooKeeperClient zooKeeperClient = new ZooKeeperClient("localhost:2181",
+				5000);
+		Assert.assertFalse(zooKeeperClient.isAvailable());
+		Assert.assertNull(zooKeeperClient.state.getMode());
+		new Thread() {
+			@Override
+			public void run() {
+				zooKeeperClient.createConnection();
+			}
+		}.start();
+		
+		Assert.assertFalse(zooKeeperClient.isAvailable());
+
 		if (zkBackgroundServer == null) {
-			zkBackgroundServer = new ZooKeeperBackgroundServer();
+			zkBackgroundServer = new ZooKeeperBackgroundServer("2181");
 			zkBackgroundServer.setDaemon(true);
 			zkBackgroundServer.start();
 			try {
@@ -56,15 +78,10 @@ public class ZooKeeperClientTest {
 				e.printStackTrace();
 			}
 		}
-	}
 
-	@Test
-	public void generalTest() {
-		ZooKeeperClient zooKeeperClient = new ZooKeeperClient("localhost:2181",
-				5000);
-		Assert.assertFalse(zooKeeperClient.isAvailable());
+		Assert.assertTrue(zooKeeperClient.isAvailable());
+		Assert.assertTrue(zooKeeperClient.state.isModeChanged());
 		Assert.assertEquals(zooKeeperClient.state.getMode(), "standalone");
-		zooKeeperClient.createConnection();
 		Assert.assertEquals(zooKeeperClient.getConnectionString(),
 				"localhost:2181");
 		Assert.assertEquals(zooKeeperClient.getSessionTimeout(), 5000);
@@ -73,7 +90,6 @@ public class ZooKeeperClientTest {
 		Assert.assertFalse(zooKeeperClient.isAvailable());
 		zooKeeperClient.createConnection();
 		Assert.assertTrue(zooKeeperClient.isAvailable());
-		Assert.assertEquals(zooKeeperClient.state.getMode(), "standalone");
 	}
 
 }
