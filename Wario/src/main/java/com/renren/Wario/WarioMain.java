@@ -47,7 +47,7 @@ public class WarioMain extends Thread {
 	private Map<String, IPlugin> plugins = null;
 
 	public WarioMain() {
-		configLoader = new ConfigLoader();
+		configLoader = ConfigLoader.getInstance();
 		clusters = new HashMap<String, ZooKeeperCluster>();
 		plugins = new HashMap<String, IPlugin>();
 	}
@@ -55,9 +55,9 @@ public class WarioMain extends Thread {
 	public void init() {
 		configLoader.loadConfig();
 		clusters.clear();
-		updateServerConfig(configLoader.serverObjects);
+		updateServerConfig(configLoader.getServerObjects());
 		plugins.clear();
-		updatePluginConfig(configLoader.pluginObjects);
+		updatePluginConfig(configLoader.getPluginObjects());
 	}
 
 	@Override
@@ -65,8 +65,8 @@ public class WarioMain extends Thread {
 		while (true) {
 
 			configLoader.loadConfig();
-			updateServerConfig(configLoader.serverObjects);
-			updatePluginConfig(configLoader.pluginObjects);
+			updateServerConfig(configLoader.getServerObjects());
+			updatePluginConfig(configLoader.getPluginObjects());
 
 			try {
 				sleep(10000);

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -31,59 +32,92 @@ public class ConfigLoader {
 	private static Logger logger = LogManager.getLogger(ConfigLoader.class
 			.getName());
 
-	private final String configPathPrefix = "./conf/";
+	// used for singleton
+	private static ConfigLoader configLoader = null;
+	
+	// Configuration variable
+	private final String configPathPrefix;
 	private final String serverConfigFile = "server.json";
 	private final String pluginConfigFile = "plugin.json";
 
 	private String serverConfigText = null;
 	private String pluginConfigText = null;
 
-	public Map<String, JSONObject> serverObjects = null;
-	public Map<String, JSONArray> pluginObjects = null;
+	private Map<String, JSONObject> serverObjects = null;
+	private Map<String, JSONArray> pluginObjects = null;
 
-	public ConfigLoader() {
+	private ConfigLoader() {
+		if (System.getProperty("default.config.path") == null) {
+			configPathPrefix = "./conf/";
+		} else {
+			configPathPrefix = System.getProperty("default.config.path");
+		}
 		serverObjects = new HashMap<String, JSONObject>();
 		pluginObjects = new HashMap<String, JSONArray>();
 	}
 
+	public static synchronized ConfigLoader getInstance() {
+		if (configLoader == null) {
+			configLoader = new ConfigLoader();
+		}
+		return configLoader;
+	}
+	
 	public void loadConfig() {
+		Map<String, JSONObject> tmpServerObjects = new HashMap<String, JSONObject>();
+		String zookeeperName = "";
 		try {
-			serverConfigText = FileReader.read(configPathPrefix
+			serverConfigText = FileCacheReader.read(configPathPrefix
 					+ serverConfigFile);
 			JSONObject jsonObject = new JSONObject(serverConfigText);
 			Iterator<?> iterator = jsonObject.keys();
-			serverObjects.clear();
 			while (iterator.hasNext()) {
-				String zookeeperName = (String) iterator.next();
-				serverObjects.put(zookeeperName,
+				zookeeperName = (String) iterator.next();
+				tmpServerObjects.put(zookeeperName,
 						jsonObject.getJSONObject(zookeeperName));
 			}
+			serverObjects = tmpServerObjects;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Load server config : " + e.toString());
 		} catch (JSONException e) {
-			logger.error("Can't parsing " + serverConfigFile
-					+ ", check the file format.");
-			e.printStackTrace();
+			logger.error("Can't parsing cluster " + zookeeperName
+					+ ", check the file format. " + e.toString());
 		}
-
+		
+		Map<String, JSONArray> tmpPluginObjects = new HashMap<String, JSONArray>();
+		String pluginName = "";
 		try {
-			pluginConfigText = FileReader.read(configPathPrefix
+			pluginConfigText = FileCacheReader.read(configPathPrefix
 					+ pluginConfigFile);
 			JSONObject jsonObject = new JSONObject(pluginConfigText);
 			Iterator<?> iterator = jsonObject.keys();
-			pluginObjects.clear();
 			while (iterator.hasNext()) {
-				String pluginName = (String) iterator.next();
-				pluginObjects.put(pluginName,
+				pluginName = (String) iterator.next();
+				tmpPluginObjects.put(pluginName,
 						jsonObject.getJSONArray(pluginName));
 			}
+			pluginObjects = tmpPluginObjects;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Load plugin config : " + e.toString());
 		} catch (JSONException e) {
-			logger.error("Can't parsing " + pluginConfigFile
-					+ ", check the file format.");
-			e.printStackTrace();
+			logger.error("Can't parsing plugin " + pluginName
+					+ ", check the file format. " + e.toString());
 		}
 	}
+
+	/**
+	 * @return the serverObjects
+	 */
+	public Map<String, JSONObject> getServerObjects() {
+		return serverObjects;
+	}
+
+	/**
+	 * @return the pluginObjects
+	 */
+	public Map<String, JSONArray> getPluginObjects() {
+		return pluginObjects;
+	}
+	
 
 }
