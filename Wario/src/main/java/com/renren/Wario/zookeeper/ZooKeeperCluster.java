@@ -32,7 +32,8 @@ public class ZooKeeperCluster {
 			.getName());
 	
 	private JSONObject object = null;
-	private Set<String> connectStrings = null;
+	//connectStrings 为null会在update的时候出现NullPointException
+	private Set<String> connectStrings = new HashSet<String>();
 	private int sessionTimeout = 10000;
 	private final String zookeeperName;
 
