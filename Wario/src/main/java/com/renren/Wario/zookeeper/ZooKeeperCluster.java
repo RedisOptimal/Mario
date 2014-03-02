@@ -57,13 +57,13 @@ public class ZooKeeperCluster {
 		return zookeeperName;
 	}
 
-	public void init() {
+	public void init() throws JSONException {
 		clients = new HashMap<String, ZooKeeperClient>();
 		connectStrings = readJSONObject();
 		addClients(connectStrings);
 	}
 
-	public void updateClients(JSONObject object) {
+	public void updateClients(JSONObject object) throws JSONException {
 		this.object = object;
 		Set<String> newConnectStrings = readJSONObject();
 		Set<String> tmp = getIntersection(connectStrings, newConnectStrings);
@@ -142,7 +142,7 @@ public class ZooKeeperCluster {
 		}
 	}
 
-	private Set<String> readJSONObject() {
+	private Set<String> readJSONObject() throws JSONException {
 		Set<String> res = new HashSet<String>();
 		try {
 			JSONArray connectStringArray = object.getJSONArray("serverIPList");
@@ -152,6 +152,7 @@ public class ZooKeeperCluster {
 			sessionTimeout = object.getInt("sessionTimeout");
 		} catch (JSONException e) {
 			logger.error("Json format error : " + object.toString() + "\n" + e.toString());
+			throw e;
 		}
 		return res;
 	}

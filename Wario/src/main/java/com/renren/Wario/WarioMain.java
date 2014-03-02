@@ -113,11 +113,19 @@ public class WarioMain extends Thread {
 
 			if (!clusters.containsKey(zookeeperName)) {
 				cluster = new ZooKeeperCluster(zookeeperName, object);
-				cluster.init();
+				try {
+					cluster.init();
+				} catch (JSONException e) {
+					logger.error("Init failed " + zookeeperName + ".");
+				}
 				clusters.put(zookeeperName, cluster);
 			} else {
 				cluster = clusters.get(zookeeperName);
-				cluster.updateClients(object);
+				try {
+					cluster.updateClients(object);
+				} catch (JSONException e) {
+					logger.error("Update failed " + zookeeperName + ".");
+				}
 			}
 		}
 	}
