@@ -33,7 +33,7 @@ public class ZooKeeperCluster {
 	
 	private JSONObject object = null;
 	private Set<String> connectStrings = null;
-	private int sessionTimeout;
+	private int sessionTimeout = 10000;
 	private final String zookeeperName;
 
 	private Map<String, ZooKeeperClient> clients = null;
