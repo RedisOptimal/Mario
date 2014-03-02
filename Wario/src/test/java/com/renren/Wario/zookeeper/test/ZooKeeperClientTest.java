@@ -15,6 +15,9 @@
  */
 package com.renren.Wario.zookeeper.test;
 
+import java.io.File;
+
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -23,25 +26,28 @@ import org.junit.Test;
 import com.renren.Wario.zookeeper.ZooKeeperClient;
 
 public class ZooKeeperClientTest {
-	private static class ZooKeeperBackgroundServer implements Runnable {
+	private static class ZooKeeperBackgroundServer extends Thread {
 
 		@Override
 		public void run() {
 			String[] args = new String[2];
 			args[0] = "2181";
-			args[1] = "./zkdata";
+			args[1] = "./zk_test_data/zkdata" + this.getId();
 			QuorumPeerMain.main(args);
 		}
 	}
-	
-	private static ZooKeeperBackgroundServer zooKeeperBackgroundServer = null;
-	private static Thread zkBackgroundServer = null;
-	
+
+	private static ZooKeeperBackgroundServer zkBackgroundServer = null;
+
 	@BeforeClass
 	public static void init() {
-		if (zooKeeperBackgroundServer == null) {
-			zooKeeperBackgroundServer = new ZooKeeperBackgroundServer();
-			zkBackgroundServer = new Thread(zooKeeperBackgroundServer);
+		new File("Wario.log").delete();
+		System.setProperty("default.config.path", "./");
+		PropertyConfigurator
+				.configure(System.getProperty("user.dir") + File.separator
+						+ "conf" + File.separator + "log4j.properties");
+		if (zkBackgroundServer == null) {
+			zkBackgroundServer = new ZooKeeperBackgroundServer();
 			zkBackgroundServer.setDaemon(true);
 			zkBackgroundServer.start();
 			try {
@@ -51,15 +57,16 @@ public class ZooKeeperClientTest {
 			}
 		}
 	}
-	
-	@SuppressWarnings("deprecation")
+
 	@Test
 	public void generalTest() {
-		ZooKeeperClient zooKeeperClient = new ZooKeeperClient("localhost:2181", 5000);
+		ZooKeeperClient zooKeeperClient = new ZooKeeperClient("localhost:2181",
+				5000);
 		Assert.assertFalse(zooKeeperClient.isAvailable());
 		Assert.assertEquals(zooKeeperClient.state.getMode(), "standalone");
 		zooKeeperClient.createConnection();
-		Assert.assertEquals(zooKeeperClient.getConnectionString(), "localhost:2181");
+		Assert.assertEquals(zooKeeperClient.getConnectionString(),
+				"localhost:2181");
 		Assert.assertEquals(zooKeeperClient.getSessionTimeout(), 5000);
 		Assert.assertTrue(zooKeeperClient.isAvailable());
 		zooKeeperClient.releaseConnection();
@@ -67,7 +74,6 @@ public class ZooKeeperClientTest {
 		zooKeeperClient.createConnection();
 		Assert.assertTrue(zooKeeperClient.isAvailable());
 		Assert.assertEquals(zooKeeperClient.state.getMode(), "standalone");
-		zkBackgroundServer.interrupt();
 	}
-	
+
 }
