@@ -18,5 +18,5 @@
 *.log.*
 
 #zkdata derectory
-**/zkdata
+**/zk_test_data
 
