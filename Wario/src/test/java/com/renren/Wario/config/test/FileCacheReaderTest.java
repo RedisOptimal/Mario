@@ -22,7 +22,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.renren.Wario.config.FileCacheReader;
@@ -56,6 +58,15 @@ public class FileCacheReaderTest {
 		}
 	}
 	
+	@BeforeClass
+	public static void init() {
+		new File("Wario.log").delete();
+		System.setProperty("default.config.path", "./");
+		PropertyConfigurator
+				.configure(System.getProperty("user.dir") + File.separator
+						+ "conf" + File.separator + "log4j.properties");
+	}
+
 	@Test
 	public void generalTest() {
 		try {
