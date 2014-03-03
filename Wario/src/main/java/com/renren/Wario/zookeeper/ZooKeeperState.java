@@ -24,7 +24,14 @@ public class ZooKeeperState {
 	private String host = null;
 	private int port;
 
+	private int minLatency, avgLatency, maxLatency;
+	private int received;
+	private int sent;
+	private int outStanding;
+	private String zxid = null;
 	private String mode = null;
+	private int nodeCount;
+	private int totalWatches;
 
 	public ZooKeeperState(String connectionString) {
 		String host = connectionString.substring(0,
@@ -33,41 +40,98 @@ public class ZooKeeperState {
 				.indexOf(':') + 1));
 		this.host = host;
 		this.port = port;
-		mode = updateMode();
+		update();
 	}
 
-	public boolean isModeChanged() {
-		boolean res = false;
-		String newMode = updateMode();
-		if(newMode != null && !newMode.equals(mode)) {
-			res = true;
-			System.err.println(host + ":" + port + " : " + mode + " -> " + newMode);
+	public void update() {
+		try {
+			String statText = cmd("stat");
+			Scanner scanner = new Scanner(statText);
+			while (scanner.hasNext()) {
+				String line = scanner.nextLine();
+				if (line.startsWith("Latency min/avg/max:")) {
+					String[] latencys = getStringValueFromLine(line).split("/");
+					minLatency = Integer.parseInt(latencys[0]);
+					avgLatency = Integer.parseInt(latencys[1]);
+					maxLatency = Integer.parseInt(latencys[2]);
+				} else if (line.startsWith("Received:")) {
+					received = Integer.parseInt(getStringValueFromLine(line));
+				} else if (line.startsWith("Sent:")) {
+					sent = Integer.parseInt(getStringValueFromLine(line));
+				} else if (line.startsWith("Outstanding:")) {
+					outStanding = Integer
+							.parseInt(getStringValueFromLine(line));
+				} else if (line.startsWith("Zxid:")) {
+					zxid = getStringValueFromLine(line);
+				} else if (line.startsWith("Mode:")) {
+					mode = getStringValueFromLine(line);
+				} else if (line.startsWith("Node count:")) {
+					nodeCount = Integer.parseInt(getStringValueFromLine(line));
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		mode = newMode;
-		return res;
+
+		try {
+			String wchsText = cmd("wchs");
+			Scanner scanner = new Scanner(wchsText);
+			while (scanner.hasNext()) {
+				String line = scanner.nextLine();
+				if (line.startsWith("Total watches:")) {
+					totalWatches = Integer
+							.parseInt(getStringValueFromLine(line));
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public int getMinLatency() {
+		return minLatency;
+	}
+
+	public int getAvgLatency() {
+		return avgLatency;
+	}
+
+	public int getMaxLatency() {
+		return maxLatency;
+	}
+
+	public int getReceived() {
+		return received;
+	}
+
+	public int getSent() {
+		return sent;
+	}
+
+	public int getOutStanding() {
+		return outStanding;
+	}
+
+	public String getZxid() {
+		return zxid;
 	}
 
 	public String getMode() {
 		return mode;
 	}
 
-	private String updateMode() {
-		String mode = null;
-		try {
-			String statText = cmd("stat");
+	public int getNodeCount() {
+		return nodeCount;
+	}
 
-			Scanner scanner = new Scanner(statText);
-			while (scanner.hasNext()) {
-				String line = scanner.nextLine();
-				if (line.startsWith("Mode:")) {
-					mode = line.substring(line.indexOf(":") + 1, line.length())
-							.replaceAll(" ", "");
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return mode;
+	public int getTotalWatches() {
+		return totalWatches;
+	}
+
+	private String getStringValueFromLine(String line) {
+		return line.substring(line.indexOf(":") + 1, line.length()).replaceAll(
+				" ", "");
 	}
 
 	private String cmd(String cmd) throws IOException {

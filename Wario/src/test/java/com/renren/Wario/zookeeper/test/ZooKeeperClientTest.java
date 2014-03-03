@@ -55,8 +55,8 @@ public class ZooKeeperClientTest {
 
 	@Test
 	public void generalTest() {
-		final ZooKeeperClient zooKeeperClient = new ZooKeeperClient("localhost:2181",
-				5000);
+		final ZooKeeperClient zooKeeperClient = new ZooKeeperClient(
+				"localhost:2181", 5000);
 		Assert.assertFalse(zooKeeperClient.isAvailable());
 		Assert.assertNull(zooKeeperClient.state.getMode());
 		new Thread() {
@@ -65,7 +65,7 @@ public class ZooKeeperClientTest {
 				zooKeeperClient.createConnection();
 			}
 		}.start();
-		
+
 		Assert.assertFalse(zooKeeperClient.isAvailable());
 
 		if (zkBackgroundServer == null) {
@@ -80,11 +80,11 @@ public class ZooKeeperClientTest {
 		}
 
 		Assert.assertTrue(zooKeeperClient.isAvailable());
-		Assert.assertTrue(zooKeeperClient.state.isModeChanged());
-		Assert.assertEquals(zooKeeperClient.state.getMode(), "standalone");
-		Assert.assertEquals(zooKeeperClient.getConnectionString(),
-				"localhost:2181");
-		Assert.assertEquals(zooKeeperClient.getSessionTimeout(), 5000);
+		zooKeeperClient.state.update();
+		Assert.assertEquals("standalone", zooKeeperClient.state.getMode());
+		Assert.assertEquals("localhost:2181",
+				zooKeeperClient.getConnectionString());
+		Assert.assertEquals(5000, zooKeeperClient.getSessionTimeout());
 		Assert.assertTrue(zooKeeperClient.isAvailable());
 		zooKeeperClient.releaseConnection();
 		Assert.assertFalse(zooKeeperClient.isAvailable());

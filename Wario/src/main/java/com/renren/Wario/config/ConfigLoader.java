@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -34,7 +33,7 @@ public class ConfigLoader {
 
 	// used for singleton
 	private static ConfigLoader configLoader = null;
-	
+
 	// Configuration variable
 	private final String configPathPrefix;
 	private final String serverConfigFile = "server.json";
@@ -62,7 +61,7 @@ public class ConfigLoader {
 		}
 		return configLoader;
 	}
-	
+
 	public void loadConfig() {
 		Map<String, JSONObject> tmpServerObjects = new HashMap<String, JSONObject>();
 		String zookeeperName = "";
@@ -83,7 +82,7 @@ public class ConfigLoader {
 			logger.error("Can't parsing cluster " + zookeeperName
 					+ ", check the file format. " + e.toString());
 		}
-		
+
 		Map<String, JSONArray> tmpPluginObjects = new HashMap<String, JSONArray>();
 		String pluginName = "";
 		try {
@@ -118,6 +117,5 @@ public class ConfigLoader {
 	public Map<String, JSONArray> getPluginObjects() {
 		return pluginObjects;
 	}
-	
 
 }

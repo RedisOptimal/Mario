@@ -88,8 +88,8 @@ public class WarioMain extends Thread {
 		logger.info("Plugin " + plugin.getClass().getName().toString()
 				+ " runs at " + plugin.zookeeperName);
 
-		Iterator<Entry<String, ZooKeeperClient>> it = plugin.cluster.getClients()
-				.entrySet().iterator();
+		Iterator<Entry<String, ZooKeeperClient>> it = plugin.cluster
+				.getClients().entrySet().iterator();
 
 		while (it.hasNext()) {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();

@@ -29,13 +29,17 @@ public class DefaultPlugin extends IPlugin {
 					"Client " + client.getConnectionString() + " is down!");
 		}
 
-		if (client.state.isModeChanged()) {
+		String oldMode = client.state.getMode();
+		client.state.update();
+		String mode = client.state.getMode();
+
+		if (!mode.equals(oldMode)) {
 			msgSender.sendMessage(number,
 					"Client " + client.getConnectionString()
-							+ " has changed mode to " + client.state.getMode());
-			mailSender.sendMail(number,
+							+ " has changed mode to " + mode);
+			mailSender.sendMail(address,
 					"Client " + client.getConnectionString()
-							+ " has changed mode to " + client.state.getMode());
+							+ " has changed mode to " + mode);
 		}
 	}
 }
