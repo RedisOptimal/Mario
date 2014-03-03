@@ -58,7 +58,6 @@ public class ZooKeeperClientTest {
 		final ZooKeeperClient zooKeeperClient = new ZooKeeperClient(
 				"localhost:2181", 5000);
 		Assert.assertFalse(zooKeeperClient.isAvailable());
-		Assert.assertNull(zooKeeperClient.state.getMode());
 		new Thread() {
 			@Override
 			public void run() {
@@ -80,8 +79,6 @@ public class ZooKeeperClientTest {
 		}
 
 		Assert.assertTrue(zooKeeperClient.isAvailable());
-		zooKeeperClient.state.update();
-		Assert.assertEquals("standalone", zooKeeperClient.state.getMode());
 		Assert.assertEquals("localhost:2181",
 				zooKeeperClient.getConnectionString());
 		Assert.assertEquals(5000, zooKeeperClient.getSessionTimeout());

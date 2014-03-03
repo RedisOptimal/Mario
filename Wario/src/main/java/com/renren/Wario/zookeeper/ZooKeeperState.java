@@ -24,14 +24,14 @@ public class ZooKeeperState {
 	private String host = null;
 	private int port;
 
-	private int minLatency, avgLatency, maxLatency;
-	private int received;
-	private int sent;
-	private int outStanding;
+	private int minLatency = -1, avgLatency = -1, maxLatency = -1;
+	private int received = -1;
+	private int sent = -1;
+	private int outStanding = -1;
 	private String zxid = null;
 	private String mode = null;
-	private int nodeCount;
-	private int totalWatches;
+	private int nodeCount = -1;
+	private int totalWatches = -1;
 
 	public ZooKeeperState(String connectionString) {
 		String host = connectionString.substring(0,
@@ -86,7 +86,6 @@ public class ZooKeeperState {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public int getMinLatency() {
@@ -130,8 +129,8 @@ public class ZooKeeperState {
 	}
 
 	private String getStringValueFromLine(String line) {
-		return line.substring(line.indexOf(":") + 1, line.length()).replaceAll(
-				" ", "");
+		return line.substring(line.indexOf(":") + 1, line.length())
+				.replaceAll(" ", "");
 	}
 
 	private String cmd(String cmd) throws IOException {
