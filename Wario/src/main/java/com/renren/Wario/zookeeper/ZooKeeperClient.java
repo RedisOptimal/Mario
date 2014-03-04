@@ -53,11 +53,9 @@ public class ZooKeeperClient implements Watcher {
 			zk = new ZooKeeper(connectionString, sessionTimeout, this);
 			countDownLatch.await();
 		} catch (IOException e) {
-			logger.error("Create connection failed! IOException occured!");
-			e.printStackTrace();
+			logger.error("Create connection failed! IOException occured!\n" + e.toString());
 		} catch (InterruptedException e) {
-			logger.error("InterruptedException occured!");
-			e.printStackTrace();
+			logger.error("InterruptedException occured!\n" + e.toString());
 		}
 	}
 
@@ -67,8 +65,7 @@ public class ZooKeeperClient implements Watcher {
 			try {
 				zk.close();
 			} catch (InterruptedException e) {
-				logger.error("InterruptedException occured!");
-				e.printStackTrace();
+				logger.error("InterruptedException occured!\n" + e.toString());
 			}
 		}
 	}

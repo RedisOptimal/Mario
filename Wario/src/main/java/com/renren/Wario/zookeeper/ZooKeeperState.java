@@ -18,9 +18,14 @@ package com.renren.Wario.zookeeper;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.apache.zookeeper.client.FourLetterWordMain;
 
 public class ZooKeeperState {
+
+	Logger logger = LogManager.getLogger(ZooKeeperState.class.getName());
+
 	private String host = null;
 	private int port;
 
@@ -70,7 +75,8 @@ public class ZooKeeperState {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Sent stat to client " + host + ":" + port
+					+ " failed!\n" + e.toString());
 		}
 
 		try {
@@ -84,7 +90,8 @@ public class ZooKeeperState {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Sent wchs to client " + host + ":" + port
+					+ " failed!\n" + e.toString());
 		}
 	}
 
@@ -129,8 +136,8 @@ public class ZooKeeperState {
 	}
 
 	private String getStringValueFromLine(String line) {
-		return line.substring(line.indexOf(":") + 1, line.length())
-				.replaceAll(" ", "");
+		return line.substring(line.indexOf(":") + 1, line.length()).replaceAll(
+				" ", "");
 	}
 
 	private String cmd(String cmd) throws IOException {
