@@ -92,7 +92,7 @@ public class ZooKeeperClusterTest {
 		server2.setDaemon(true);
 		server2.start();
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(6000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

@@ -72,7 +72,7 @@ public class ZooKeeperClientTest {
 			zkBackgroundServer.setDaemon(true);
 			zkBackgroundServer.start();
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(6000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
