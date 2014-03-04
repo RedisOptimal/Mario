@@ -95,6 +95,17 @@ public class ZooKeeperState {
 		}
 	}
 
+	public boolean ruok() {
+		String res = "";
+		try {
+			res = cmd("ruok");
+		} catch (IOException e) {
+			logger.error("Sent ruok to client " + host + ":" + port
+					+ " failed!\n" + e.toString());
+		}
+		return res.equals("imok\n");
+	}
+	
 	public int getMinLatency() {
 		return minLatency;
 	}

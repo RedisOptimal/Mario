@@ -19,7 +19,8 @@ public class DefaultPlugin extends IPlugin {
 
 	private final String number = "13888888888";
 	private final String address = "test@test.com";
-
+	private final int maxOutStanding = 5;
+	
 	@Override
 	public void run() {
 		if (!client.isAvailable()) {
@@ -27,6 +28,13 @@ public class DefaultPlugin extends IPlugin {
 					"Client " + client.getConnectionString() + " is down!");
 			mailSender.sendMail(address,
 					"Client " + client.getConnectionString() + " is down!");
+		}
+		
+		if (!client.state.ruok()) {
+			msgSender.sendMessage(number,
+					"Something wrong with client " + client.getConnectionString() + "!");
+			mailSender.sendMail(address,
+					"Something wrong with client " + client.getConnectionString() + "!");
 		}
 
 		String oldMode = client.state.getMode();
@@ -40,6 +48,24 @@ public class DefaultPlugin extends IPlugin {
 			mailSender.sendMail(address,
 					"Client " + client.getConnectionString()
 							+ " has changed mode to " + mode);
+		}
+		
+		if(client.state.getOutStanding() > maxOutStanding) {
+			msgSender.sendMessage(number,
+					"Client " + client.getConnectionString()
+							+ " exceed max outstanding.");
+			mailSender.sendMail(address,
+					"Client " + client.getConnectionString()
+							+ " exceed max outstanding.");
+		}
+		
+		if(!client.canBeUsed()) {
+			msgSender.sendMessage(number,
+					"Client " + client.getConnectionString()
+							+ " can not be used.");
+			mailSender.sendMail(address,
+					"Client " + client.getConnectionString()
+							+ " can not be used.");
 		}
 	}
 }
