@@ -50,7 +50,7 @@ public class ZooKeeperState {
 
 	public void update() {
 		try {
-			String statText = cmd("stat");
+			String statText = cmd("srvr");
 			Scanner scanner = new Scanner(statText);
 			while (scanner.hasNext()) {
 				String line = scanner.nextLine();
