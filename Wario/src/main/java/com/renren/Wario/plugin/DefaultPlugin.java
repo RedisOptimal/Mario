@@ -17,8 +17,8 @@ package com.renren.Wario.plugin;
 
 public class DefaultPlugin extends IPlugin {
 
-	private final String number = "15510606016";
-	private final String address = "zhe.yuan@renren-inc.com";
+	private final String number = "13888888888";
+	private final String address = "test@test.com";
 
 	@Override
 	public void run() {
