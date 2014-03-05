@@ -15,7 +15,9 @@
  */
 package com.renren.Wario.zookeeper;
 
+import java.awt.List;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.LogManager;
@@ -112,12 +114,12 @@ public class ZooKeeperClient implements Watcher {
 	}
 
 	public boolean canBeUsed() {
-		if (zk == null) {
+		boolean res = true;
+		if(zk == null) {
 			return false;
 		}
-		boolean res = false;
 		try {
-			if (exits(ZK_PATH)) {
+			if (exists(ZK_PATH)) {
 				deleteNode(ZK_PATH);
 			}
 			createPath(ZK_PATH, "I am the initial data");
@@ -137,7 +139,23 @@ public class ZooKeeperClient implements Watcher {
 		return res;
 	}
 
-	private boolean exits(String path) throws KeeperException,
+	public int calChildrenNumber(String path) {
+		int res = -1;
+		try {
+			if(zk != null && exists(path)) {
+				res = zk.getChildren(path, false).size();
+			}
+		} catch (KeeperException e) {
+			logger.error("GetChildren failed at client " + connectionString
+					+ ".\n" + e.toString());
+		} catch (InterruptedException e) {
+			logger.error("GetChildren failed at client " + connectionString
+					+ ".\n" + e.toString());
+		}
+		return res;
+	}
+
+	private boolean exists(String path) throws KeeperException,
 			InterruptedException {
 		return zk.exists(ZK_PATH, false) != null;
 	}
