@@ -161,12 +161,12 @@ public class ZooKeeperState {
 	}
 
 	private String cmd(String cmd) {
-		final int sessionTimeout = 10;
+		final int waitTimeout = 5;
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 		SendThread sendThread = new SendThread(countDownLatch, cmd);
 		sendThread.start();
 		try {
-			if (!countDownLatch.await(sessionTimeout, TimeUnit.SECONDS)) {
+			if (!countDownLatch.await(waitTimeout, TimeUnit.SECONDS)) {
 				sendThread.interrupt();
 			}
 		} catch (InterruptedException e) {
