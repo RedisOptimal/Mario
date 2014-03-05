@@ -43,7 +43,7 @@ public class ZooKeeperClient implements Watcher {
 	private CountDownLatch countDownLatch = null;
 
 	private static final String ZK_PATH = "/god_damn_zookeeper";
-	
+
 	public ZooKeeperClient(String connectionString, int sessionTimeout) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
@@ -92,7 +92,7 @@ public class ZooKeeperClient implements Watcher {
 			}
 		}
 	}
-	
+
 	public boolean isAvailable() {
 		return isAvailable;
 	}
@@ -112,43 +112,54 @@ public class ZooKeeperClient implements Watcher {
 	}
 
 	public boolean canBeUsed() {
-		boolean res = true;
+		if (zk == null) {
+			return false;
+		}
+		boolean res = false;
 		try {
-			if(exits(ZK_PATH)) {
+			if (exits(ZK_PATH)) {
 				deleteNode(ZK_PATH);
 			}
 			createPath(ZK_PATH, "I am the initial data");
-			readData(ZK_PATH);
+			res = readData(ZK_PATH).equals("I am the initial data");
 			writeData(ZK_PATH, "I am the updated data");
-			readData(ZK_PATH);
+			res = readData(ZK_PATH).equals("I am the updated data");
 			deleteNode(ZK_PATH);
 		} catch (KeeperException e) {
-			logger.error("Client " + connectionString + " can not be used!\n" + e.toString());
+			logger.error("Client " + connectionString + " can not be used!\n"
+					+ e.toString());
 			res = false;
 		} catch (InterruptedException e) {
-			logger.error("Client " + connectionString + " can not be used!\n" + e.toString());
+			logger.error("Client " + connectionString + " can not be used!\n"
+					+ e.toString());
 			res = false;
 		}
 		return res;
 	}
-	
-	private boolean exits(String path) throws KeeperException, InterruptedException {
+
+	private boolean exits(String path) throws KeeperException,
+			InterruptedException {
 		return zk.exists(ZK_PATH, false) != null;
 	}
-	
-	private void createPath(String path, String data) throws KeeperException, InterruptedException {
-		zk.create(path, data.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+
+	private void createPath(String path, String data) throws KeeperException,
+			InterruptedException {
+		zk.create(path, data.getBytes(), Ids.OPEN_ACL_UNSAFE,
+				CreateMode.EPHEMERAL);
 	}
 
-	private String readData(String path) throws KeeperException, InterruptedException {
+	private String readData(String path) throws KeeperException,
+			InterruptedException {
 		return new String(zk.getData(path, false, null));
 	}
 
-	private void writeData(String path, String data) throws KeeperException, InterruptedException {
+	private void writeData(String path, String data) throws KeeperException,
+			InterruptedException {
 		zk.setData(path, data.getBytes(), -1);
 	}
 
-	private void deleteNode(String path) throws InterruptedException, KeeperException {
+	private void deleteNode(String path) throws InterruptedException,
+			KeeperException {
 		zk.delete(path, -1);
 	}
 
