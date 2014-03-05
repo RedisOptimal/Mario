@@ -44,20 +44,16 @@ public class WarioMain extends Thread {
 
 	private ConfigLoader configLoader = null;
 	private Map<String, ZooKeeperCluster> clusters = null;
-	private Map<String, IPlugin> plugins = null;
 
 	public WarioMain() {
 		configLoader = ConfigLoader.getInstance();
 		clusters = new HashMap<String, ZooKeeperCluster>();
-		plugins = new HashMap<String, IPlugin>();
 	}
 
 	public void init() {
 		configLoader.loadConfig();
 		clusters.clear();
 		updateServerConfig(configLoader.getServerObjects());
-		plugins.clear();
-		updatePluginConfig(configLoader.getPluginObjects());
 	}
 
 	@Override
@@ -66,7 +62,6 @@ public class WarioMain extends Thread {
 
 			configLoader.loadConfig();
 			updateServerConfig(configLoader.getServerObjects());
-			updatePluginConfig(configLoader.getPluginObjects());
 
 			try {
 				sleep(10000);
@@ -74,28 +69,40 @@ public class WarioMain extends Thread {
 				e.printStackTrace();
 			}
 
-			Iterator<Entry<String, IPlugin>> it = plugins.entrySet().iterator();
+			Iterator<Entry<String, JSONArray>> it = configLoader.getPluginObjects().entrySet()
+					.iterator();
 
 			while (it.hasNext()) {
-				Map.Entry<String, IPlugin> entry = it.next();
+				Map.Entry<String, JSONArray> entry = it.next();
 
-				processPlugin(entry.getValue());
+				String pluginName = entry.getKey();
+				JSONArray arrary = entry.getValue();
+
+				for (int i = 0; i < arrary.length(); ++i) {
+					JSONObject object;
+					try {
+						object = arrary.getJSONObject(i);		
+						processPlugin(pluginName, object);						
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+
 			}
 		}
 	}
 
-	private void processPlugin(IPlugin plugin) {
-		logger.info("Plugin " + plugin.getClass().getName().toString()
-				+ " runs at " + plugin.zookeeperName);
+	private void processPlugin(String pluginName, JSONObject object) throws JSONException {
+		String zooKeeperName = object.getString("ZooKeeperName");
 
-		Iterator<Entry<String, ZooKeeperClient>> it = plugin.cluster
+		Iterator<Entry<String, ZooKeeperClient>> it = clusters.get(zooKeeperName)
 				.getClients().entrySet().iterator();
 
 		while (it.hasNext()) {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();
 
-			plugin.setClient(entry.getValue());
-			new Thread(plugin).start();
+			IPlugin plugin = createPlugin(pluginName, object, entry.getValue());
+			plugin.run();
 		}
 	}
 
@@ -130,50 +137,19 @@ public class WarioMain extends Thread {
 		}
 	}
 
-	private void updatePluginConfig(Map<String, JSONArray> pluginObjects) {
-		IPlugin plugin = null;
-		Iterator<Entry<String, JSONArray>> it = pluginObjects.entrySet()
-				.iterator();
-
-		while (it.hasNext()) {
-			Map.Entry<String, JSONArray> entry = it.next();
-
-			String pluginName = entry.getKey();
-			JSONArray arrary = entry.getValue();
-
-			for (int i = 0; i < arrary.length(); ++i) {
-				JSONObject object;
-				try {
-					object = arrary.getJSONObject(i);
-					String messionName = object.getString("messionName");
-					if (!plugins.containsKey(messionName)) {
-						plugin = createPlugin(pluginName, object);
-						plugins.put(messionName, plugin);
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-
-		}
-	}
-
-	private IPlugin createPlugin(String pluginName, JSONObject object) {
+	private IPlugin createPlugin(String pluginName, JSONObject object, ZooKeeperClient client) {
 		IPlugin plugin = null;
 		try {
-			String zookeeperName = object.getString("zookeeperName");
-			String msgSenderName = object.getString("msgSender");
-			String mailSenderName = object.getString("mailSender");
+			String msgSenderName = object.getString("MsgSender");
+			String mailSenderName = object.getString("MailSender");
 
 			plugin = (IPlugin) Class.forName(pluginPackage + pluginName)
 					.newInstance();
-			plugin.zookeeperName = zookeeperName;
-			plugin.cluster = clusters.get(zookeeperName);
 			plugin.msgSender = (IMsgSender) Class.forName(
 					msgSenderPackage + msgSenderName).newInstance();
 			plugin.mailSender = (IMailSender) Class.forName(
 					mailSenderPackage + mailSenderName).newInstance();
-
+			plugin.client = client;
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {

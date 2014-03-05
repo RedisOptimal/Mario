@@ -51,8 +51,6 @@ public class ConfigLoader {
 		} else {
 			configPathPrefix = System.getProperty("default.config.path");
 		}
-		serverObjects = new HashMap<String, JSONObject>();
-		pluginObjects = new HashMap<String, JSONArray>();
 	}
 
 	public static synchronized ConfigLoader getInstance() {

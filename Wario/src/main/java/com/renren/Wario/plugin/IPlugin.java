@@ -22,14 +22,8 @@ import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public abstract class IPlugin implements Runnable {
 
-	public String zookeeperName = null;
-	public ZooKeeperCluster cluster = null;
 	public IMsgSender msgSender = null;
 	public IMailSender mailSender = null;
+	public ZooKeeperClient client = null;
 
-	protected ZooKeeperClient client = null;
-
-	public void setClient(ZooKeeperClient client) {
-		this.client = client;
-	}
 }

@@ -15,9 +15,7 @@
  */
 package com.renren.Wario.zookeeper;
 
-import java.awt.List;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.LogManager;
