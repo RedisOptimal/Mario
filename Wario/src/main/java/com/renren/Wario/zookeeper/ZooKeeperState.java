@@ -17,6 +17,8 @@ package com.renren.Wario.zookeeper;
 
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -26,8 +28,8 @@ public class ZooKeeperState {
 
 	Logger logger = LogManager.getLogger(ZooKeeperState.class.getName());
 
-	private String host = null;
-	private int port;
+	private final String host;
+	private final int port;
 
 	private int minLatency = -1, avgLatency = -1, maxLatency = -1;
 	private int received = -1;
@@ -49,63 +51,46 @@ public class ZooKeeperState {
 	}
 
 	public void update() {
-		try {
-			String statText = cmd("srvr");
-			Scanner scanner = new Scanner(statText);
-			while (scanner.hasNext()) {
-				String line = scanner.nextLine();
-				if (line.startsWith("Latency min/avg/max:")) {
-					String[] latencys = getStringValueFromLine(line).split("/");
-					minLatency = Integer.parseInt(latencys[0]);
-					avgLatency = Integer.parseInt(latencys[1]);
-					maxLatency = Integer.parseInt(latencys[2]);
-				} else if (line.startsWith("Received:")) {
-					received = Integer.parseInt(getStringValueFromLine(line));
-				} else if (line.startsWith("Sent:")) {
-					sent = Integer.parseInt(getStringValueFromLine(line));
-				} else if (line.startsWith("Outstanding:")) {
-					outStanding = Integer
-							.parseInt(getStringValueFromLine(line));
-				} else if (line.startsWith("Zxid:")) {
-					zxid = getStringValueFromLine(line);
-				} else if (line.startsWith("Mode:")) {
-					mode = getStringValueFromLine(line);
-				} else if (line.startsWith("Node count:")) {
-					nodeCount = Integer.parseInt(getStringValueFromLine(line));
-				}
+		String statText = cmd("srvr");
+		Scanner scannerForStat = new Scanner(statText);
+		while (scannerForStat.hasNext()) {
+			String line = scannerForStat.nextLine();
+			if (line.startsWith("Latency min/avg/max:")) {
+				String[] latencys = getStringValueFromLine(line).split("/");
+				minLatency = Integer.parseInt(latencys[0]);
+				avgLatency = Integer.parseInt(latencys[1]);
+				maxLatency = Integer.parseInt(latencys[2]);
+			} else if (line.startsWith("Received:")) {
+				received = Integer.parseInt(getStringValueFromLine(line));
+			} else if (line.startsWith("Sent:")) {
+				sent = Integer.parseInt(getStringValueFromLine(line));
+			} else if (line.startsWith("Outstanding:")) {
+				outStanding = Integer.parseInt(getStringValueFromLine(line));
+			} else if (line.startsWith("Zxid:")) {
+				zxid = getStringValueFromLine(line);
+			} else if (line.startsWith("Mode:")) {
+				mode = getStringValueFromLine(line);
+			} else if (line.startsWith("Node count:")) {
+				nodeCount = Integer.parseInt(getStringValueFromLine(line));
 			}
-		} catch (IOException e) {
-			logger.error("Sent stat to client " + host + ":" + port
-					+ " failed!\n" + e.toString());
 		}
 
-		try {
-			String wchsText = cmd("wchs");
-			Scanner scanner = new Scanner(wchsText);
-			while (scanner.hasNext()) {
-				String line = scanner.nextLine();
-				if (line.startsWith("Total watches:")) {
-					totalWatches = Integer
-							.parseInt(getStringValueFromLine(line));
-				}
+		String wchsText = cmd("wchs");
+		Scanner scannerForWchs = new Scanner(wchsText);
+		while (scannerForWchs.hasNext()) {
+			String line = scannerForWchs.nextLine();
+			if (line.startsWith("Total watches:")) {
+				totalWatches = Integer.parseInt(getStringValueFromLine(line));
 			}
-		} catch (IOException e) {
-			logger.error("Sent wchs to client " + host + ":" + port
-					+ " failed!\n" + e.toString());
 		}
 	}
 
 	public boolean ruok() {
 		String res = "";
-		try {
-			res = cmd("ruok");
-		} catch (IOException e) {
-			logger.error("Sent ruok to client " + host + ":" + port
-					+ " failed!\n" + e.toString());
-		}
+		res = cmd("ruok");
 		return res.equals("imok\n");
 	}
-	
+
 	public int getMinLatency() {
 		return minLatency;
 	}
@@ -151,7 +136,42 @@ public class ZooKeeperState {
 				" ", "");
 	}
 
-	private String cmd(String cmd) throws IOException {
-		return FourLetterWordMain.send4LetterWord(host, port, cmd);
+	private class SendThread extends Thread {
+		private CountDownLatch countDownLatch;
+		private String cmd;
+
+		public String ret = "";
+
+		public SendThread(CountDownLatch countDownLatch, String cmd) {
+			this.countDownLatch = countDownLatch;
+			this.cmd = cmd;
+		}
+
+		@Override
+		public void run() {
+			try {
+				ret = FourLetterWordMain.send4LetterWord(host, port, cmd);
+			} catch (IOException e) {
+				logger.error("Sent " + cmd + " to client " + host + ":" + port
+						+ " failed!\n" + e.toString());
+			}
+			countDownLatch.countDown();
+		}
+
+	}
+
+	private String cmd(String cmd) {
+		final int sessionTimeout = 10;
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+		SendThread sendThread = new SendThread(countDownLatch, cmd);
+		sendThread.start();
+		try {
+			if (!countDownLatch.await(sessionTimeout, TimeUnit.SECONDS)) {
+				sendThread.interrupt();
+			}
+		} catch (InterruptedException e) {
+			logger.error("This will not happen.");
+		}
+		return sendThread.ret;
 	}
 }

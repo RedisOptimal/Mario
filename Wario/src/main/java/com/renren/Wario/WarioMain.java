@@ -95,7 +95,7 @@ public class WarioMain extends Thread {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();
 
 			plugin.setClient(entry.getValue());
-			plugin.run();
+			new Thread(plugin).start();
 		}
 	}
 
