@@ -15,13 +15,23 @@
  */
 package com.renren.Wario;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 public class Main {
+	private static Logger logger = LogManager.getLogger(Main.class
+			.getName());
 	
 	public static void main(String[] args) {
 		WarioMain warioMain = new WarioMain();
 		warioMain.init();
-		
 		warioMain.start();
+		try {
+			warioMain.join();
+			logger.error("WarioMain exited and Main thread will exit.");
+		} catch (InterruptedException e) {
+			logger.error("WarioMain interrupted with " + e.toString());
+		}
 	}
 
 }
