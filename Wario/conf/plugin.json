@@ -1,7 +1,7 @@
 {
 	"DefaultPlugin":[
-		{ZooKeeperName:"Zookeeper1",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender"},
-		{ZooKeeperName:"Zookeeper2",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender"},
-		{ZooKeeperName:"Zookeeper3",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender"}
+		{ZooKeeperName:"Zookeeper1",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"},
+		{ZooKeeperName:"Zookeeper2",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"},
+		{ZooKeeperName:"Zookeeper3",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"}
 	]
 }
