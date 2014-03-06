@@ -18,7 +18,6 @@ package com.renren.Wario.plugin;
 import com.renren.Wario.mailsender.IMailSender;
 import com.renren.Wario.msgsender.IMsgSender;
 import com.renren.Wario.zookeeper.ZooKeeperClient;
-import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public abstract class IPlugin implements Runnable {
 
