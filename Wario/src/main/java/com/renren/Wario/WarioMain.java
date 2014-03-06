@@ -69,8 +69,8 @@ public class WarioMain extends Thread {
 				e.printStackTrace();
 			}
 
-			Iterator<Entry<String, JSONArray>> it = configLoader.getPluginObjects().entrySet()
-					.iterator();
+			Iterator<Entry<String, JSONArray>> it = configLoader
+					.getPluginObjects().entrySet().iterator();
 
 			while (it.hasNext()) {
 				Map.Entry<String, JSONArray> entry = it.next();
@@ -81,8 +81,8 @@ public class WarioMain extends Thread {
 				for (int i = 0; i < arrary.length(); ++i) {
 					JSONObject object;
 					try {
-						object = arrary.getJSONObject(i);		
-						processPlugin(pluginName, object);						
+						object = arrary.getJSONObject(i);
+						processPlugin(pluginName, object);
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
@@ -91,17 +91,23 @@ public class WarioMain extends Thread {
 		}
 	}
 
-	private void processPlugin(String pluginName, JSONObject object) throws JSONException {
+	private void processPlugin(String pluginName, JSONObject object)
+			throws JSONException {
 		String zooKeeperName = object.getString("ZooKeeperName");
 
-		Iterator<Entry<String, ZooKeeperClient>> it = clusters.get(zooKeeperName)
-				.getClients().entrySet().iterator();
+		Iterator<Entry<String, ZooKeeperClient>> it = clusters
+				.get(zooKeeperName).getClients().entrySet().iterator();
 
 		while (it.hasNext()) {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();
 
 			IPlugin plugin = createPlugin(pluginName, object, entry.getValue());
-			plugin.run();
+			try {
+				plugin.run();
+			} catch (Throwable e) {
+				logger.error("Call " + plugin.getClass().getName()
+						+ " plugin run method : " + e.toString());
+			}
 		}
 	}
 
@@ -137,7 +143,8 @@ public class WarioMain extends Thread {
 		}
 	}
 
-	private IPlugin createPlugin(String pluginName, JSONObject object, ZooKeeperClient client) {
+	private IPlugin createPlugin(String pluginName, JSONObject object,
+			ZooKeeperClient client) {
 		IPlugin plugin = null;
 		try {
 			String msgSenderName = object.getString("MsgSender");
