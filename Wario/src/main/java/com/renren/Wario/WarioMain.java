@@ -87,7 +87,6 @@ public class WarioMain extends Thread {
 						e.printStackTrace();
 					}
 				}
-
 			}
 		}
 	}
@@ -123,7 +122,8 @@ public class WarioMain extends Thread {
 				try {
 					cluster.init();
 				} catch (JSONException e) {
-					logger.error("Init failed " + zookeeperName + ".");
+					logger.error("Read JSON object failed.\n"
+							+ object.toString() + "\n" + e.toString());
 				}
 				clusters.put(zookeeperName, cluster);
 			} else {
