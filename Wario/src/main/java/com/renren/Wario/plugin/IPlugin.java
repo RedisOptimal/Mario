@@ -24,5 +24,5 @@ public abstract class IPlugin implements Runnable {
 	public IMsgSender msgSender = null;
 	public IMailSender mailSender = null;
 	public ZooKeeperClient client = null;
-	public byte[] context;
+	public byte[] clusterContext;
 }

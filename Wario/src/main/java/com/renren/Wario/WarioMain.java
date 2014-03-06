@@ -16,9 +16,12 @@
 package com.renren.Wario;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -38,6 +41,9 @@ public class WarioMain extends Thread {
 	private static Logger logger = LogManager.getLogger(WarioMain.class
 			.getName());
 
+	// <pluginName, <ZooKeeperName, context> >
+	private final Map<String, Map<String, byte[]>> clusterContext;
+
 	private final String pluginPackage = "com.renren.Wario.plugin.";
 	private final String msgSenderPackage = "com.renren.Wario.msgsender.";
 	private final String mailSenderPackage = "com.renren.Wario.mailsender.";
@@ -46,6 +52,7 @@ public class WarioMain extends Thread {
 	private Map<String, ZooKeeperCluster> clusters = null;
 
 	public WarioMain() {
+		clusterContext = new TreeMap<String, Map<String, byte[]>>();
 		configLoader = ConfigLoader.getInstance();
 		clusters = new HashMap<String, ZooKeeperCluster>();
 	}
@@ -71,12 +78,21 @@ public class WarioMain extends Thread {
 
 			Iterator<Entry<String, JSONArray>> it = configLoader
 					.getPluginObjects().entrySet().iterator();
+			// 删除配置中没有的数据结构
+			Set<String> differenceSet = new HashSet<String>();
+			differenceSet.addAll(clusterContext.keySet());
+			differenceSet.removeAll(configLoader.getPluginObjects().keySet());
+			clusterContext.entrySet().removeAll(differenceSet);
 
 			while (it.hasNext()) {
 				Map.Entry<String, JSONArray> entry = it.next();
 
 				String pluginName = entry.getKey();
 				JSONArray arrary = entry.getValue();
+				if (!clusterContext.containsKey(pluginName)) {
+					clusterContext.put(pluginName,
+							new TreeMap<String, byte[]>());
+				}
 
 				for (int i = 0; i < arrary.length(); ++i) {
 					JSONObject object;
@@ -84,7 +100,8 @@ public class WarioMain extends Thread {
 						object = arrary.getJSONObject(i);
 						processPlugin(pluginName, object);
 					} catch (JSONException e) {
-						e.printStackTrace();
+						logger.error("Failed to process json string : "
+								+ pluginName + " " + i + "th lines.");
 					}
 				}
 			}
@@ -95,13 +112,19 @@ public class WarioMain extends Thread {
 			throws JSONException {
 		String zooKeeperName = object.getString("ZooKeeperName");
 
-		Iterator<Entry<String, ZooKeeperClient>> it = clusters
-				.get(zooKeeperName).getClients().entrySet().iterator();
+		ZooKeeperCluster cluster = clusters.get(zooKeeperName);
+		Iterator<Entry<String, ZooKeeperClient>> it = cluster.getClients()
+				.entrySet().iterator();
+
+		if (!clusterContext.get(pluginName).containsKey(zooKeeperName)) {
+			clusterContext.get(pluginName).put(zooKeeperName, new byte[1024]);
+		}
 
 		while (it.hasNext()) {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();
 
-			IPlugin plugin = createPlugin(pluginName, object, entry.getValue());
+			IPlugin plugin = createPlugin(pluginName, object, entry.getValue(),
+					clusterContext.get(pluginName).get(zooKeeperName));
 			try {
 				plugin.run();
 			} catch (Throwable e) {
@@ -144,7 +167,7 @@ public class WarioMain extends Thread {
 	}
 
 	private IPlugin createPlugin(String pluginName, JSONObject object,
-			ZooKeeperClient client) {
+			ZooKeeperClient client, byte[] context) {
 		IPlugin plugin = null;
 		try {
 			String msgSenderName = object.getString("MsgSender");
@@ -157,7 +180,9 @@ public class WarioMain extends Thread {
 			plugin.mailSender = (IMailSender) Class.forName(
 					mailSenderPackage + mailSenderName).newInstance();
 			plugin.client = client;
+			plugin.clusterContext = context;
 		} catch (InstantiationException e) {
+			// TODO log
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
