@@ -32,8 +32,7 @@ public class ZooKeeperCluster {
 			.getName());
 	
 	private JSONObject object = null;
-	//connectStrings 为null会在update的时候出现NullPointException
-	private Set<String> connectStrings = new HashSet<String>();
+	private Set<String> connectStrings = null;
 	private int sessionTimeout = 10000;
 	private final String zookeeperName;
 
@@ -49,6 +48,10 @@ public class ZooKeeperCluster {
 	public ZooKeeperCluster(String zookeeperName, JSONObject object) {
 		this.zookeeperName = zookeeperName;
 		this.object = object;
+		connectStrings = new HashSet<String>();
+		connectStrings.clear();
+		clients = new HashMap<String, ZooKeeperClient>();
+		clients.clear();
 	}
 
 	/**
@@ -59,13 +62,14 @@ public class ZooKeeperCluster {
 	}
 
 	public void init() throws JSONException {
-		clients = new HashMap<String, ZooKeeperClient>();
+		sessionTimeout = object.getInt("sessionTimeout");
 		connectStrings = readJSONObject();
 		addClients(connectStrings);
 	}
 
 	public void updateClients(JSONObject object) throws JSONException {
 		this.object = object;
+		sessionTimeout = object.getInt("sessionTimeout");
 		Set<String> newConnectStrings = readJSONObject();
 		Set<String> tmp = getIntersection(connectStrings, newConnectStrings);
 		deleteClients(getDifference(connectStrings, tmp));
@@ -147,15 +151,10 @@ public class ZooKeeperCluster {
 
 	private Set<String> readJSONObject() throws JSONException {
 		Set<String> res = new HashSet<String>();
-		try {
-			JSONArray connectStringArray = object.getJSONArray("serverIPList");
-			for (int i = 0; i < connectStringArray.length(); ++i) {
-				res.add(connectStringArray.getString(i));
-			}
-			sessionTimeout = object.getInt("sessionTimeout");
-		} catch (JSONException e) {
-			logger.error("Json format error : " + object.toString() + "\n" + e.toString());
-			throw e;
+		res.clear();
+		JSONArray connectStringArray = object.getJSONArray("serverIPList");
+		for (int i = 0; i < connectStringArray.length(); ++i) {
+			res.add(connectStringArray.getString(i));
 		}
 		return res;
 	}
