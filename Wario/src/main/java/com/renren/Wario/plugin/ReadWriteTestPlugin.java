@@ -1,22 +1,26 @@
 package com.renren.Wario.plugin;
 
+import org.apache.log4j.Logger;
 import org.apache.zookeeper.KeeperException;
 
 public class ReadWriteTestPlugin extends IPlugin {
-	
+
+	private static Logger logger = Logger.getLogger(ReadWriteTestPlugin.class);
+
 	private final String number = "";
 	private final String address = "";
-	
+
 	private static String path = "/test";
 	private static String INITIAL = "I'm the initial data.";
 	private static String UPDATED = "I'm the updated data.";
-	
+
 	@Override
 	public void run() {
-		System.err.println("ReadWriteTestPlugin runs at client. " + client.getConnectionString());
+		logger.info("ReadWriteTestPlugin runs at client. "
+				+ client.getConnectionString());
 		boolean canBeUsed = true;
 		try {
-			if(client.testExists(path) == null) {
+			if (client.testExists(path) == null) {
 				client.testCreate(path, INITIAL.getBytes());
 			}
 			canBeUsed = INITIAL.equals(new String(client.testGetData(path)));
@@ -28,9 +32,11 @@ public class ReadWriteTestPlugin extends IPlugin {
 		} catch (InterruptedException e) {
 			canBeUsed = false;
 		}
-		if(!canBeUsed) {
-			mailSender.sendMail(address, "Client can not be used. " + client.getConnectionString());
-			msgSender.sendMessage(number, "Client can not be used. " + client.getConnectionString());
+		if (!canBeUsed) {
+			mailSender.sendMail(address,
+					"Client can not be used. " + client.getConnectionString());
+			msgSender.sendMessage(number,
+					"Client can not be used. " + client.getConnectionString());
 		}
 	}
 }

@@ -15,27 +15,32 @@
  */
 package com.renren.Wario.plugin;
 
+import org.apache.log4j.Logger;
+
 public class DefaultPlugin extends IPlugin {
+
+	private static Logger logger = Logger.getLogger(DefaultPlugin.class);
 
 	private final String number = "";
 	private final String address = "";
 	private final int maxOutStanding = 5;
-	
+
 	@Override
 	public void run() {
-		System.err.println("DefaultPlugin runs at client. " + client.getConnectionString());
+		logger.info("DefaultPlugin runs at client. "
+				+ client.getConnectionString());
 		if (!client.isAvailable()) {
 			msgSender.sendMessage(number,
 					"Client " + client.getConnectionString() + " is down!");
 			mailSender.sendMail(address,
 					"Client " + client.getConnectionString() + " is down!");
 		}
-		
+
 		if (!client.state.ruok()) {
-			msgSender.sendMessage(number,
-					"Something wrong with client " + client.getConnectionString() + "!");
-			mailSender.sendMail(address,
-					"Something wrong with client " + client.getConnectionString() + "!");
+			msgSender.sendMessage(number, "Something wrong with client "
+					+ client.getConnectionString() + "!");
+			mailSender.sendMail(address, "Something wrong with client "
+					+ client.getConnectionString() + "!");
 		}
 
 		String oldMode = client.state.getMode();
@@ -50,8 +55,8 @@ public class DefaultPlugin extends IPlugin {
 					"Client " + client.getConnectionString()
 							+ " has changed mode to " + mode);
 		}
-		
-		if(client.state.getOutStanding() > maxOutStanding) {
+
+		if (client.state.getOutStanding() > maxOutStanding) {
 			msgSender.sendMessage(number,
 					"Client " + client.getConnectionString()
 							+ " exceed max outstanding.");
@@ -59,6 +64,5 @@ public class DefaultPlugin extends IPlugin {
 					"Client " + client.getConnectionString()
 							+ " exceed max outstanding.");
 		}
-		
 	}
 }
