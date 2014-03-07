@@ -15,14 +15,26 @@
  */
 package com.renren.Wario;
 
+import java.io.File;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public class Main {
-	private static Logger logger = LogManager.getLogger(Main.class
-			.getName());
-	
+	private static Logger logger = LogManager.getLogger(Main.class.getName());
+
 	public static void main(String[] args) {
+		if (System.getProperty("default.config.path") == null) {
+			PropertyConfigurator.configure(System.getProperty("user.dir")
+					+ File.separator + "conf" + File.separator
+					+ "log4j.properties");
+		} else {
+			PropertyConfigurator.configure(System
+					.getProperty("default.config.path")
+					+ File.separator
+					+ "log4j.properties");
+		}
 		WarioMain warioMain = new WarioMain();
 		warioMain.init();
 		warioMain.start();
