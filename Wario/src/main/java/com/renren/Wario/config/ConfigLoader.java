@@ -42,8 +42,8 @@ public class ConfigLoader {
 	private String serverConfigText = null;
 	private String pluginConfigText = null;
 
-	private Map<String, JSONObject> serverObjects = null;
-	private Map<String, JSONArray> pluginObjects = null;
+	private Map<String, JSONObject> serverObjects = new HashMap<String, JSONObject>();
+	private Map<String, JSONArray> pluginObjects = new HashMap<String, JSONArray>();
 
 	private ConfigLoader() {
 		if (System.getProperty("default.config.path") == null) {
