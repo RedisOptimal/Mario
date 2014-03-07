@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.zookeeper.ClientCnxn;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -127,6 +128,10 @@ public class WarioMain extends Thread {
 					clusterContext.get(pluginName).get(zooKeeperName));
 			try {
 				plugin.run();
+				logger.info("Call " + plugin.getClass().getName()
+						+ " plugin run on "
+						+ entry.getValue().getConnectionString()
+						+ " was successful.");
 			} catch (Throwable e) {
 				logger.error("Call " + plugin.getClass().getName()
 						+ " plugin run method : " + e.toString());
