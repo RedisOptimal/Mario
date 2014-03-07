@@ -3,5 +3,8 @@
 		{ZooKeeperName:"Zookeeper1",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"},
 		{ZooKeeperName:"Zookeeper2",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"},
 		{ZooKeeperName:"Zookeeper3",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"}
+	],
+	"ReadWriteTestPlugin":[
+		{ZooKeeperName:"Zookeeper3",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"}
 	]
 }
