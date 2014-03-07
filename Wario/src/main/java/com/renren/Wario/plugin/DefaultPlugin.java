@@ -17,12 +17,13 @@ package com.renren.Wario.plugin;
 
 public class DefaultPlugin extends IPlugin {
 
-	private final String number = "13888888888";
-	private final String address = "test@test.com";
+	private final String number = "";
+	private final String address = "";
 	private final int maxOutStanding = 5;
 	
 	@Override
 	public void run() {
+		System.err.println("DefaultPlugin runs at client. " + client.getConnectionString());
 		if (!client.isAvailable()) {
 			msgSender.sendMessage(number,
 					"Client " + client.getConnectionString() + " is down!");
@@ -59,13 +60,5 @@ public class DefaultPlugin extends IPlugin {
 							+ " exceed max outstanding.");
 		}
 		
-		if(!client.canBeUsed()) {
-			msgSender.sendMessage(number,
-					"Client " + client.getConnectionString()
-							+ " can not be used.");
-			mailSender.sendMail(address,
-					"Client " + client.getConnectionString()
-							+ " can not be used.");
-		}
 	}
 }
