@@ -16,6 +16,7 @@
 package com.renren.Wario.zookeeper;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.LogManager;
@@ -28,6 +29,7 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.Stat;
 
 public class ZooKeeperClient implements Watcher {
 
@@ -42,12 +44,13 @@ public class ZooKeeperClient implements Watcher {
 	private volatile boolean isAvailable;
 	private CountDownLatch countDownLatch = null;
 
-	private static final String ZK_PATH = "/god_damn_zookeeper";
+	private final String ZK_PATH;
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
-		this.state = new ZooKeeperState(connectionString);
+		state = new ZooKeeperState(connectionString);
+		ZK_PATH = "/god_damn_zookeeper/" + connectionString;
 	}
 
 	public void createConnection() {
@@ -111,72 +114,50 @@ public class ZooKeeperClient implements Watcher {
 		return sessionTimeout;
 	}
 
-	public boolean canBeUsed() {
-		boolean res = true;
-		if(zk == null) {
-			return false;
-		}
-		try {
-			if (exists(ZK_PATH)) {
-				deleteNode(ZK_PATH);
-			}
-			createPath(ZK_PATH, "I am the initial data");
-			res = readData(ZK_PATH).equals("I am the initial data");
-			writeData(ZK_PATH, "I am the updated data");
-			res = readData(ZK_PATH).equals("I am the updated data");
-			deleteNode(ZK_PATH);
-		} catch (KeeperException e) {
-			logger.error("Client " + connectionString + " can not be used!\n"
-					+ e.toString());
-			res = false;
-		} catch (InterruptedException e) {
-			logger.error("Client " + connectionString + " can not be used!\n"
-					+ e.toString());
-			res = false;
-		}
-		return res;
-	}
-
-	public int calChildrenNumber(String path) {
-		int res = -1;
-		try {
-			if(zk != null && exists(path)) {
-				res = zk.getChildren(path, false).size();
-			}
-		} catch (KeeperException e) {
-			logger.error("GetChildren failed at client " + connectionString
-					+ ".\n" + e.toString());
-		} catch (InterruptedException e) {
-			logger.error("GetChildren failed at client " + connectionString
-					+ ".\n" + e.toString());
-		}
-		return res;
-	}
-
-	private boolean exists(String path) throws KeeperException,
+	public Stat exists(String path) throws KeeperException,
 			InterruptedException {
-		return zk.exists(ZK_PATH, false) != null;
+		return zk.exists(path, false);
 	}
 
-	private void createPath(String path, String data) throws KeeperException,
+	public byte[] getData(String path) throws KeeperException,
 			InterruptedException {
-		zk.create(path, data.getBytes(), Ids.OPEN_ACL_UNSAFE,
+		return zk.getData(path, false, null);
+	}
+
+	public List<String> getChildren(String path) throws KeeperException,
+			InterruptedException {
+		return zk.getChildren(path, false);
+	}
+
+	public Stat testExists(String path) throws KeeperException,
+			InterruptedException {
+		return zk.exists(ZK_PATH + path, false);
+	}
+
+	public void testCreate(String path, byte[] data) throws KeeperException,
+			InterruptedException {
+		zk.create(ZK_PATH + path, data, Ids.OPEN_ACL_UNSAFE,
 				CreateMode.EPHEMERAL);
 	}
 
-	private String readData(String path) throws KeeperException,
+	public byte[] testGetData(String path) throws KeeperException,
 			InterruptedException {
-		return new String(zk.getData(path, false, null));
+		return zk.getData(ZK_PATH + path, false, null);
 	}
 
-	private void writeData(String path, String data) throws KeeperException,
+	public void testSetData(String path, byte[] data) throws KeeperException,
 			InterruptedException {
-		zk.setData(path, data.getBytes(), -1);
+		zk.setData(ZK_PATH + path, data, -1);
 	}
 
-	private void deleteNode(String path) throws InterruptedException,
+	public List<String> testGetChildren(String path) throws KeeperException,
+			InterruptedException {
+		return zk.getChildren(path, false);
+	}
+
+	public void testDdelete(String path) throws InterruptedException,
 			KeeperException {
-		zk.delete(path, -1);
+		zk.delete(ZK_PATH + path, -1);
 	}
 
 }
