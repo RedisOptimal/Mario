@@ -15,6 +15,10 @@
  */
 package com.renren.Wario;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,7 +29,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.zookeeper.ClientCnxn;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,11 +51,17 @@ public class WarioMain extends Thread {
 	private final String pluginPackage = "com.renren.Wario.plugin.";
 	private final String msgSenderPackage = "com.renren.Wario.msgsender.";
 	private final String mailSenderPackage = "com.renren.Wario.mailsender.";
+	private final String pluginPathPrefix;
 
 	private ConfigLoader configLoader = null;
 	private Map<String, ZooKeeperCluster> clusters = null;
 
 	public WarioMain() {
+		if (System.getProperty("default.plugin.path") == null) {
+			pluginPathPrefix = "./plugins/";
+		} else {
+			pluginPathPrefix = System.getProperty("default.plugin.path");
+		}
 		clusterContext = new TreeMap<String, Map<String, byte[]>>();
 		configLoader = ConfigLoader.getInstance();
 		clusters = new HashMap<String, ZooKeeperCluster>();
@@ -66,7 +75,7 @@ public class WarioMain extends Thread {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (!isInterrupted()) {
 
 			configLoader.loadConfig();
 			updateServerConfig(configLoader.getServerObjects());
@@ -126,15 +135,20 @@ public class WarioMain extends Thread {
 
 			IPlugin plugin = createPlugin(pluginName, object, entry.getValue(),
 					clusterContext.get(pluginName).get(zooKeeperName));
-			try {
-				plugin.run();
-				logger.info("Call " + plugin.getClass().getName()
-						+ " plugin run on "
-						+ entry.getValue().getConnectionString()
-						+ " was successful.");
-			} catch (Throwable e) {
-				logger.error("Call " + plugin.getClass().getName()
-						+ " plugin run method : " + e.toString());
+			if (plugin != null) {
+				try {
+					plugin.run();
+					logger.info("Call " + plugin.getClass().getName()
+							+ " plugin run on "
+							+ entry.getValue().getConnectionString()
+							+ " was successful.");
+				} catch (Throwable e) {
+					logger.error("Call " + plugin.getClass().getName()
+							+ " plugin run method : " + e.toString());
+				}
+			} else {
+				logger.error("Construction plugin " + pluginName + " failed.");
+				break;
 			}
 		}
 	}
@@ -177,8 +191,17 @@ public class WarioMain extends Thread {
 		try {
 			String msgSenderName = object.getString("MsgSender");
 			String mailSenderName = object.getString("MailSender");
-
-			plugin = (IPlugin) Class.forName(pluginPackage + pluginName)
+			File file = new File(pluginPathPrefix);
+			URL url = null;
+			ClassLoader classLoader = null;
+			try {
+				url = file.toURI().toURL();
+				URL[] urls = new URL[] { url };
+				classLoader = new URLClassLoader(urls);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+			plugin = (IPlugin) classLoader.loadClass(pluginPackage + pluginName)
 					.newInstance();
 			plugin.msgSender = (IMsgSender) Class.forName(
 					msgSenderPackage + msgSenderName).newInstance();
