@@ -42,13 +42,13 @@ public class DefaultMailSender implements IMailSender {
 	private Properties props;
 	private Multipart multipart;
 
-	private final String smtp = "smtp.test.com";
-	private final String username = "test@test.com";
-	private final String password = "test";
+	private final String smtp = "";
+	private final String username = "";
+	private final String password = "";
 
 	@Override
 	public void sendMail(String address, String message) {
-
+		System.err.println(address + ":" + message);
 		String from = username;
 		String to = address;
 		String copyto = "";
@@ -59,12 +59,10 @@ public class DefaultMailSender implements IMailSender {
 			sendAndCc(from, to, copyto, subject, content);
 		} catch (AddressException e) {
 			logger.error("Address:" + address + " Message:" + message
-					+ " send failed!");
-			e.printStackTrace();
+					+ " send failed!\n" + e.toString());
 		} catch (MessagingException e) {
 			logger.error("Address:" + address + " Message:" + message
-					+ " send failed!");
-			e.printStackTrace();
+					+ " send failed!\n" + e.toString());
 		}
 	}
 

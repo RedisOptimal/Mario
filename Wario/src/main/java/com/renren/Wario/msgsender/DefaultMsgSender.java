@@ -32,15 +32,14 @@ public class DefaultMsgSender implements IMsgSender {
 	private static Logger logger = LogManager.getLogger(DefaultMsgSender.class
 			.getName());
 
-	private final String SERVER_URL = "http://sms.test.com/";
+	private final String SERVER_URL = "";
 
 	@Override
 	public void sendMessage(String number, String message) {
-
-		String url = generateUrl(number, message);
-
+		System.err.println(number + ":" + message);
 		String ret = "";
 		try {
+			String url = generateUrl(number, message);
 			HttpURLConnection conn = (HttpURLConnection) new URL(url)
 					.openConnection();
 			conn.connect();
@@ -54,16 +53,14 @@ public class DefaultMsgSender implements IMsgSender {
 					+ ret + ".");
 		} catch (MalformedURLException e) {
 			logger.warn("Number:" + number + " Message:" + message
-					+ " send failed!");
-			e.printStackTrace();
+					+ " send failed!\n" + e.toString());
 		} catch (IOException e) {
 			logger.warn("Number:" + number + " Message:" + message
-					+ " send failed!");
-			e.printStackTrace();
+					+ " send failed!\n" + e.toString());
 		}
 	}
 
-	private String generateUrl(String mobilePhone, String msg) {
+	private String generateUrl(String mobilePhone, String msg) throws UnsupportedEncodingException {
 		StringBuilder url = new StringBuilder();
 		url.append(SERVER_URL);
 
@@ -76,11 +73,7 @@ public class DefaultMsgSender implements IMsgSender {
 		return url.toString();
 	}
 
-	private String urlEncode(String s) throws RuntimeException {
-		try {
-			return URLEncoder.encode(s, "UTF-8").replace(".", "%2E");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException("This should never happen.");
-		}
+	private String urlEncode(String s) throws UnsupportedEncodingException {
+		return URLEncoder.encode(s, "UTF-8").replace(".", "%2E");
 	}
 }
