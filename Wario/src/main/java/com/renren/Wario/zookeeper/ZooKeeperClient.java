@@ -30,7 +30,6 @@ import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
-import org.hamcrest.core.IsNull;
 
 public class ZooKeeperClient implements Watcher {
 
