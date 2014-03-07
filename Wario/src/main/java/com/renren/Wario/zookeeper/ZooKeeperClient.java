@@ -50,7 +50,7 @@ public class ZooKeeperClient implements Watcher {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
 		state = new ZooKeeperState(connectionString);
-		ZK_PATH = "/god_damn_zookeeper/" + connectionString;
+		ZK_PATH = "/god_damn_zookeeper_" + connectionString;
 	}
 
 	public void createConnection() {
@@ -65,6 +65,15 @@ public class ZooKeeperClient implements Watcher {
 					+ e.toString());
 		} catch (InterruptedException e) {
 			logger.error("InterruptedException occured!\n" + e.toString());
+		}
+
+		try {
+				zk.create(ZK_PATH, "this is a test node.".getBytes(),
+						Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+		} catch (KeeperException e) {
+			
+		} catch (InterruptedException e) {
+			
 		}
 	}
 
@@ -137,7 +146,7 @@ public class ZooKeeperClient implements Watcher {
 	public void testCreate(String path, byte[] data) throws KeeperException,
 			InterruptedException {
 		zk.create(ZK_PATH + path, data, Ids.OPEN_ACL_UNSAFE,
-				CreateMode.EPHEMERAL);
+				CreateMode.PERSISTENT);
 	}
 
 	public byte[] testGetData(String path) throws KeeperException,
