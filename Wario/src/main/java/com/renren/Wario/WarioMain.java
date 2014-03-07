@@ -184,7 +184,8 @@ public class WarioMain extends Thread {
 			}
 		}
 	}
-
+	
+	// TODO 异常的log处理和classloader
 	private IPlugin createPlugin(String pluginName, JSONObject object,
 			ZooKeeperClient client, byte[] context) {
 		IPlugin plugin = null;
