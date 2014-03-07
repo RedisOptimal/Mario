@@ -49,15 +49,11 @@ public class ZooKeeperStateTest {
 	public void test() throws IOException, KeeperException {
 
 		ZooKeeperState state = new ZooKeeperState("localhost:2181");
-		assertEquals(-1, state.getReceived());
-		assertEquals(-1, state.getSent());
 		assertEquals(-1, state.getOutStanding());
 		assertNull(state.getMode());
 		assertEquals(-1, state.getNodeCount());
 		assertEquals(-1, state.getTotalWatches());
 		state.update();
-		assertEquals(-1, state.getReceived());
-		assertEquals(-1, state.getSent());
 		assertEquals(-1, state.getOutStanding());
 		assertNull(state.getMode());
 		assertEquals(-1, state.getNodeCount());
@@ -74,16 +70,12 @@ public class ZooKeeperStateTest {
 			}
 		}
 
-		assertEquals(-1, state.getReceived());
-		assertEquals(-1, state.getSent());
 		assertEquals(-1, state.getOutStanding());
 		assertNull(state.getMode());
 		assertEquals(-1, state.getNodeCount());
 		assertEquals(-1, state.getTotalWatches());
 
 		state.update();
-		assertEquals(1, state.getReceived());
-		assertEquals(0, state.getSent());
 		assertEquals(0, state.getOutStanding());
 		assertEquals("standalone", state.getMode());
 		assertEquals(4, state.getNodeCount());
@@ -101,8 +93,6 @@ public class ZooKeeperStateTest {
 		} catch (InterruptedException e) {
 		}
 		state.update();
-		assertEquals(6, state.getReceived());
-		assertEquals(5, state.getSent());
 		assertEquals(0, state.getOutStanding());
 		assertEquals("standalone", state.getMode());
 		assertEquals(5, state.getNodeCount());
@@ -113,8 +103,6 @@ public class ZooKeeperStateTest {
 		} catch (InterruptedException e) {
 		}
 		state.update();
-		assertEquals(9, state.getReceived());
-		assertEquals(8, state.getSent());
 		assertEquals(0, state.getOutStanding());
 		assertEquals("standalone", state.getMode());
 		assertEquals(4, state.getNodeCount());
