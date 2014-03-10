@@ -184,7 +184,7 @@ public class WarioMain extends Thread {
 			}
 		}
 	}
-	
+
 	// TODO 异常的log处理和classloader
 	private IPlugin createPlugin(String pluginName, JSONObject object,
 			ZooKeeperClient client, byte[] context) {
@@ -192,21 +192,26 @@ public class WarioMain extends Thread {
 		try {
 			String msgSenderName = object.getString("MsgSender");
 			String mailSenderName = object.getString("MailSender");
-			File file = new File(pluginPathPrefix);
-			URL url = null;
+
+			URL pluginUrl = null, msgSenderUrl = null, mailSenderUrl = null;
 			ClassLoader classLoader = null;
 			try {
-				url = file.toURI().toURL();
-				URL[] urls = new URL[] { url };
+				pluginUrl = new File(pluginPathPrefix + File.separator
+						+ pluginName + ".jar").toURI().toURL();
+				msgSenderUrl = new File(pluginPathPrefix + File.separator
+						+ msgSenderName + ".jar").toURI().toURL();
+				mailSenderUrl = new File(pluginPathPrefix + File.separator
+						+ mailSenderName + ".jar").toURI().toURL();
+				URL[] urls = new URL[]{pluginUrl, msgSenderUrl, mailSenderUrl};
 				classLoader = new URLClassLoader(urls);
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
-			plugin = (IPlugin) classLoader.loadClass(pluginPackage + pluginName)
-					.newInstance();
-			plugin.msgSender = (IMsgSender) Class.forName(
+			plugin = (IPlugin) classLoader
+					.loadClass(pluginPackage + pluginName).newInstance();
+			plugin.msgSender = (IMsgSender) classLoader.loadClass(
 					msgSenderPackage + msgSenderName).newInstance();
-			plugin.mailSender = (IMailSender) Class.forName(
+			plugin.mailSender = (IMailSender) classLoader.loadClass(
 					mailSenderPackage + mailSenderName).newInstance();
 			plugin.client = client;
 			plugin.clusterContext = context;
