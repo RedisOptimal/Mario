@@ -1,0 +1,19 @@
+ZooKeeper监控报警平台
+
+v0.1.0
+
+#Wario
+
+ZooKeeper监控平台
+
+ * 支持在线修改配置文件，添加修改集群信息，添加修改报警插件信息。
+ * 支持自定义扩展插件，提供接口IPlugin，可以通过重载此类添加扩展。
+ * 支持对于ZooKeeper的基本监控，ZooKeeper角色互换报警，ZooKeeper状态监控报警
+ * 通过maven管理，快速的部署使用，提供各种脚本。
+
+#Mario
+
+ZooKeeper数据展示平台
+
+ * 提供ZooKeeper的历史数据的查询和展示。
+ * 提供友好的用户界面。
