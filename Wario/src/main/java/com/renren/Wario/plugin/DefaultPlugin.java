@@ -27,8 +27,6 @@ public class DefaultPlugin extends IPlugin {
 
 	@Override
 	public void run() {
-		logger.info("DefaultPlugin runs at client. "
-				+ client.getConnectionString());
 		if (!client.isAvailable()) {
 			msgSender.sendMessage(number,
 					"Client " + client.getConnectionString() + " is down!");

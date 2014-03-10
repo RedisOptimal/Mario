@@ -16,8 +16,6 @@ public class ReadWriteTestPlugin extends IPlugin {
 
 	@Override
 	public void run() {
-		logger.info("ReadWriteTestPlugin runs at client. "
-				+ client.getConnectionString());
 		boolean canBeUsed = true;
 		try {
 			if (client.testExists(path) == null) {

@@ -122,8 +122,13 @@ public class WarioMain extends Thread {
 	private void processPlugin(String pluginName, JSONObject object)
 			throws JSONException {
 		String zooKeeperName = object.getString("ZooKeeperName");
-
-		ZooKeeperCluster cluster = clusters.get(zooKeeperName);
+		ZooKeeperCluster cluster = null;
+		if (clusters.containsKey(zooKeeperName)) {
+			cluster = clusters.get(zooKeeperName);
+		} else {
+			logger.error("Wrong zooKeeperName! " + zooKeeperName);
+			return;
+		}
 		Iterator<Entry<String, ZooKeeperClient>> it = cluster.getClients()
 				.entrySet().iterator();
 
@@ -133,23 +138,17 @@ public class WarioMain extends Thread {
 
 		while (it.hasNext()) {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();
-
-			IPlugin plugin = createPlugin(pluginName, object, entry.getValue(),
+			ZooKeeperClient client = entry.getValue();
+			IPlugin plugin = createPlugin(pluginName, object, client,
 					clusterContext.get(pluginName).get(zooKeeperName));
-			if (plugin != null) {
-				try {
-					plugin.run();
-					logger.info("Call " + plugin.getClass().getName()
-							+ " plugin run on "
-							+ entry.getValue().getConnectionString()
-							+ " was successful.");
-				} catch (Throwable e) {
-					logger.error("Call " + plugin.getClass().getName()
-							+ " plugin run method : " + e.toString());
-				}
-			} else {
-				logger.error("Construction plugin " + pluginName + " failed.");
-				break;
+			try {
+				plugin.run();
+				logger.info(pluginName + " runs at "
+						+ client.getConnectionString() + " successfully!");
+			} catch (Exception e) {
+				logger.info(pluginName + " runs at "
+						+ client.getConnectionString() + " failed! "
+						+ e.toString());
 			}
 		}
 	}
@@ -171,8 +170,8 @@ public class WarioMain extends Thread {
 				try {
 					cluster.init();
 				} catch (JSONException e) {
-					logger.error("Read JSON object failed.\n"
-							+ object.toString() + "\n" + e.toString());
+					logger.error(zookeeperName + " init failed! "
+							+ e.toString());
 				}
 				clusters.put(zookeeperName, cluster);
 			} else {
@@ -180,56 +179,57 @@ public class WarioMain extends Thread {
 				try {
 					cluster.updateClients(object);
 				} catch (JSONException e) {
-					logger.error("Update failed " + zookeeperName + ".");
+					logger.error(zookeeperName + " update failed! "
+							+ e.toString());
 				}
 			}
 		}
 	}
-	
-	// TODO 异常的log处理和classloader
+
 	private IPlugin createPlugin(String pluginName, JSONObject object,
 			ZooKeeperClient client, byte[] context) {
 		IPlugin plugin = null;
+		boolean success = false;
 		try {
 			String msgSenderName = object.getString("MsgSender");
 			String mailSenderName = object.getString("MailSender");
 			JSONArray array = object.getJSONArray("args");
 			File file = new File(pluginPathPrefix);
-			URL url = null;
-			ClassLoader classLoader = null;
-			try {
-				url = file.toURI().toURL();
-				URL[] urls = new URL[] { url };
-				classLoader = new URLClassLoader(urls);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			}
-			plugin = (IPlugin) classLoader.loadClass(pluginPackage + pluginName)
-					.newInstance();
+			URL url = file.toURI().toURL();
+			URL[] urls = new URL[] { url };
+			ClassLoader classLoader = new URLClassLoader(urls);
+			plugin = (IPlugin) classLoader
+					.loadClass(pluginPackage + pluginName).newInstance();
 			plugin.msgSender = (IMsgSender) Class.forName(
 					msgSenderPackage + msgSenderName).newInstance();
 			plugin.mailSender = (IMailSender) Class.forName(
 					mailSenderPackage + mailSenderName).newInstance();
 			plugin.client = client;
 			plugin.clusterContext = context;
-			
+
 			ArrayList<String> args = new ArrayList<String>();
 			args.clear();
-			for(int i = 0; i < array.length(); i ++) {
+			for (int i = 0; i < array.length(); i++) {
 				args.add(array.getString(i));
 			}
 			plugin.args = new String[array.length()];
 			plugin.args = args.toArray(plugin.args);
+			success = true;
 		} catch (InstantiationException e) {
-			// TODO log
-			e.printStackTrace();
+			logger.error(pluginName + " create failed! " + e.toString());
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			logger.error(pluginName + " create failed! " + e.toString());
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			logger.error(pluginName + " create failed! " + e.toString());
 		} catch (JSONException e) {
-			e.printStackTrace();
+			logger.error(pluginName + " create failed! " + e.toString());
+		} catch (Exception e) {
+			logger.error(pluginName + " create failed! " + e.toString());
 		}
-		return plugin;
+		if (success) {
+			return plugin;
+		} else {
+			return null;
+		}
 	}
 }

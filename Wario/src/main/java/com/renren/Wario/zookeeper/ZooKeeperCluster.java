@@ -129,7 +129,7 @@ public class ZooKeeperCluster {
 					sessionTimeout);
 			synchronized (clients) {
 				clients.put(connectString, client);
-				logger.info("Client " + connectString + " added to " + zookeeperName + ".");
+				logger.warn("Client " + connectString + " added to " + zookeeperName + ".");
 			}
 			client.createConnection();
 		}
@@ -144,7 +144,7 @@ public class ZooKeeperCluster {
 				ZooKeeperClient zookeeperClient = clients.get(connectString);
 				zookeeperClient.releaseConnection();
 				clients.remove(connectString);
-				logger.info("Client " + connectString + " removed from " + zookeeperName + ".");
+				logger.warn("Client " + connectString + " removed from " + zookeeperName + ".");
 			}
 		}
 	}
