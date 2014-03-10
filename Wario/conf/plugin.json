@@ -1,10 +1,10 @@
 {
 	"DefaultPlugin":[
-		{ZooKeeperName:"Zookeeper1",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"},
-		{ZooKeeperName:"Zookeeper2",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"},
-		{ZooKeeperName:"Zookeeper3",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"}
+		{ZooKeeperName:"Zookeeper1",MsgSender:"DebugMsgSender",MailSender:"DebugMailSender",args:[],comment:"whatfor"},
+		{ZooKeeperName:"Zookeeper2",MsgSender:"DebugMsgSender",MailSender:"DebugMailSender",args:["arg1"],comment:"whatfor"},
+		{ZooKeeperName:"Zookeeper3",MsgSender:"DebugMsgSender",MailSender:"DebugMailSender",args:["arg1","arg2"],comment:"whatfor"}
 	],
 	"ReadWriteTestPlugin":[
-		{ZooKeeperName:"Zookeeper3",MsgSender:"DefaultMsgSender",MailSender:"DefaultMailSender",comment:"whatfor"}
+		{ZooKeeperName:"Zookeeper3",MsgSender:"DebugMsgSender",MailSender:"DebugMailSender",args:["arg1","arg2","arg3"],comment:"whatfor"}
 	]
 }

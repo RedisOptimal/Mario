@@ -19,6 +19,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -192,6 +193,7 @@ public class WarioMain extends Thread {
 		try {
 			String msgSenderName = object.getString("MsgSender");
 			String mailSenderName = object.getString("MailSender");
+			JSONArray array = object.getJSONArray("args");
 			File file = new File(pluginPathPrefix);
 			URL url = null;
 			ClassLoader classLoader = null;
@@ -210,6 +212,14 @@ public class WarioMain extends Thread {
 					mailSenderPackage + mailSenderName).newInstance();
 			plugin.client = client;
 			plugin.clusterContext = context;
+			
+			ArrayList<String> args = new ArrayList<String>();
+			args.clear();
+			for(int i = 0; i < array.length(); i ++) {
+				args.add(array.getString(i));
+			}
+			plugin.args = new String[array.length()];
+			plugin.args = args.toArray(plugin.args);
 		} catch (InstantiationException e) {
 			// TODO log
 			e.printStackTrace();
