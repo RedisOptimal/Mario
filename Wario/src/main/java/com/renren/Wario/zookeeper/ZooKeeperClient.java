@@ -39,18 +39,19 @@ public class ZooKeeperClient implements Watcher {
 	private ZooKeeper zk = null;
 	private final String connectionString;
 	private final int sessionTimeout;
-	public ZooKeeperState state = null;
 
 	private volatile boolean isAvailable;
-	private CountDownLatch countDownLatch = null;
-
 	private final String ZK_PATH;
+	public ZooKeeperState state = null;
+
+	private CountDownLatch countDownLatch = null;
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
-		state = new ZooKeeperState(connectionString);
+		isAvailable = false;
 		ZK_PATH = "/god_damn_zookeeper_" + connectionString;
+		state = new ZooKeeperState(connectionString);
 	}
 
 	public void createConnection() {
@@ -68,12 +69,12 @@ public class ZooKeeperClient implements Watcher {
 		}
 
 		try {
-				zk.create(ZK_PATH, "this is a test node.".getBytes(),
-						Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			zk.create(ZK_PATH, "this is a test node.".getBytes(),
+					Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 		} catch (KeeperException e) {
-			
+
 		} catch (InterruptedException e) {
-			
+
 		}
 	}
 
