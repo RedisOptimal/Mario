@@ -15,9 +15,25 @@
  */
 package com.renren.Wario.zookeeper.test;
 
+import java.awt.List;
 import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.Watcher.Event.EventType;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Id;
+import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -54,7 +70,7 @@ public class ZooKeeperClientTest {
 	}
 
 	@Test
-	public void generalTest() {
+	public void generalTest() throws InterruptedException, IOException, KeeperException {
 		final ZooKeeperClient zooKeeperClient = new ZooKeeperClient(
 				"localhost:2181", 5000);
 		Assert.assertFalse(zooKeeperClient.isAvailable());
@@ -87,6 +103,51 @@ public class ZooKeeperClientTest {
 		Assert.assertFalse(zooKeeperClient.isAvailable());
 		zooKeeperClient.createConnection();
 		Assert.assertTrue(zooKeeperClient.isAvailable());
+		
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+		ZooKeeper zk = new ZooKeeper("localhost:2181", 2000, new MyWatcher(countDownLatch));
+		countDownLatch.await();
+		
+		try {
+			ArrayList<ACL> acls = new ArrayList<ACL>();
+			Id id = new Id("digest", DigestAuthenticationProvider.generateDigest("admin:admin"));
+			ACL acl = new ACL(ZooDefs.Perms.ALL, id);
+			acls.add(acl);
+			zk.create("/testACL", "testACL".getBytes(), acls, CreateMode.PERSISTENT);	
+			
+			ZooKeeperClient zooKeeperClient2 = new ZooKeeperClient("localhost:2181", 2000, "admin:admin");
+			zooKeeperClient2.createConnection();
+			Assert.assertEquals("testACL", new String(zooKeeperClient2.getData("/testACL")));
+			
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (KeeperException e) {
+			e.printStackTrace();
+		} finally {
+			zk.delete("/testACL", -1);
+		}
 	}
 
+	private class MyWatcher implements Watcher {
+
+		private CountDownLatch coutCountDownLatch;
+		
+		public MyWatcher(CountDownLatch countDownLatch) {
+			this.coutCountDownLatch = countDownLatch;
+		}
+		
+		@Override
+		public void process(WatchedEvent event) {
+			// TODO Auto-generated method stub
+			System.err.println("MyWatcher " + event.getType() + " | " + event.getState());
+			if(event.getType() == EventType.None) {
+				if(event.getState().equals(KeeperState.SyncConnected)) {
+					coutCountDownLatch.countDown();
+				}
+			}
+		}
+		
+	}
 }
