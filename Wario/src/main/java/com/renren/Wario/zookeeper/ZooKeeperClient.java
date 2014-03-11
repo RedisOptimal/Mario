@@ -172,7 +172,7 @@ public class ZooKeeperClient implements Watcher {
 
 	public List<String> testGetChildren(String path) throws KeeperException,
 			InterruptedException {
-		return zk.getChildren(path, false);
+		return zk.getChildren(ZK_PATH + path, false);
 	}
 
 	public void testDdelete(String path) throws InterruptedException,
