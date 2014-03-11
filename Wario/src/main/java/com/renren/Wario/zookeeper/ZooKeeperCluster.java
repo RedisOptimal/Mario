@@ -32,10 +32,11 @@ public class ZooKeeperCluster {
 			.getName());
 	
 	private JSONObject object = null;
-	private Set<String> connectStrings = null;
 	private int sessionTimeout = 10000;
 	private final String zookeeperName;
+	private String authInfo;
 
+	private Set<String> connectStrings = null;
 	private Map<String, ZooKeeperClient> clients = null;
 
 	/**
@@ -48,6 +49,7 @@ public class ZooKeeperCluster {
 	public ZooKeeperCluster(String zookeeperName, JSONObject object) {
 		this.zookeeperName = zookeeperName;
 		this.object = object;
+		authInfo = "";
 		connectStrings = new HashSet<String>();
 		connectStrings.clear();
 		clients = new HashMap<String, ZooKeeperClient>();
@@ -63,6 +65,7 @@ public class ZooKeeperCluster {
 
 	public void init() throws JSONException {
 		sessionTimeout = object.getInt("sessionTimeout");
+		authInfo = object.getString("authInfo");
 		connectStrings = readJSONObject();
 		addClients(connectStrings);
 	}
@@ -126,10 +129,15 @@ public class ZooKeeperCluster {
 		@Override
 		public void run() {
 			ZooKeeperClient client = new ZooKeeperClient(connectString,
-					sessionTimeout);
+					sessionTimeout, authInfo);
 			synchronized (clients) {
 				clients.put(connectString, client);
-				logger.warn("Client " + connectString + " added to " + zookeeperName + ".");
+				logger.warn("Client "
+						+ connectString
+						+ " added to "
+						+ zookeeperName
+						+ ("".equals(authInfo) ? "" : (" with auth " + authInfo))
+						+ ".");
 			}
 			client.createConnection();
 		}

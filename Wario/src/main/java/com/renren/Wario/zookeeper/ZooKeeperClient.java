@@ -39,7 +39,9 @@ public class ZooKeeperClient implements Watcher {
 	private ZooKeeper zk = null;
 	private final String connectionString;
 	private final int sessionTimeout;
-
+	private final String scheme = "digest";
+	private final String auth;
+	
 	private volatile boolean isAvailable;
 	private final String ZK_PATH;
 	public ZooKeeperState state = null;
@@ -47,8 +49,13 @@ public class ZooKeeperClient implements Watcher {
 	private CountDownLatch countDownLatch = null;
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout) {
+		this(connectionString, sessionTimeout, "");
+	}
+	
+	public ZooKeeperClient(String connectionString, int sessionTimeout, String auth) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
+		this.auth = auth;
 		isAvailable = false;
 		ZK_PATH = "/god_damn_zookeeper_" + connectionString;
 		state = new ZooKeeperState(connectionString);
@@ -61,6 +68,9 @@ public class ZooKeeperClient implements Watcher {
 		try {
 			zk = new ZooKeeper(connectionString, sessionTimeout, this);
 			countDownLatch.await();
+			if(!"".equals(auth)) {
+				zk.addAuthInfo(scheme, auth.getBytes());
+			}
 		} catch (IOException e) {
 			logger.error("Create connection failed! IOException occured!\n"
 					+ e.toString());
