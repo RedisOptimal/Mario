@@ -46,15 +46,15 @@ public class WarioMain extends Thread {
 	private static Logger logger = LogManager.getLogger(WarioMain.class
 			.getName());
 
-	// <pluginName, <ZooKeeperName, context> >
-	private final Map<String, Map<String, byte[]>> clusterContext;
-
 	private final String pluginPackage = "com.renren.Wario.plugin.";
 	private final String msgSenderPackage = "com.renren.Wario.msgsender.";
 	private final String mailSenderPackage = "com.renren.Wario.mailsender.";
 	private final String pluginPathPrefix;
 
+	// <pluginName, <ZooKeeperName, context> >
+	private final Map<String, Map<String, byte[]>> clusterContext;
 	private ConfigLoader configLoader = null;
+	// <zooKeeperName, cluster>
 	private Map<String, ZooKeeperCluster> clusters = null;
 
 	public WarioMain() {
@@ -87,14 +87,14 @@ public class WarioMain extends Thread {
 				e.printStackTrace();
 			}
 
-			Iterator<Entry<String, JSONArray>> it = configLoader
-					.getPluginObjects().entrySet().iterator();
 			// 删除配置中没有的数据结构
 			Set<String> differenceSet = new HashSet<String>();
 			differenceSet.addAll(clusterContext.keySet());
 			differenceSet.removeAll(configLoader.getPluginObjects().keySet());
 			clusterContext.entrySet().removeAll(differenceSet);
 
+			Iterator<Entry<String, JSONArray>> it = configLoader
+					.getPluginObjects().entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<String, JSONArray> entry = it.next();
 
@@ -121,7 +121,7 @@ public class WarioMain extends Thread {
 
 	private void processPlugin(String pluginName, JSONObject object)
 			throws JSONException {
-		String zooKeeperName = object.getString("ZooKeeperName");
+		String zooKeeperName = object.getString("zooKeeperName");
 		ZooKeeperCluster cluster = null;
 		if (clusters.containsKey(zooKeeperName)) {
 			cluster = clusters.get(zooKeeperName);
@@ -139,14 +139,15 @@ public class WarioMain extends Thread {
 		while (it.hasNext()) {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();
 			ZooKeeperClient client = entry.getValue();
-			IPlugin plugin = createPlugin(pluginName, object, client,
-					clusterContext.get(pluginName).get(zooKeeperName));
+			byte[] context = clusterContext.get(pluginName).get(zooKeeperName);
 			try {
+				IPlugin plugin = createPlugin(pluginName, object, client,
+						context);
 				plugin.run();
 				logger.info(pluginName + " runs at "
 						+ client.getConnectionString() + " successfully!");
 			} catch (Exception e) {
-				logger.info(pluginName + " runs at "
+				logger.error(pluginName + " runs at "
 						+ client.getConnectionString() + " failed! "
 						+ e.toString());
 			}
@@ -187,55 +188,39 @@ public class WarioMain extends Thread {
 	}
 
 	private IPlugin createPlugin(String pluginName, JSONObject object,
-			ZooKeeperClient client, byte[] context) {
+			ZooKeeperClient client, byte[] context)
+			throws InstantiationException, IllegalAccessException,
+			ClassNotFoundException, MalformedURLException, JSONException {
 		IPlugin plugin = null;
-		boolean success = false;
-		try {
-			String msgSenderName = object.getString("MsgSender");
-			String mailSenderName = object.getString("MailSender");
-			JSONArray array = object.getJSONArray("args");
-			URL pluginUrl = null, msgSenderUrl = null, mailSenderUrl = null;
-			pluginUrl = new File(pluginPathPrefix + File.separator + pluginName
-					+ ".jar").toURI().toURL();
-			msgSenderUrl = new File(pluginPathPrefix + File.separator
-					+ msgSenderName + ".jar").toURI().toURL();
-			mailSenderUrl = new File(pluginPathPrefix + File.separator
-					+ mailSenderName + ".jar").toURI().toURL();
-			URL[] urls = new URL[]{pluginUrl, msgSenderUrl, mailSenderUrl};
+		String msgSenderName = object.getString("msgSender");
+		String mailSenderName = object.getString("mailSender");
+		JSONArray array = object.getJSONArray("args");
 
-			ClassLoader classLoader = new URLClassLoader(urls);
-			plugin = (IPlugin) classLoader
-					.loadClass(pluginPackage + pluginName).newInstance();
-			plugin.msgSender = (IMsgSender) classLoader.loadClass(
-					msgSenderPackage + msgSenderName).newInstance();
-			plugin.mailSender = (IMailSender) classLoader.loadClass(
-					mailSenderPackage + mailSenderName).newInstance();
-			plugin.client = client;
-			plugin.clusterContext = context;
+		URL pluginUrl = new File(pluginPathPrefix + File.separator + pluginName
+				+ ".jar").toURI().toURL();
+		URL msgSenderUrl = new File(pluginPathPrefix + File.separator
+				+ msgSenderName + ".jar").toURI().toURL();
+		URL mailSenderUrl = new File(pluginPathPrefix + File.separator
+				+ mailSenderName + ".jar").toURI().toURL();
+		URL[] urls = new URL[] { pluginUrl, msgSenderUrl, mailSenderUrl };
 
-			ArrayList<String> args = new ArrayList<String>();
-			args.clear();
-			for (int i = 0; i < array.length(); i++) {
-				args.add(array.getString(i));
-			}
-			plugin.args = new String[array.length()];
-			plugin.args = args.toArray(plugin.args);
-			success = true;
-		} catch (InstantiationException e) {
-			logger.error(pluginName + " create failed! " + e.toString());
-		} catch (IllegalAccessException e) {
-			logger.error(pluginName + " create failed! " + e.toString());
-		} catch (ClassNotFoundException e) {
-			logger.error(pluginName + " create failed! " + e.toString());
-		} catch (JSONException e) {
-			logger.error(pluginName + " create failed! " + e.toString());
-		} catch (Exception e) {
-			logger.error(pluginName + " create failed! " + e.toString());
+		ClassLoader classLoader = new URLClassLoader(urls);
+		plugin = (IPlugin) classLoader.loadClass(pluginPackage + pluginName)
+				.newInstance();
+		plugin.msgSender = (IMsgSender) classLoader.loadClass(
+				msgSenderPackage + msgSenderName).newInstance();
+		plugin.mailSender = (IMailSender) classLoader.loadClass(
+				mailSenderPackage + mailSenderName).newInstance();
+		plugin.client = client;
+		plugin.clusterContext = context;
+
+		ArrayList<String> args = new ArrayList<String>();
+		args.clear();
+		for (int i = 0; i < array.length(); i++) {
+			args.add(array.getString(i));
 		}
-		if (success) {
-			return plugin;
-		} else {
-			return null;
-		}
+		plugin.args = new String[args.size()];
+		plugin.args = args.toArray(plugin.args);
+		return plugin;
 	}
 }
