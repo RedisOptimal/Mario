@@ -27,10 +27,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.renren.Wario.WarioUtilTools;
+
 public class ZooKeeperCluster {
 	private static Logger logger = LogManager.getLogger(ZooKeeperCluster.class
 			.getName());
-	
+
 	private JSONObject object = null;
 	private int sessionTimeout = 10000;
 	private final String zookeeperName;
@@ -74,35 +76,11 @@ public class ZooKeeperCluster {
 		this.object = object;
 		sessionTimeout = object.getInt("sessionTimeout");
 		Set<String> newConnectStrings = readJSONObject();
-		Set<String> tmp = getIntersection(connectStrings, newConnectStrings);
-		deleteClients(getDifference(connectStrings, tmp));
-		addClients(getDifference(newConnectStrings, tmp));
+		Set<String> tmp = WarioUtilTools.getIntersection(connectStrings,
+				newConnectStrings);
+		deleteClients(WarioUtilTools.getDifference(connectStrings, tmp));
+		addClients(WarioUtilTools.getDifference(newConnectStrings, tmp));
 		connectStrings = newConnectStrings;
-	}
-
-	@SuppressWarnings("unused")
-	private Set<String> getUnion(Set<String> a, Set<String> b) {
-		Set<String> res = new HashSet<String>();
-		res.clear();
-		res.addAll(a);
-		res.addAll(b);
-		return res;
-	}
-
-	private Set<String> getDifference(Set<String> a, Set<String> b) {
-		Set<String> res = new HashSet<String>();
-		res.clear();
-		res.addAll(a);
-		res.removeAll(b);
-		return res;
-	}
-
-	private Set<String> getIntersection(Set<String> a, Set<String> b) {
-		Set<String> res = new HashSet<String>();
-		res.clear();
-		res.addAll(a);
-		res.retainAll(b);
-		return res;
 	}
 
 	private void addClients(Set<String> connectStrings) {
@@ -136,8 +114,8 @@ public class ZooKeeperCluster {
 						+ connectString
 						+ " added to "
 						+ zookeeperName
-						+ ("".equals(authInfo) ? "" : (" with auth " + authInfo))
-						+ ".");
+						+ ("".equals(authInfo) ? ""
+								: (" with auth " + authInfo)) + ".");
 			}
 			client.createConnection();
 		}
@@ -152,7 +130,8 @@ public class ZooKeeperCluster {
 				ZooKeeperClient zookeeperClient = clients.get(connectString);
 				zookeeperClient.releaseConnection();
 				clients.remove(connectString);
-				logger.warn("Client " + connectString + " removed from " + zookeeperName + ".");
+				logger.warn("Client " + connectString + " removed from "
+						+ zookeeperName + ".");
 			}
 		}
 	}
