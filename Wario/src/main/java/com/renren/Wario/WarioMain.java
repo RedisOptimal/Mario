@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.LogManager;
@@ -78,12 +79,21 @@ public class WarioMain extends Thread {
 
 			configLoader.loadConfig();
 
-			clusters.entrySet().removeAll(
-					WarioUtilTools.getDifference(clusters.keySet(),
-							configLoader.getServerObjects().keySet()));
-			contexts.entrySet().removeAll(
-					WarioUtilTools.getDifference(contexts.keySet(),
-							configLoader.getPluginObjects().keySet()));
+			Set<String> uselessClusters = WarioUtilTools
+					.getDifference(clusters.keySet(), configLoader
+							.getServerObjects().keySet());
+			Iterator<String> it = uselessClusters.iterator();
+			while (it.hasNext()) {
+				String zooKeeperName = it.next();
+				ZooKeeperCluster cluster = clusters.get(zooKeeperName);
+				cluster.close();
+				clusters.remove(zooKeeperName);
+			}
+
+			Set<String> uselessContexts = WarioUtilTools
+					.getDifference(contexts.keySet(), configLoader
+							.getPluginObjects().keySet());
+			contexts.entrySet().removeAll(uselessContexts);
 
 			updateServerConfig(configLoader.getServerObjects());
 

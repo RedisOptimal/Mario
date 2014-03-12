@@ -72,6 +72,11 @@ public class ZooKeeperCluster {
 		addClients(connectStrings);
 	}
 
+	public void close() {
+		deleteClients(connectStrings);
+		logger.warn("Cluster " + zookeeperName + " closed!");
+	}
+
 	public void updateClients(JSONObject object) throws JSONException {
 		this.object = object;
 		sessionTimeout = object.getInt("sessionTimeout");
@@ -145,5 +150,4 @@ public class ZooKeeperCluster {
 		}
 		return res;
 	}
-
 }
