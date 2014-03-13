@@ -89,7 +89,7 @@ public class ZooKeeperState {
 
 		String consText = cmd("cons");
 		Scanner scannerForCons = new Scanner(consText);
-		if(!"".equals(consText)) {
+		if (!"".equals(consText)) {
 			clientNumber = 0;
 		}
 		while (scannerForCons.hasNext()) {

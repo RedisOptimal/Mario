@@ -33,7 +33,8 @@ public class FileCacheReader {
 	private static Logger logger = LogManager.getLogger(FileCacheReader.class
 			.getName());
 
-	private static final class FileCache implements Comparable<FileCache>, Comparator<FileCache>{
+	private static final class FileCache implements Comparable<FileCache>,
+			Comparator<FileCache> {
 		private final String pathString;
 		private final long lastModified;
 		private final String content;
@@ -41,7 +42,7 @@ public class FileCacheReader {
 		public FileCache(String pathString) throws IOException {
 			String tmpString = "";
 			File file = new File(pathString);
-			
+
 			InputStreamReader in = null;
 			BufferedReader reader = null;
 			try {
@@ -66,14 +67,14 @@ public class FileCacheReader {
 			this.pathString = file.getAbsolutePath();
 			lastModified = file.lastModified();
 		}
-		
+
 		/**
 		 * @return the content
 		 */
 		public String getContent() {
 			return content;
 		}
-		
+
 		/**
 		 * @return the lastModified
 		 */
@@ -88,7 +89,9 @@ public class FileCacheReader {
 			return pathString;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 		@Override
@@ -96,7 +99,9 @@ public class FileCacheReader {
 			return o1.compareTo(o2);
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
 		@Override
@@ -104,7 +109,7 @@ public class FileCacheReader {
 			return this.getPathString().compareTo(arg0.getPathString());
 		}
 	}
-	
+
 	private static Map<String, FileCache> fileCache = new HashMap<String, FileCache>();
 
 	public static String read(String path) throws IOException {

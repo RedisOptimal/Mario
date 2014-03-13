@@ -1,11 +1,8 @@
 package com.renren.Wario.plugin;
 
-import org.apache.log4j.Logger;
 import org.apache.zookeeper.KeeperException;
 
 public class ReadWriteTestPlugin extends IPlugin {
-
-	private static Logger logger = Logger.getLogger(ReadWriteTestPlugin.class);
 
 	private final String number = "";
 	private final String address = "";

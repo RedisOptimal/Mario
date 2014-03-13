@@ -16,6 +16,6 @@
 package com.renren.Wario.mailsender;
 
 public interface IMailSender {
-	
+
 	public void sendMail(String address, String message);
 }

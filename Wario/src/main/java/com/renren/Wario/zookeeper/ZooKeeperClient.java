@@ -41,7 +41,7 @@ public class ZooKeeperClient implements Watcher {
 	private final int sessionTimeout;
 	private final String scheme = "digest";
 	private final String auth;
-	
+
 	private volatile boolean isAvailable;
 	private final String ZK_PATH;
 	public ZooKeeperState state = null;
@@ -51,8 +51,9 @@ public class ZooKeeperClient implements Watcher {
 	public ZooKeeperClient(String connectionString, int sessionTimeout) {
 		this(connectionString, sessionTimeout, "");
 	}
-	
-	public ZooKeeperClient(String connectionString, int sessionTimeout, String auth) {
+
+	public ZooKeeperClient(String connectionString, int sessionTimeout,
+			String auth) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
 		this.auth = auth;
@@ -68,7 +69,7 @@ public class ZooKeeperClient implements Watcher {
 		try {
 			zk = new ZooKeeper(connectionString, sessionTimeout, this);
 			countDownLatch.await();
-			if(!"".equals(auth)) {
+			if (!"".equals(auth)) {
 				zk.addAuthInfo(scheme, auth.getBytes());
 			}
 		} catch (IOException e) {

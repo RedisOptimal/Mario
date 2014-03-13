@@ -60,7 +60,8 @@ public class DefaultMsgSender implements IMsgSender {
 		}
 	}
 
-	private String generateUrl(String mobilePhone, String msg) throws UnsupportedEncodingException {
+	private String generateUrl(String mobilePhone, String msg)
+			throws UnsupportedEncodingException {
 		StringBuilder url = new StringBuilder();
 		url.append(SERVER_URL);
 

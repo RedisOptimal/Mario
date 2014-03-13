@@ -22,8 +22,11 @@ public final class DebugMailSender implements IMailSender {
 	private static Logger logger = LogManager.getLogger(DebugMailSender.class
 			.getName());
 
-	/* (non-Javadoc)
-	 * @see com.renren.Wario.mailsender.IMailSender#sendMail(java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.renren.Wario.mailsender.IMailSender#sendMail(java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
 	public void sendMail(String address, String message) {

@@ -216,6 +216,7 @@ public class WarioMain extends Thread {
 				+ mailSenderName + ".jar").toURI().toURL();
 		URL[] urls = new URL[] { pluginUrl, msgSenderUrl, mailSenderUrl };
 
+		@SuppressWarnings("resource")
 		ClassLoader classLoader = new URLClassLoader(urls);
 		plugin = (IPlugin) classLoader.loadClass(pluginPackage + pluginName)
 				.newInstance();

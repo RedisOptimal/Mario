@@ -20,14 +20,17 @@ import org.apache.log4j.Logger;
 
 /**
  * @author zhe
- *
+ * 
  */
 public final class DebugMsgSender implements IMsgSender {
 	private static Logger logger = LogManager.getLogger(DebugMsgSender.class
 			.getName());
 
-	/* (non-Javadoc)
-	 * @see com.renren.Wario.msgsender.IMsgSender#sendMessage(java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.renren.Wario.msgsender.IMsgSender#sendMessage(java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
 	public void sendMessage(String number, String message) {
