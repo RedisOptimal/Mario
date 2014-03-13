@@ -32,8 +32,8 @@ public class ZooKeeperState {
 	private final int port;
 
 	private int minLatency = -1, avgLatency = -1, maxLatency = -1;
-	private int received = -1;
-	private int sent = -1;
+	private long received = -1;
+	private long sent = -1;
 	private int outStanding = -1;
 	private String zxid = null;
 	private String mode = null;
@@ -62,9 +62,9 @@ public class ZooKeeperState {
 				avgLatency = Integer.parseInt(latencys[1]);
 				maxLatency = Integer.parseInt(latencys[2]);
 			} else if (line.startsWith("Received:")) {
-				received = Integer.parseInt(getStringValueFromLine(line));
+				received = Long.parseLong(getStringValueFromLine(line));
 			} else if (line.startsWith("Sent:")) {
-				sent = Integer.parseInt(getStringValueFromLine(line));
+				sent = Long.parseLong(getStringValueFromLine(line));
 			} else if (line.startsWith("Outstanding:")) {
 				outStanding = Integer.parseInt(getStringValueFromLine(line));
 			} else if (line.startsWith("Zxid:")) {
@@ -116,11 +116,11 @@ public class ZooKeeperState {
 		return maxLatency;
 	}
 
-	public int getReceived() {
+	public long getReceived() {
 		return received;
 	}
 
-	public int getSent() {
+	public long getSent() {
 		return sent;
 	}
 
