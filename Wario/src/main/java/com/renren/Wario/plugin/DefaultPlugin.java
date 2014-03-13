@@ -21,8 +21,10 @@ public class DefaultPlugin extends IPlugin {
 
 	private String[] numbers;
 	private String[] addresses;
-	private final int maxOutStanding = 15;
-
+	
+	private final int maxOutStanding = 30;
+	private final int testTime = 5;
+	
 	private String mode;
 
 	@Override
@@ -30,20 +32,29 @@ public class DefaultPlugin extends IPlugin {
 		readContext();
 
 		String message = "";
-		
+
 		if (!client.isAvailable() || !client.state.ruok()) {
 				message += "Client " + client.getConnectionString() + " is down!\n";
 		}
 
 		client.state.update();
-
 		String newMode = client.state.getMode();
 		if (mode != null && !mode.equals(newMode)) {
 			mode = newMode;
 			message += "Client " + client.getConnectionString() + " has changed mode to " + newMode + ".\n";
 		}
 
-		if (client.state.getOutStanding() > maxOutStanding) {
+		int outStanding = 0;
+		for(int i = 0; i < testTime; ++ i) {
+			client.state.update();
+			outStanding += client.state.getOutStanding();
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if (outStanding > maxOutStanding * testTime) {
 			message += "Client " + client.getConnectionString() + " exceed max outstanding.\n";
 		}
 
