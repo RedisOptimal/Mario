@@ -4,8 +4,8 @@ import org.apache.zookeeper.KeeperException;
 
 public class ReadWriteTestPlugin extends IPlugin {
 
-	private final String number = "";
-	private final String address = "";
+	private String[] numbers;
+	private String[] addresses;
 
 	private static String path = "/test";
 	private static String INITIAL = "I'm the initial data.";
@@ -13,6 +13,9 @@ public class ReadWriteTestPlugin extends IPlugin {
 
 	@Override
 	public void run() {
+		numbers = args[0].split(",");
+		addresses = args[1].split(",");
+
 		boolean canBeUsed = true;
 		try {
 			if (client.testExists(path) == null) {
@@ -28,10 +31,14 @@ public class ReadWriteTestPlugin extends IPlugin {
 			canBeUsed = false;
 		}
 		if (!canBeUsed) {
-			mailSender.sendMail(address,
-					"Client can not be used. " + client.getConnectionString());
-			msgSender.sendMessage(number,
-					"Client can not be used. " + client.getConnectionString());
+			for (String address : addresses) {
+				mailSender.sendMail(address, "Client can not be used. "
+						+ client.getConnectionString());
+			}
+			for (String number : numbers) {
+				msgSender.sendMessage(number, "Client can not be used. "
+						+ client.getConnectionString());
+			}
 		}
 	}
 }

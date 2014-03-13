@@ -5,6 +5,6 @@
 		{zooKeeperName:"ZooKeeper3",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["numbers","addresses"],comment:"whatfor"}
 	],
 	"ReadWriteTestPlugin":[
-		{zooKeeperName:"ZooKeeper3",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:[],comment:"whatfor"}
+		{zooKeeperName:"ZooKeeper3",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["numbers", "addresses"],comment:"whatfor"}
 	]
 }
