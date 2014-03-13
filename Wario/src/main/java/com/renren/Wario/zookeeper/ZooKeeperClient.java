@@ -29,6 +29,7 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.ZooKeeper.States;
 import org.apache.zookeeper.data.Stat;
 
 public class ZooKeeperClient implements Watcher {
@@ -109,9 +110,20 @@ public class ZooKeeperClient implements Watcher {
 			if (event.getState().equals(KeeperState.SyncConnected)) {
 				isAvailable = true;
 				countDownLatch.countDown();
-			} else if (event.getState().equals(KeeperState.Expired)
-					|| event.getState().equals(KeeperState.Disconnected)) {
+			} else if (event.getState().equals(KeeperState.Expired)) {
 				isAvailable = false;
+				createConnection();
+			} else if (event.getState().equals(KeeperState.Disconnected)) {
+				isAvailable = false;
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				if (this.zk.getState() == States.CONNECTED) {
+					isAvailable = true;
+					return;
+				}
 				createConnection();
 			}
 		}
