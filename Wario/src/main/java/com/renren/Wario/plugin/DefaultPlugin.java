@@ -27,31 +27,12 @@ public class DefaultPlugin extends IPlugin {
 
 	@Override
 	public void run() {
-		numbers = args[0].split(",");
-		addresses = args[1].split(",");
-
 		readContext();
 
-		if (!client.isAvailable()) {
-			for (String number : numbers) {
-				msgSender.sendMessage(number,
-						"Client " + client.getConnectionString() + " is down!");
-			}
-			for (String address : addresses) {
-				mailSender.sendMail(address,
-						"Client " + client.getConnectionString() + " is down!");
-			}
-		}
-
-		if (!client.state.ruok()) {
-			for (String number : numbers) {
-				msgSender.sendMessage(number, "Something wrong with client "
-						+ client.getConnectionString() + "!");
-			}
-			for (String address : addresses) {
-				mailSender.sendMail(address, "Something wrong with client "
-						+ client.getConnectionString() + "!");
-			}
+		String message = "";
+		
+		if (!client.isAvailable() || !client.state.ruok()) {
+				message += "Client " + client.getConnectionString() + " is down!\n";
 		}
 
 		client.state.update();
@@ -59,31 +40,24 @@ public class DefaultPlugin extends IPlugin {
 		String newMode = client.state.getMode();
 		if (mode != null && !mode.equals(newMode)) {
 			mode = newMode;
-			for (String number : numbers) {
-				msgSender.sendMessage(number,
-						"Client " + client.getConnectionString()
-								+ " has changed mode to " + newMode);
-			}
-			for (String address : addresses) {
-				mailSender.sendMail(address,
-						"Client " + client.getConnectionString()
-								+ " has changed mode to " + newMode);
-			}
+			message += "Client " + client.getConnectionString() + " has changed mode to " + newMode + ".\n";
 		}
 
 		if (client.state.getOutStanding() > maxOutStanding) {
-			for (String number : numbers) {
-				msgSender.sendMessage(number,
-						"Client " + client.getConnectionString()
-								+ " exceed max outstanding.");
-			}
-			for (String address : addresses) {
-				mailSender.sendMail(address,
-						"Client " + client.getConnectionString()
-								+ " exceed max outstanding.");
-			}
+			message += "Client " + client.getConnectionString() + " exceed max outstanding.\n";
 		}
 
+		numbers = args[0].split(",");
+		addresses = args[1].split(",");
+		if(!"".equals(message)) {
+			for(String number : numbers) {
+				msgSender.sendMessage(number, message);
+			}
+			for(String address : addresses) {
+				mailSender.sendMail(address, message);
+			}
+		}
+		
 		writeContext();
 	}
 
@@ -122,8 +96,7 @@ public class DefaultPlugin extends IPlugin {
 		while (scanner.hasNext()) {
 			String line = scanner.next();
 			if (line.startsWith(client.getConnectionString())) {
-				String newLine = client.getConnectionString() + "#" + mode
-						+ "\n";
+				String newLine = client.getConnectionString() + "#" + mode + "\n";
 				res += newLine;
 			} else {
 				res += line;

@@ -13,9 +13,11 @@ public class ReadWriteTestPlugin extends IPlugin {
 
 	@Override
 	public void run() {
-		numbers = args[0].split(",");
-		addresses = args[1].split(",");
-
+		
+		if(!client.isAvailable()) {
+			return ;
+		}
+		
 		boolean canBeUsed = true;
 		try {
 			if (client.testExists(path) == null) {
@@ -30,7 +32,11 @@ public class ReadWriteTestPlugin extends IPlugin {
 		} catch (InterruptedException e) {
 			canBeUsed = false;
 		}
+		
 		if (!canBeUsed) {
+			numbers = args[0].split(",");
+			addresses = args[1].split(",");
+			
 			for (String address : addresses) {
 				mailSender.sendMail(address, "Client can not be used. "
 						+ client.getConnectionString());
