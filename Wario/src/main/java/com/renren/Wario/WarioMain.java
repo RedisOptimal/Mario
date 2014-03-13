@@ -98,7 +98,7 @@ public class WarioMain extends Thread {
 			updateServerConfig(configLoader.getServerObjects());
 
 			try {
-				sleep(10000);
+				sleep(300 << 10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -178,7 +178,7 @@ public class WarioMain extends Thread {
 				.entrySet().iterator();
 
 		if (!contexts.get(pluginName).containsKey(zooKeeperName)) {
-			contexts.get(pluginName).put(zooKeeperName, new byte[1024]);
+			contexts.get(pluginName).put(zooKeeperName, new byte[1 << 20]);  // 1M
 		}
 
 		while (it.hasNext()) {
@@ -216,7 +216,6 @@ public class WarioMain extends Thread {
 				+ mailSenderName + ".jar").toURI().toURL();
 		URL[] urls = new URL[] { pluginUrl, msgSenderUrl, mailSenderUrl };
 
-		@SuppressWarnings("resource")
 		ClassLoader classLoader = new URLClassLoader(urls);
 		plugin = (IPlugin) classLoader.loadClass(pluginPackage + pluginName)
 				.newInstance();
@@ -226,7 +225,7 @@ public class WarioMain extends Thread {
 				mailSenderPackage + mailSenderName).newInstance();
 		plugin.client = client;
 		plugin.clusterContext = context;
-
+		
 		ArrayList<String> args = new ArrayList<String>();
 		args.clear();
 		for (int i = 0; i < array.length(); i++) {

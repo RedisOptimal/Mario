@@ -21,7 +21,7 @@ public class DefaultPlugin extends IPlugin {
 
 	private String[] numbers;
 	private String[] addresses;
-	private final int maxOutStanding = 5;
+	private final int maxOutStanding = 15;
 
 	private String mode;
 
