@@ -53,12 +53,15 @@ public class ZooKeeperStateTest {
 		assertNull(state.getMode());
 		assertEquals(-1, state.getNodeCount());
 		assertEquals(-1, state.getTotalWatches());
+		assertEquals(-1, state.getClientNumber());
+		
 		state.update();
 		assertEquals(-1, state.getOutStanding());
 		assertNull(state.getMode());
 		assertEquals(-1, state.getNodeCount());
 		assertEquals(-1, state.getTotalWatches());
-
+		assertEquals(-1, state.getClientNumber());
+		
 		if (zkBackgroundServer == null) {
 			zkBackgroundServer = new ZooKeeperBackgroundServer("2181");
 			zkBackgroundServer.setDaemon(true);
@@ -74,14 +77,16 @@ public class ZooKeeperStateTest {
 		assertNull(state.getMode());
 		assertEquals(-1, state.getNodeCount());
 		assertEquals(-1, state.getTotalWatches());
+		assertEquals(-1, state.getClientNumber());
 
 		state.update();
 		assertEquals(0, state.getOutStanding());
 		assertEquals("standalone", state.getMode());
 		assertEquals(4, state.getNodeCount());
 		assertEquals(0, state.getTotalWatches());
+		assertEquals(1, state.getClientNumber());
+		
 		ZooKeeper zk = new ZooKeeper("localhost:2181", 5000, null);
-
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -97,6 +102,8 @@ public class ZooKeeperStateTest {
 		assertEquals("standalone", state.getMode());
 		assertEquals(5, state.getNodeCount());
 		assertEquals(0, state.getTotalWatches());
+		assertEquals(2, state.getClientNumber());
+		
 		try {
 			zk.delete("/test", -1);
 		} catch (KeeperException e) {
@@ -107,6 +114,18 @@ public class ZooKeeperStateTest {
 		assertEquals("standalone", state.getMode());
 		assertEquals(4, state.getNodeCount());
 		assertEquals(0, state.getTotalWatches());
+		assertEquals(2, state.getClientNumber());
+		
+		try {
+			zk.close();
+		} catch (InterruptedException e) {
+		}
+		state.update();
+		assertEquals(0, state.getOutStanding());
+		assertEquals("standalone", state.getMode());
+		assertEquals(4, state.getNodeCount());
+		assertEquals(0, state.getTotalWatches());
+		assertEquals(1, state.getClientNumber());
 	}
 
 }

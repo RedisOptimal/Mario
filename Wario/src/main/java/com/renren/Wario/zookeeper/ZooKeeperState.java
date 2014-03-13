@@ -39,6 +39,7 @@ public class ZooKeeperState {
 	private String mode = null;
 	private int nodeCount = -1;
 	private int totalWatches = -1;
+	private int clientNumber = -1;
 
 	public ZooKeeperState(String connectionString) {
 		String host = connectionString.substring(0,
@@ -74,6 +75,7 @@ public class ZooKeeperState {
 				nodeCount = Integer.parseInt(getStringValueFromLine(line));
 			}
 		}
+		scannerForStat.close();
 
 		String wchsText = cmd("wchs");
 		Scanner scannerForWchs = new Scanner(wchsText);
@@ -83,12 +85,23 @@ public class ZooKeeperState {
 				totalWatches = Integer.parseInt(getStringValueFromLine(line));
 			}
 		}
+		scannerForWchs.close();
+
+		String consText = cmd("cons");
+		Scanner scannerForCons = new Scanner(consText);
+		if(!"".equals(consText)) {
+			clientNumber = 0;
+		}
+		while (scannerForCons.hasNext()) {
+			@SuppressWarnings("unused")
+			String line = scannerForCons.nextLine();
+			++clientNumber;
+		}
+		scannerForCons.close();
 	}
 
 	public boolean ruok() {
-		String res = "";
-		res = cmd("ruok");
-		return res.equals("imok\n");
+		return "imok".equals(cmd("ruok"));
 	}
 
 	public int getMinLatency() {
@@ -129,6 +142,10 @@ public class ZooKeeperState {
 
 	public int getTotalWatches() {
 		return totalWatches;
+	}
+
+	public int getClientNumber() {
+		return clientNumber;
 	}
 
 	private String getStringValueFromLine(String line) {
