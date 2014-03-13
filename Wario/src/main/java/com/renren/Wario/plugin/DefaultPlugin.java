@@ -15,18 +15,23 @@
  */
 package com.renren.Wario.plugin;
 
-import org.apache.log4j.Logger;
+import java.util.Scanner;
 
 public class DefaultPlugin extends IPlugin {
 
-	private static Logger logger = Logger.getLogger(DefaultPlugin.class);
-
-	private final String number = "";
-	private final String address = "";
+	private String number;
+	private String address;
 	private final int maxOutStanding = 5;
 
+	private String mode;
+	
 	@Override
 	public void run() {
+		number = args[0];
+		address = args[1];
+		
+		readContext();
+		
 		if (!client.isAvailable()) {
 			msgSender.sendMessage(number,
 					"Client " + client.getConnectionString() + " is down!");
@@ -41,17 +46,18 @@ public class DefaultPlugin extends IPlugin {
 					+ client.getConnectionString() + "!");
 		}
 
-		String oldMode = client.state.getMode();
+		
 		client.state.update();
-		String mode = client.state.getMode();
-
-		if (!mode.equals(oldMode)) {
+		
+		String newMode = client.state.getMode();
+		if (mode != null && !mode.equals(newMode)) {
+			mode = newMode;
 			msgSender.sendMessage(number,
 					"Client " + client.getConnectionString()
-							+ " has changed mode to " + mode);
+							+ " has changed mode to " + newMode);
 			mailSender.sendMail(address,
 					"Client " + client.getConnectionString()
-							+ " has changed mode to " + mode);
+							+ " has changed mode to " + newMode);
 		}
 
 		if (client.state.getOutStanding() > maxOutStanding) {
@@ -62,5 +68,52 @@ public class DefaultPlugin extends IPlugin {
 					"Client " + client.getConnectionString()
 							+ " exceed max outstanding.");
 		}
+		
+		writeContext();
+	}
+	
+	/**
+	 * clusterContext:
+	 *  connectionString1#Mode
+	 *  connectionString2#Mode
+	 *  connectionString3#Mode
+	 */
+	private void readContext() {
+		String text = new String(clusterContext);
+		boolean exists = false;
+		Scanner scanner = new Scanner(text);
+		while(scanner.hasNext()) {
+			String line = scanner.next();
+			if(line.startsWith(client.getConnectionString())) {
+				exists = true;
+				String[] args = line.split("#");
+				mode = args[1];
+			}
+		}
+		scanner.close();
+		
+		if(!exists) {
+			mode = client.state.getMode();
+			String newLine = client.getConnectionString() + "#" + mode + "\n";
+			text += newLine;
+			clusterContext = text.getBytes();
+		}
+	}
+	
+	private void writeContext() {
+		String res = "";
+		String text = new String(clusterContext);
+		Scanner scanner = new Scanner(text);
+		while(scanner.hasNext()) {
+			String line = scanner.next();
+			if(line.startsWith(client.getConnectionString())) {
+				String newLine = client.getConnectionString() + "#" + mode + "\n";
+				res += newLine;
+			} else {
+				res += line;
+			}
+		}
+		scanner.close();
+		clusterContext = res.getBytes();
 	}
 }

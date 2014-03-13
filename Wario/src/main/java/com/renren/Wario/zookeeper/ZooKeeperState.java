@@ -101,7 +101,7 @@ public class ZooKeeperState {
 	}
 
 	public boolean ruok() {
-		return "imok".equals(cmd("ruok"));
+		return "imok\n".equals(cmd("ruok"));
 	}
 
 	public int getMinLatency() {
@@ -169,8 +169,8 @@ public class ZooKeeperState {
 			try {
 				ret = FourLetterWordMain.send4LetterWord(host, port, cmd);
 			} catch (IOException e) {
-				logger.error("Sent " + cmd + " to client " + host + ":" + port
-						+ " failed!\n" + e.toString());
+				logger.error("Send " + cmd + " to client " + host + ":" + port
+						+ " failed! " + e.toString());
 			}
 			countDownLatch.countDown();
 		}
