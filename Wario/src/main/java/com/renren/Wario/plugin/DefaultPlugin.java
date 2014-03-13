@@ -19,95 +19,111 @@ import java.util.Scanner;
 
 public class DefaultPlugin extends IPlugin {
 
-	private String number;
-	private String address;
+	private String[] numbers;
+	private String[] addresses;
 	private final int maxOutStanding = 5;
 
 	private String mode;
-	
+
 	@Override
 	public void run() {
-		number = args[0];
-		address = args[1];
-		
+		numbers = args[0].split(",");
+		addresses = args[1].split(",");
+
 		readContext();
-		
+
 		if (!client.isAvailable()) {
-			msgSender.sendMessage(number,
-					"Client " + client.getConnectionString() + " is down!");
-			mailSender.sendMail(address,
-					"Client " + client.getConnectionString() + " is down!");
+			for (String number : numbers) {
+				msgSender.sendMessage(number,
+						"Client " + client.getConnectionString() + " is down!");
+			}
+			for (String address : addresses) {
+				mailSender.sendMail(address,
+						"Client " + client.getConnectionString() + " is down!");
+			}
 		}
 
 		if (!client.state.ruok()) {
-			msgSender.sendMessage(number, "Something wrong with client "
-					+ client.getConnectionString() + "!");
-			mailSender.sendMail(address, "Something wrong with client "
-					+ client.getConnectionString() + "!");
+			for (String number : numbers) {
+				msgSender.sendMessage(number, "Something wrong with client "
+						+ client.getConnectionString() + "!");
+			}
+			for (String address : addresses) {
+				mailSender.sendMail(address, "Something wrong with client "
+						+ client.getConnectionString() + "!");
+			}
 		}
 
-		
 		client.state.update();
-		
+
 		String newMode = client.state.getMode();
 		if (mode != null && !mode.equals(newMode)) {
 			mode = newMode;
-			msgSender.sendMessage(number,
-					"Client " + client.getConnectionString()
-							+ " has changed mode to " + newMode);
-			mailSender.sendMail(address,
-					"Client " + client.getConnectionString()
-							+ " has changed mode to " + newMode);
+			for (String number : numbers) {
+				msgSender.sendMessage(number,
+						"Client " + client.getConnectionString()
+								+ " has changed mode to " + newMode);
+			}
+			for (String address : addresses) {
+				mailSender.sendMail(address,
+						"Client " + client.getConnectionString()
+								+ " has changed mode to " + newMode);
+			}
 		}
 
 		if (client.state.getOutStanding() > maxOutStanding) {
-			msgSender.sendMessage(number,
-					"Client " + client.getConnectionString()
-							+ " exceed max outstanding.");
-			mailSender.sendMail(address,
-					"Client " + client.getConnectionString()
-							+ " exceed max outstanding.");
+			for (String number : numbers) {
+				msgSender.sendMessage(number,
+						"Client " + client.getConnectionString()
+								+ " exceed max outstanding.");
+			}
+			for (String address : addresses) {
+				mailSender.sendMail(address,
+						"Client " + client.getConnectionString()
+								+ " exceed max outstanding.");
+			}
 		}
-		
+
 		writeContext();
 	}
-	
+
 	/**
-	 * clusterContext:
-	 *  connectionString1#Mode
-	 *  connectionString2#Mode
-	 *  connectionString3#Mode
+	 * clusterContext: 
+	 * connectionString1#Mode 
+	 * connectionString2#Mode
+	 * connectionString3#Mode
 	 */
 	private void readContext() {
 		String text = new String(clusterContext);
 		boolean exists = false;
 		Scanner scanner = new Scanner(text);
-		while(scanner.hasNext()) {
+		while (scanner.hasNext()) {
 			String line = scanner.next();
-			if(line.startsWith(client.getConnectionString())) {
+			if (line.startsWith(client.getConnectionString())) {
 				exists = true;
 				String[] args = line.split("#");
 				mode = args[1];
 			}
 		}
 		scanner.close();
-		
-		if(!exists) {
+
+		if (!exists) {
 			mode = client.state.getMode();
 			String newLine = client.getConnectionString() + "#" + mode + "\n";
 			text += newLine;
 			clusterContext = text.getBytes();
 		}
 	}
-	
+
 	private void writeContext() {
 		String res = "";
 		String text = new String(clusterContext);
 		Scanner scanner = new Scanner(text);
-		while(scanner.hasNext()) {
+		while (scanner.hasNext()) {
 			String line = scanner.next();
-			if(line.startsWith(client.getConnectionString())) {
-				String newLine = client.getConnectionString() + "#" + mode + "\n";
+			if (line.startsWith(client.getConnectionString())) {
+				String newLine = client.getConnectionString() + "#" + mode
+						+ "\n";
 				res += newLine;
 			} else {
 				res += line;
