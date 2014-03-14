@@ -74,19 +74,22 @@ public class ZooKeeperClient implements Watcher {
 				zk.addAuthInfo(scheme, auth.getBytes());
 			}
 		} catch (IOException e) {
-			logger.error("Create connection failed! IOException occured!\n"
+			logger.error("Create connection " + connectionString + " failed! "
 					+ e.toString());
 		} catch (InterruptedException e) {
-			logger.error("InterruptedException occured!\n" + e.toString());
+			logger.error("Create connection " + connectionString + " failed! "
+					+ e.toString());
 		}
 
 		try {
 			zk.create(ZK_PATH, "this is a test node.".getBytes(),
 					Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 		} catch (KeeperException e) {
-
+			logger.error("Create test node " + ZK_PATH + " faild! "
+					+ e.toString());
 		} catch (InterruptedException e) {
-
+			logger.error("Create test node " + ZK_PATH + " faild! "
+					+ e.toString());
 		}
 	}
 
@@ -96,7 +99,8 @@ public class ZooKeeperClient implements Watcher {
 			try {
 				zk.close();
 			} catch (InterruptedException e) {
-				logger.error("InterruptedException occured!\n" + e.toString());
+				logger.error("Close connection " + connectionString
+						+ " failed! " + e.toString());
 			}
 		}
 	}
