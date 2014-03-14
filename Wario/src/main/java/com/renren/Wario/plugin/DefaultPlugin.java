@@ -55,7 +55,9 @@ public class DefaultPlugin extends IPlugin {
 			}
 		}
 		if (outStanding > maxOutStanding * testTime) {
-			message += "Client " + client.getConnectionString() + " exceed max outstanding.\n";
+			message += "Client " + client.getConnectionString()
+					+ " exceed max outstanding. Max outstanding is "
+					+ maxOutStanding + ", but now is " + outStanding + ".\n";
 		}
 
 		numbers = args[0].split(",");
