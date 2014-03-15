@@ -13,12 +13,21 @@ public class ReadWriteTestPlugin extends IPlugin {
 
 	@Override
 	public void run() {
-		
+		boolean canBeUsed = true;
+		String message = "";
 		if(!client.isAvailable()) {
-			return ;
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if (!client.isAvailable()) {
+				canBeUsed = false;
+				message += "Client can not establish connection with " +
+							client.getConnectionString() + ". \n";
+			}
 		}
 		
-		boolean canBeUsed = true;
 		try {
 			if (client.testExists(path) == null) {
 				client.testCreate(path, INITIAL.getBytes());
@@ -29,8 +38,9 @@ public class ReadWriteTestPlugin extends IPlugin {
 			client.testDdelete(path);
 		} catch (KeeperException e) {
 			canBeUsed = false;
+			message += "ZooKeeper " + client.getConnectionString() 
+					+ " can not be used.";
 		} catch (InterruptedException e) {
-			canBeUsed = false;
 		}
 		
 		if (!canBeUsed) {
@@ -38,12 +48,10 @@ public class ReadWriteTestPlugin extends IPlugin {
 			addresses = args[1].split(",");
 			
 			for (String address : addresses) {
-				mailSender.sendMail(address, "Client can not be used. "
-						+ client.getConnectionString());
+				mailSender.sendMail(address, message);
 			}
 			for (String number : numbers) {
-				msgSender.sendMessage(number, "Client can not be used. "
-						+ client.getConnectionString());
+				msgSender.sendMessage(number, message);
 			}
 		}
 	}

@@ -33,15 +33,15 @@ public class DefaultPlugin extends IPlugin {
 
 		String message = "";
 
-		if (!client.isAvailable() || !client.state.ruok()) {
-				message += "Client " + client.getConnectionString() + " is down!\n";
+		if (!client.state.ruok()) {
+				message += "ZooKeeper " + client.getConnectionString() + " is down!\n";
 		}
 
 		client.state.update();
 		String newMode = client.state.getMode();
 		if (mode != null && !mode.equals(newMode)) {
 			mode = newMode;
-			message += "Client " + client.getConnectionString() + " has changed mode to " + newMode + ".\n";
+			message += "ZooKeeper " + client.getConnectionString() + " has changed mode to " + newMode + ".\n";
 		}
 
 		int outStanding = 0;
@@ -55,7 +55,7 @@ public class DefaultPlugin extends IPlugin {
 			}
 		}
 		if (outStanding > maxOutStanding * testTime) {
-			message += "Client " + client.getConnectionString()
+			message += "ZooKeeper " + client.getConnectionString()
 					+ " exceed max outstanding. Max outstanding is "
 					+ maxOutStanding + ", but now is " + outStanding + ".\n";
 		}
