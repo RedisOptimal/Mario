@@ -31,9 +31,13 @@ public class ReadWriteTestPlugin extends IPlugin {
 				if (client.testExists(path) == null) {
 					client.testCreate(path, INITIAL.getBytes());
 				}
-				canBeUsed = INITIAL.equals(new String(client.testGetData(path)));
+				if (!INITIAL.equals(new String(client.testGetData(path)))) {
+					canBeUsed = false;
+				}
 				client.testSetData(path, UPDATED.getBytes());
-				canBeUsed = UPDATED.equals(new String(client.testGetData(path)));
+				if (!UPDATED.equals(new String(client.testGetData(path)))) {
+					canBeUsed = false;
+				}
 				client.testDdelete(path);
 			} catch (KeeperException e) {
 				canBeUsed = false;
