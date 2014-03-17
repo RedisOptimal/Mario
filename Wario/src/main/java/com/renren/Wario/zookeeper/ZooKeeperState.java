@@ -169,8 +169,7 @@ public class ZooKeeperState {
 			try {
 				ret = FourLetterWordMain.send4LetterWord(host, port, cmd);
 			} catch (IOException e) {
-				logger.error("Send " + cmd + " to client " + host + ":" + port
-						+ " failed! " + e.toString());
+				return;
 			}
 			countDownLatch.countDown();
 		}
@@ -185,6 +184,8 @@ public class ZooKeeperState {
 		try {
 			if (!countDownLatch.await(waitTimeout, TimeUnit.SECONDS)) {
 				sendThread.interrupt();
+				logger.error("Send " + cmd + " to client " + host + ":" + port
+						+ " failed!");
 			}
 		} catch (InterruptedException e) {
 			logger.error("This will not happen.");
