@@ -23,9 +23,9 @@ public class DefaultPlugin extends IPlugin {
 	private String[] addresses;
 	
 	private final int maxOutStanding = 30;
-	private final int testTime = 5;
 	
 	private String mode;
+	private int outStanding;
 
 	@Override
 	public void run() {
@@ -41,28 +41,22 @@ public class DefaultPlugin extends IPlugin {
 		String newMode = client.state.getMode();
 		if (mode != null && !mode.equals(newMode)) {
 			mode = newMode;
-			message += "Client " + client.getConnectionString() + " has changed mode to " + newMode + ".\n";
+			message += "Client " + client.getConnectionString()
+					+ " has changed mode to " + newMode + ".\n";
 		}
 
-		int outStanding = 0;
-		for(int i = 0; i < testTime; ++ i) {
-			client.state.update();
-			outStanding += client.state.getOutStanding();
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		if (outStanding > maxOutStanding * testTime) {
+		int newOutStanding = client.state.getOutStanding();
+		if (outStanding > maxOutStanding && newOutStanding > maxOutStanding) {
 			message += "Client " + client.getConnectionString()
 					+ " exceed max outstanding. Max outstanding is "
-					+ maxOutStanding + ", but now is " + outStanding + ".\n";
+					+ maxOutStanding + ", but now is " + newOutStanding
+					+ " and last time is " + outStanding + ".\n";
 		}
+		outStanding = newOutStanding;
 
-		numbers = args[0].split(",");
-		addresses = args[1].split(",");
 		if(!"".equals(message)) {
+			numbers = args[0].split(",");
+			addresses = args[1].split(",");
 			for(String number : numbers) {
 				msgSender.sendMessage(number, message);
 			}
@@ -76,9 +70,9 @@ public class DefaultPlugin extends IPlugin {
 
 	/**
 	 * clusterContext: 
-	 * connectionString1#Mode 
-	 * connectionString2#Mode
-	 * connectionString3#Mode
+	 * connectionString1#Mode#OutStanding 
+	 * connectionString2#Mode#OutStanding
+	 * connectionString3#Mode#OutStanding
 	 */
 	private void readContext() {
 		String text = new String(clusterContext);
@@ -88,15 +82,17 @@ public class DefaultPlugin extends IPlugin {
 			String line = scanner.next();
 			if (line.startsWith(client.getConnectionString())) {
 				exists = true;
-				String[] args = line.split("#");
-				mode = args[1];
+				String[] contexts = line.split("#");
+				mode = contexts[1];
+				outStanding = Integer.parseInt(contexts[2]);
 			}
 		}
 		scanner.close();
 
 		if (!exists) {
 			mode = client.state.getMode();
-			String newLine = client.getConnectionString() + "#" + mode + "\n";
+			outStanding = client.state.getOutStanding();
+			String newLine = client.getConnectionString() + "#" + mode + "#" + outStanding + "\n";
 			text += newLine;
 			clusterContext = text.getBytes();
 		}
@@ -109,7 +105,7 @@ public class DefaultPlugin extends IPlugin {
 		while (scanner.hasNext()) {
 			String line = scanner.next();
 			if (line.startsWith(client.getConnectionString())) {
-				String newLine = client.getConnectionString() + "#" + mode + "\n";
+				String newLine = client.getConnectionString() + "#" + mode + "#" + outStanding + "\n";
 				res += newLine;
 			} else {
 				res += line;
