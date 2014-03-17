@@ -18,6 +18,7 @@ package com.renren.Wario.zookeeper;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -115,20 +116,16 @@ public class ZooKeeperClient implements Watcher {
 				isAvailable = true;
 				countDownLatch.countDown();
 			} else if (event.getState().equals(KeeperState.Expired)) {
-				isAvailable = false;
 				createConnection();
 			} else if (event.getState().equals(KeeperState.Disconnected)) {
-				isAvailable = false;
+				countDownLatch = new CountDownLatch(1);
 				try {
-					Thread.sleep(3000);
+					if(!countDownLatch.await(5, TimeUnit.SECONDS)) {
+						createConnection();
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				if (this.zk.getState() == States.CONNECTED) {
-					isAvailable = true;
-					return;
-				}
-				createConnection();
 			}
 		}
 	}
