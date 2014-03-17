@@ -48,7 +48,6 @@ public class ZooKeeperState {
 				.indexOf(':') + 1));
 		this.host = host;
 		this.port = port;
-		update();
 	}
 
 	public void update() {

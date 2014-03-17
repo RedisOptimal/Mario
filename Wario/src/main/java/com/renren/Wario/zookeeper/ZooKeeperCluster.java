@@ -38,7 +38,7 @@ public class ZooKeeperCluster {
 	private final String zookeeperName;
 	private String authInfo;
 
-	private Set<String> connectStrings = null;
+	private Set<String> connectionStrings = null;
 	private Map<String, ZooKeeperClient> clients = null;
 
 	/**
@@ -52,8 +52,8 @@ public class ZooKeeperCluster {
 		this.zookeeperName = zookeeperName;
 		this.object = object;
 		authInfo = "";
-		connectStrings = new HashSet<String>();
-		connectStrings.clear();
+		connectionStrings = new HashSet<String>();
+		connectionStrings.clear();
 		clients = new HashMap<String, ZooKeeperClient>();
 		clients.clear();
 	}
@@ -68,32 +68,35 @@ public class ZooKeeperCluster {
 	public void init() throws JSONException {
 		sessionTimeout = object.getInt("sessionTimeout");
 		authInfo = object.getString("authInfo");
-		connectStrings = readJSONObject();
-		addClients(connectStrings);
+		connectionStrings = readJSONObject();
+		addClients(connectionStrings);
 	}
 
 	public void close() {
-		deleteClients(connectStrings);
+		deleteClients(connectionStrings);
 		logger.warn("Cluster " + zookeeperName + " closed!");
 	}
 
 	public void updateClients(JSONObject object) throws JSONException {
 		this.object = object;
 		sessionTimeout = object.getInt("sessionTimeout");
-		Set<String> newConnectStrings = readJSONObject();
-		Set<String> tmp = WarioUtilTools.getIntersection(connectStrings,
-				newConnectStrings);
-		deleteClients(WarioUtilTools.getDifference(connectStrings, tmp));
-		addClients(WarioUtilTools.getDifference(newConnectStrings, tmp));
-		connectStrings = newConnectStrings;
+		Set<String> newConnectionStrings = readJSONObject();
+		Set<String> tmp = WarioUtilTools.getIntersection(connectionStrings,
+				newConnectionStrings);
+		deleteClients(WarioUtilTools.getDifference(connectionStrings, tmp));
+		addClients(WarioUtilTools.getDifference(newConnectionStrings, tmp));
+		connectionStrings = newConnectionStrings;
 	}
 
-	private void addClients(Set<String> connectStrings) {
-		Iterator<String> it = connectStrings.iterator();
+	private void addClients(Set<String> connectionStrings) {
+		Iterator<String> it = connectionStrings.iterator();
 		while (it.hasNext()) {
-			String connectString = it.next();
-			if (!clients.containsKey(connectString)) {
-				AddClient add = new AddClient(connectString, sessionTimeout);
+			String connectionString = it.next();
+			if (!clients.containsKey(connectionString)) {
+				ZooKeeperClient client = new ZooKeeperClient(connectionString,
+						sessionTimeout, authInfo);
+				clients.put(connectionString, client);
+				AddClient add = new AddClient(client);
 				new Thread(add).start();
 			}
 		}
@@ -101,41 +104,32 @@ public class ZooKeeperCluster {
 
 	private class AddClient implements Runnable {
 
-		private String connectString = null;
-		private int sessionTimeout;
-
-		public AddClient(String connectString, int sessionTimeout) {
-			this.connectString = connectString;
-			this.sessionTimeout = sessionTimeout;
+		ZooKeeperClient client = null;
+		
+		public AddClient(ZooKeeperClient client) {
+			this.client = client;
 		}
 
 		@Override
 		public void run() {
-			ZooKeeperClient client = new ZooKeeperClient(connectString,
-					sessionTimeout, authInfo);
-			synchronized (clients) {
-				clients.put(connectString, client);
-				logger.warn("Client "
-						+ connectString
-						+ " added to "
-						+ zookeeperName
-						+ ("".equals(authInfo) ? ""
-								: (" with auth " + authInfo)) + ".");
-			}
+			logger.warn("Client " + client.getConnectionString() + " added to "
+					+ zookeeperName
+					+ ("".equals(authInfo) ? "" : (" with auth " + authInfo))
+					+ ".");
 			client.createConnection();
 		}
 
 	}
 
-	private void deleteClients(Set<String> connectStrings) {
-		Iterator<String> it = connectStrings.iterator();
+	private void deleteClients(Set<String> connectionStrings) {
+		Iterator<String> it = connectionStrings.iterator();
 		while (it.hasNext()) {
-			String connectString = it.next();
-			if (clients.containsKey(connectString)) {
-				ZooKeeperClient zookeeperClient = clients.get(connectString);
+			String connectionString = it.next();
+			if (clients.containsKey(connectionString)) {
+				ZooKeeperClient zookeeperClient = clients.get(connectionString);
 				zookeeperClient.releaseConnection();
-				clients.remove(connectString);
-				logger.warn("Client " + connectString + " removed from "
+				clients.remove(connectionString);
+				logger.warn("Client " + connectionString + " removed from "
 						+ zookeeperName + ".");
 			}
 		}
@@ -144,9 +138,9 @@ public class ZooKeeperCluster {
 	private Set<String> readJSONObject() throws JSONException {
 		Set<String> res = new HashSet<String>();
 		res.clear();
-		JSONArray connectStringArray = object.getJSONArray("serverIPList");
-		for (int i = 0; i < connectStringArray.length(); ++i) {
-			res.add(connectStringArray.getString(i));
+		JSONArray connectionStringArray = object.getJSONArray("serverIPList");
+		for (int i = 0; i < connectionStringArray.length(); ++i) {
+			res.add(connectionStringArray.getString(i));
 		}
 		return res;
 	}

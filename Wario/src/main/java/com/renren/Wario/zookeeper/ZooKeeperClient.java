@@ -69,9 +69,6 @@ public class ZooKeeperClient {
 		try {
 			zk = new ZooKeeper(connectionString, sessionTimeout, new MyWatcher());
 			countDownLatch.await();
-			if (!"".equals(auth)) {
-				zk.addAuthInfo(scheme, auth.getBytes());
-			}
 		} catch (IOException e) {
 			logger.error("Create connection " + connectionString + " failed! "
 					+ e.toString());
@@ -81,6 +78,9 @@ public class ZooKeeperClient {
 		}
 
 		try {
+			if (!"".equals(auth)) {
+				zk.addAuthInfo(scheme, auth.getBytes());
+			}
 			if (zk.exists(ZK_PATH, false) == null) {
 				zk.create(ZK_PATH, "this is a test node.".getBytes(),
 						Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
@@ -92,6 +92,8 @@ public class ZooKeeperClient {
 			logger.error("Create test node " + ZK_PATH + " faild! "
 					+ e.toString());
 		}
+		
+		state.update();
 	}
 
 	public void releaseConnection() {
