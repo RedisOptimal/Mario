@@ -18,7 +18,6 @@ package com.renren.Wario.zookeeper;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -30,10 +29,9 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.ZooKeeper.States;
 import org.apache.zookeeper.data.Stat;
 
-public class ZooKeeperClient implements Watcher {
+public class ZooKeeperClient {
 
 	private static Logger logger = LogManager.getLogger(ZooKeeperClient.class
 			.getName());
@@ -69,7 +67,7 @@ public class ZooKeeperClient implements Watcher {
 		countDownLatch = new CountDownLatch(1);
 
 		try {
-			zk = new ZooKeeper(connectionString, sessionTimeout, this);
+			zk = new ZooKeeper(connectionString, sessionTimeout, new MyWatcher());
 			countDownLatch.await();
 			if (!"".equals(auth)) {
 				zk.addAuthInfo(scheme, auth.getBytes());
@@ -83,8 +81,10 @@ public class ZooKeeperClient implements Watcher {
 		}
 
 		try {
-			zk.create(ZK_PATH, "this is a test node.".getBytes(),
-					Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			if (zk.exists(ZK_PATH, false) == null) {
+				zk.create(ZK_PATH, "this is a test node.".getBytes(),
+						Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			}
 		} catch (KeeperException e) {
 			logger.error("Create test node " + ZK_PATH + " faild! "
 					+ e.toString());
@@ -106,30 +106,24 @@ public class ZooKeeperClient implements Watcher {
 		}
 	}
 
-	@Override
-	public void process(WatchedEvent event) {
-		logger.info("SessionWatcher: " + connectionString + "|"
-				+ event.getType() + "|" + event.getState());
-
-		if (event.getType() == EventType.None) {
-			if (event.getState().equals(KeeperState.SyncConnected)) {
-				isAvailable = true;
-				countDownLatch.countDown();
-			} else if (event.getState().equals(KeeperState.Expired)) {
-				createConnection();
-			} else if (event.getState().equals(KeeperState.Disconnected)) {
-				countDownLatch = new CountDownLatch(1);
-				try {
-					if(!countDownLatch.await(5, TimeUnit.SECONDS)) {
-						createConnection();
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+	private class MyWatcher implements Watcher {
+		@Override
+		public void process(WatchedEvent event) {
+			logger.info("SessionWatcher: " + connectionString + "|"
+					+ event.getType() + "|" + event.getState());
+			if (event.getType() == EventType.None) {
+				if (event.getState().equals(KeeperState.SyncConnected)) {
+					isAvailable = true;
+					countDownLatch.countDown();
+				} else if (event.getState().equals(KeeperState.Expired)) {
+					createConnection();
+				} else if (event.getState().equals(KeeperState.Disconnected)) {
+					isAvailable = false;
 				}
 			}
 		}
 	}
-
+	
 	public boolean isAvailable() {
 		return isAvailable;
 	}
