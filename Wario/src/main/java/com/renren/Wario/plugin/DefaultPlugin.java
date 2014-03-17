@@ -34,14 +34,16 @@ public class DefaultPlugin extends IPlugin {
 		String message = "";
 
 		if (!client.state.ruok()) {
-				message += "ZooKeeper " + client.getConnectionString() + " is down!\n";
+			message += "ZooKeeper " + client.getConnectionString()
+					+ " is down!\n";
 		}
 
 		client.state.update();
 		String newMode = client.state.getMode();
 		if (mode != null && !mode.equals(newMode)) {
 			mode = newMode;
-			message += "ZooKeeper " + client.getConnectionString() + " has changed mode to " + newMode + ".\n";
+			message += "ZooKeeper " + client.getConnectionString()
+					+ " has changed mode to " + newMode + ".\n";
 		}
 
 		int newOutStanding = client.state.getOutStanding();
@@ -53,17 +55,17 @@ public class DefaultPlugin extends IPlugin {
 		}
 		outStanding = newOutStanding;
 
-		if(!"".equals(message)) {
+		if (!"".equals(message)) {
 			numbers = args[0].split(",");
 			addresses = args[1].split(",");
-			for(String number : numbers) {
+			for (String number : numbers) {
 				msgSender.sendMessage(number, message);
 			}
-			for(String address : addresses) {
+			for (String address : addresses) {
 				mailSender.sendMail(address, message);
 			}
 		}
-		
+
 		writeContext();
 	}
 
@@ -91,7 +93,8 @@ public class DefaultPlugin extends IPlugin {
 		if (!exists) {
 			mode = client.state.getMode();
 			outStanding = client.state.getOutStanding();
-			String newLine = client.getConnectionString() + "#" + mode + "#" + outStanding + "\n";
+			String newLine = client.getConnectionString() + "#" + mode + "#"
+					+ outStanding + "\n";
 			text += newLine;
 			clusterContext = text.getBytes();
 		}
@@ -104,7 +107,8 @@ public class DefaultPlugin extends IPlugin {
 		while (scanner.hasNext()) {
 			String line = scanner.next();
 			if (line.startsWith(client.getConnectionString())) {
-				String newLine = client.getConnectionString() + "#" + mode + "#" + outStanding + "\n";
+				String newLine = client.getConnectionString() + "#" + mode
+						+ "#" + outStanding + "\n";
 				res += newLine;
 			} else {
 				res += line;

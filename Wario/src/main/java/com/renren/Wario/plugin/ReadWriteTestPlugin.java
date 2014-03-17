@@ -13,7 +13,6 @@ public class ReadWriteTestPlugin extends IPlugin {
 
 	@Override
 	public void run() {
-		boolean canBeUsed = true;
 		String message = "";
 		if(!client.isAvailable()) {
 			try {
@@ -21,32 +20,36 @@ public class ReadWriteTestPlugin extends IPlugin {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if (!client.isAvailable()) {
+		}
+
+		if (!client.isAvailable()) {
+			message += "Client can not establish connection with " +
+						client.getConnectionString() + ". \n";
+		} else {
+			boolean canBeUsed = true;
+			try {
+				if (client.testExists(path) == null) {
+					client.testCreate(path, INITIAL.getBytes());
+				}
+				canBeUsed = INITIAL.equals(new String(client.testGetData(path)));
+				client.testSetData(path, UPDATED.getBytes());
+				canBeUsed = UPDATED.equals(new String(client.testGetData(path)));
+				client.testDdelete(path);
+			} catch (KeeperException e) {
 				canBeUsed = false;
-				message += "Client can not establish connection with " +
-							client.getConnectionString() + ". \n";
+			} catch (InterruptedException e) {
+				canBeUsed = false;
 			}
-		}
-		
-		try {
-			if (client.testExists(path) == null) {
-				client.testCreate(path, INITIAL.getBytes());
+			if (!canBeUsed) {
+				message += "ZooKeeper " + client.getConnectionString()
+						+ " can not be used.";
 			}
-			canBeUsed = INITIAL.equals(new String(client.testGetData(path)));
-			client.testSetData(path, UPDATED.getBytes());
-			canBeUsed = UPDATED.equals(new String(client.testGetData(path)));
-			client.testDdelete(path);
-		} catch (KeeperException e) {
-			canBeUsed = false;
-			message += "ZooKeeper " + client.getConnectionString() 
-					+ " can not be used.";
-		} catch (InterruptedException e) {
-		}
+		}		
 		
-		if (!canBeUsed) {
+		if (!"".equals(message)) {
 			numbers = args[0].split(",");
 			addresses = args[1].split(",");
-			
+
 			for (String address : addresses) {
 				mailSender.sendMail(address, message);
 			}
