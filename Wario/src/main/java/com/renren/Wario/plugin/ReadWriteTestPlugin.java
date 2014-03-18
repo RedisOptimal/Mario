@@ -23,30 +23,29 @@ public class ReadWriteTestPlugin extends IPlugin {
 		}
 
 		if (!client.isAvailable()) {
-			message += "Client can not establish connection with " +
-						client.getConnectionString() + ". \n";
+			message += "Client can not establish connection with "
+					+ client.getConnectionString() + ". \n";
 		} else {
-			boolean canBeUsed = true;
 			try {
 				if (client.testExists(path) == null) {
 					client.testCreate(path, INITIAL.getBytes());
 				}
 				if (!INITIAL.equals(new String(client.testGetData(path)))) {
-					canBeUsed = false;
+					message += "ZooKeeper: " + client.getConnectionString()
+							+ "\nRead error.\n";
 				}
 				client.testSetData(path, UPDATED.getBytes());
 				if (!UPDATED.equals(new String(client.testGetData(path)))) {
-					canBeUsed = false;
+					message += "ZooKeeper: " + client.getConnectionString()
+							+ "\nRead error.\n";
 				}
 				client.testDdelete(path);
 			} catch (KeeperException e) {
-				canBeUsed = false;
+				message += "ZooKeeper: " + client.getConnectionString() + "\n"
+						+ e.toString();
 			} catch (InterruptedException e) {
-				canBeUsed = false;
-			}
-			if (!canBeUsed) {
-				message += "ZooKeeper " + client.getConnectionString()
-						+ " can not be used.";
+				message += "ZooKeeper: " + client.getConnectionString() + "\n"
+						+ e.toString();
 			}
 		}		
 		
