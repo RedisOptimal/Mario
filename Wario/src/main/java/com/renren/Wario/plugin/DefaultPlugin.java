@@ -41,9 +41,10 @@ public class DefaultPlugin extends IPlugin {
 		client.state.update();
 		String newMode = client.state.getMode();
 		if (mode != null && !mode.equals(newMode)) {
-			mode = newMode;
 			message += "ZooKeeper " + client.getConnectionString()
-					+ " has changed mode to " + newMode + ".\n";
+					+ " has changed mode from " + mode + " to " + newMode
+					+ ".\n";
+			mode = newMode;
 		}
 
 		int newOutStanding = client.state.getOutStanding();
