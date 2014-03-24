@@ -1,3 +1,0 @@
-{
-	"ZooKeeper1":{serverIPList:["10.2.78.184:21811","10.2.78.184:21812","10.2.78.184:21813","10.2.78.184:21814","10.2.78.184:21815"],sessionTimeout:5000,authInfo:"username:password"}
-}

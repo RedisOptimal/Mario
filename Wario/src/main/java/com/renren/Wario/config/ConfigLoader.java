@@ -16,6 +16,8 @@
 package com.renren.Wario.config;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.renren.Wario.db.MySQLHelper;
 
 public class ConfigLoader {
 
@@ -36,15 +40,15 @@ public class ConfigLoader {
 
 	// Configuration variable
 	private final String configPathPrefix;
-	private final String serverConfigFile = "server.json";
 	private final String pluginConfigFile = "plugin.json";
 
-	private String serverConfigText = null;
 	private String pluginConfigText = null;
 
 	private Map<String, JSONObject> serverObjects = new HashMap<String, JSONObject>();
 	private Map<String, JSONArray> pluginObjects = new HashMap<String, JSONArray>();
 
+	private MySQLHelper helper = new MySQLHelper();
+	
 	private ConfigLoader() {
 		if (System.getProperty("default.config.path") == null) {
 			configPathPrefix = "./conf/";
@@ -61,25 +65,55 @@ public class ConfigLoader {
 	}
 
 	public void loadConfig() {
-		Map<String, JSONObject> tmpServerObjects = new HashMap<String, JSONObject>();
-		String zookeeperName = "";
+		
+		loadServerConfig();
+		
+		loadPluginConfig();
+	}
+	
+	private void loadServerConfig() {
+
+		Map<String, JSONObject> tmpServerObjects = new HashMap<String, JSONObject>(); 
 		try {
-			serverConfigText = FileCacheReader.read(configPathPrefix
-					+ serverConfigFile);
-			JSONObject jsonObject = new JSONObject(serverConfigText);
-			Iterator<?> iterator = jsonObject.keys();
-			while (iterator.hasNext()) {
-				zookeeperName = (String) iterator.next();
-				tmpServerObjects.put(zookeeperName,
-						jsonObject.getJSONObject(zookeeperName));
+			String sql = "select id, zk_name, session_timeout from mario_zk_info";
+			helper.open();
+			ResultSet rs = helper.executeQuery(sql);
+			while(rs.next()) {
+				int id = rs.getInt("id");
+				String zk_name = rs.getString("zk_name");
+				int sessionTimeout = rs.getInt("session_timeout");
+				
+				tmpServerObjects.put(zk_name, getServerObject(id, sessionTimeout));
 			}
+			helper.close();
 			serverObjects = tmpServerObjects;
-		} catch (IOException e) {
-			logger.error("Load server config : " + e.toString());
+		} catch (ClassNotFoundException e) {
+			logger.error("Load server config failed! " + e.toString());
+		} catch (SQLException e) {
+			logger.error("Load server config failed! " + e.toString());
 		} catch (JSONException e) {
-			logger.error("Can't parsing cluster " + zookeeperName
-					+ ", check the file format. " + e.toString());
+			logger.error("Load server config failed! " + e.toString());
 		}
+	}
+	
+	private JSONObject getServerObject(int zkId, int sessionTimeout) throws JSONException, ClassNotFoundException, SQLException {
+		JSONObject serverObject = new JSONObject();
+		JSONArray serverIPList = new JSONArray();
+		String sql = "select id, host, port, mode from mario_server_info where zk_id = " + zkId;
+		helper.open();
+		ResultSet rs = helper.executeQuery(sql);
+		while(rs.next()) {
+			String host = rs.getString("host");
+			int port = rs.getInt("port");
+			serverIPList.put(host + ":" + port);
+		}
+		serverObject.put("serverIPList", serverIPList);
+		serverObject.put("sessionTimeout", sessionTimeout);
+		serverObject.put("authInfo", "");
+		return serverObject;
+	}
+	
+	private void loadPluginConfig() {
 
 		Map<String, JSONArray> tmpPluginObjects = new HashMap<String, JSONArray>();
 		String pluginName = "";

@@ -70,6 +70,7 @@ public class ZooKeeperCluster {
 		authInfo = object.getString("authInfo");
 		connectionStrings = readJSONObject();
 		addClients(connectionStrings);
+		logger.warn("Cluster " + zookeeperName + " inited!");
 	}
 
 	public void close() {

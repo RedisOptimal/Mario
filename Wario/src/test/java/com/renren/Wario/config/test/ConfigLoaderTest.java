@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.json.JSONArray;
-import org.json.JSONObject;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,14 +35,6 @@ import org.junit.Test;
 import com.renren.Wario.config.ConfigLoader;
 
 public class ConfigLoaderTest {
-	private static String serverConfig1 = "";
-	private static String serverConfig2 = "{}";
-	private static String serverConfig3 = "{\n"
-			+ "\"Zookeeper1\":{serverIPList:[\"localhost:2181\",\"localhost:2182\"],sessionTimeout:5000},\n"
-			+ "\"Zookeeper2\":{serverIPList:[\"localhost:2183\",\"localhost:2184\"],sessionTimeout:4000},\n"
-			+ "\"Zookeeper3\":{serverIPList:[\"localhost:2181\",\"localhost:2182\",\"localhost:2183\"],sessionTimeout:3000},\n"
-			+ "\"Test1\":{serverIPList:[\"localhost:2181\"],sessionTimeout:3000}\n"
-			+ "}";
 	private static String pluginConfig1 = "";
 	private static String pluginConfig2 = "{}";
 	private static String pluginConfig3 = "{\n"
@@ -92,7 +84,6 @@ public class ConfigLoaderTest {
 
 	@BeforeClass
 	public static void init() {
-		new File("Wario.log").delete();
 		System.setProperty("default.config.path", "./");
 		PropertyConfigurator
 				.configure(System.getProperty("user.dir") + File.separator
@@ -108,10 +99,9 @@ public class ConfigLoaderTest {
 		}
 		ConfigLoader config = ConfigLoader.getInstance();
 		config.loadConfig();
-		File file = new File("Wario.log");
+		File file = new File("logs/Wario.log");
 		Assert.assertTrue(file.exists());
-		Assert.assertTrue(SearchFile("Wario.log", "Load server config"));
-		Assert.assertTrue(SearchFile("Wario.log", "Load plugin config"));
+		Assert.assertTrue(SearchFile("logs/Wario.log", "Load plugin config"));
 	}
 
 	@Test
@@ -121,17 +111,12 @@ public class ConfigLoaderTest {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		output("server.json", serverConfig1);
 		output("plugin.json", pluginConfig1);
 		ConfigLoader config = ConfigLoader.getInstance();
 		config.loadConfig();
-		new File("server.json").delete();
 		new File("plugin.json").delete();
 		Assert.assertTrue(SearchFile(
-				"Wario.log",
-				"parsing cluster , check the file format. org.json.JSONException: A JSONObject text must begin with '{'"));
-		Assert.assertTrue(SearchFile(
-				"Wario.log",
+				"logs/Wario.log",
 				"parsing plugin , check the file format. org.json.JSONException: A JSONObject text must begin with '{'"));
 	}
 
@@ -142,36 +127,31 @@ public class ConfigLoaderTest {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		output("server.json", serverConfig3);
 		output("plugin.json", pluginConfig3);
 		ConfigLoader config = ConfigLoader.getInstance();
 		config.loadConfig();
-		Map<String, JSONObject> serverMap = config.getServerObjects();
 		Map<String, JSONArray> pluginMap = config.getPluginObjects();
-		Assert.assertTrue(serverMap.size() == 4);
 		Assert.assertTrue(pluginMap.size() == 1);
 		config.loadConfig();
-		serverMap = config.getServerObjects();
 		pluginMap = config.getPluginObjects();
-		Assert.assertTrue(serverMap.size() == 4);
 		Assert.assertTrue(pluginMap.size() == 1);
-		new File("server.json").delete();
 		new File("plugin.json").delete();
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		output("server.json", serverConfig2);
 		output("plugin.json", pluginConfig2);
 		config.loadConfig();
-		Assert.assertTrue(serverMap.size() == 4);
 		Assert.assertTrue(pluginMap.size() == 1);
-		serverMap = config.getServerObjects();
 		pluginMap = config.getPluginObjects();
-		Assert.assertTrue(serverMap.size() == 0);
 		Assert.assertTrue(pluginMap.size() == 0);
-		new File("server.json").delete();
 		new File("plugin.json").delete();
+	}
+	
+	@AfterClass
+	public static void close() {
+
+		new File("logs/Wario.log").delete();
 	}
 }
