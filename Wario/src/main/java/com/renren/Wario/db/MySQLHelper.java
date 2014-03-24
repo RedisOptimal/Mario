@@ -23,11 +23,11 @@ import java.sql.Statement;
 
 public class MySQLHelper extends DBHelper {
 
-	private String ip = "localhost";
+	private String ip = "127.0.0.1";
 	private int port = 3306;
 	private String user = "root";
 	private String password = "123456";
-	private String dbName = "Mario";
+	private String dbName = "xweb";
 	
 	private String url;
 	private Connection connection;

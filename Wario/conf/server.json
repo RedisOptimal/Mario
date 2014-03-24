@@ -1,5 +1,3 @@
 {
-	"ZooKeeper1":{serverIPList:["localhost:21811","localhost:21812","localhost:21813","localhost:21814","localhost:21815"],sessionTimeout:5000,authInfo:"username:password"},
-	"ZooKeeper2":{serverIPList:["localhost:21811","localhost:21812","localhost:21813","localhost:21814"],sessionTimeout:4000,authInfo:""},
-	"ZooKeeper3":{serverIPList:["localhost:21811","localhost:21812","localhost:21813"],sessionTimeout:3000,authInfo:""}
+	"ZooKeeper1":{serverIPList:["10.2.78.184:21811","10.2.78.184:21812","10.2.78.184:21813","10.2.78.184:21814","10.2.78.184:21815"],sessionTimeout:5000,authInfo:"username:password"}
 }

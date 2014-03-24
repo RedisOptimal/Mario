@@ -98,7 +98,7 @@ public class WarioMain extends Thread {
 			updateServerConfig(configLoader.getServerObjects());
 
 			try {
-				sleep(300 << 10);
+				sleep(10 << 10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
