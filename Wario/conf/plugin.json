@@ -5,6 +5,9 @@
 	"ReadWriteTestPlugin":[
 		{zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["numbers", "addresses"],comment:"whatfor"}
 	],
+	"ObserverPlugin":[
+		{zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["number1,number2","address1,address2"],comment:"whatfor"}
+	],
 	"DBPlugin":[
 		{zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:[],comment:"whatfor"}
 	]

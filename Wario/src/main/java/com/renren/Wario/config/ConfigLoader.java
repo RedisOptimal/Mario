@@ -47,8 +47,6 @@ public class ConfigLoader {
 	private Map<String, JSONObject> serverObjects = new HashMap<String, JSONObject>();
 	private Map<String, JSONArray> pluginObjects = new HashMap<String, JSONArray>();
 
-	private MySQLHelper helper = new MySQLHelper();
-	
 	private ConfigLoader() {
 		if (System.getProperty("default.config.path") == null) {
 			configPathPrefix = "./conf/";
@@ -65,25 +63,27 @@ public class ConfigLoader {
 	}
 
 	public void loadConfig() {
-		
+
 		loadServerConfig();
-		
+
 		loadPluginConfig();
 	}
-	
+
 	private void loadServerConfig() {
 
-		Map<String, JSONObject> tmpServerObjects = new HashMap<String, JSONObject>(); 
+		Map<String, JSONObject> tmpServerObjects = new HashMap<String, JSONObject>();
 		try {
 			String sql = "select id, zk_name, session_timeout from mario_zk_info";
+			MySQLHelper helper = new MySQLHelper();
 			helper.open();
 			ResultSet rs = helper.executeQuery(sql);
-			while(rs.next()) {
+			while (rs.next()) {
 				int id = rs.getInt("id");
 				String zk_name = rs.getString("zk_name");
 				int sessionTimeout = rs.getInt("session_timeout");
-				
-				tmpServerObjects.put(zk_name, getServerObject(id, sessionTimeout));
+
+				tmpServerObjects.put(zk_name,
+						getServerObject(id, sessionTimeout));
 			}
 			helper.close();
 			serverObjects = tmpServerObjects;
@@ -95,24 +95,36 @@ public class ConfigLoader {
 			logger.error("Load server config failed! " + e.toString());
 		}
 	}
-	
-	private JSONObject getServerObject(int zkId, int sessionTimeout) throws JSONException, ClassNotFoundException, SQLException {
+
+	private JSONObject getServerObject(int zkId, int sessionTimeout)
+			throws JSONException, ClassNotFoundException, SQLException {
 		JSONObject serverObject = new JSONObject();
 		JSONArray serverIPList = new JSONArray();
-		String sql = "select id, host, port, mode from mario_server_info where zk_id = " + zkId;
+		String sql = "select id, host, port, mode "
+				+ "from mario_server_info "
+				+ "where zk_id = " + zkId;
+		MySQLHelper helper = new MySQLHelper();
 		helper.open();
 		ResultSet rs = helper.executeQuery(sql);
-		while(rs.next()) {
+		String observer = "";
+		while (rs.next()) {
 			String host = rs.getString("host");
 			int port = rs.getInt("port");
-			serverIPList.put(host + ":" + port);
+			String mode = rs.getString("mode");
+			if ("Observer".equalsIgnoreCase(mode)) {
+				observer = host + ":" + port;
+			} else {
+				serverIPList.put(host + ":" + port);
+			}
 		}
+		helper.close();
 		serverObject.put("serverIPList", serverIPList);
 		serverObject.put("sessionTimeout", sessionTimeout);
 		serverObject.put("authInfo", "");
+		serverObject.put("observer", observer);
 		return serverObject;
 	}
-	
+
 	private void loadPluginConfig() {
 
 		Map<String, JSONArray> tmpPluginObjects = new HashMap<String, JSONArray>();

@@ -41,6 +41,7 @@ public class ZooKeeperClient {
 	private final int sessionTimeout;
 	private final String scheme = "digest";
 	private final String auth;
+	private final String mode;
 
 	private volatile boolean isAvailable;
 	private final String ZK_PATH;
@@ -54,12 +55,20 @@ public class ZooKeeperClient {
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout,
 			String auth) {
+		this(connectionString, sessionTimeout, auth, "");
+	}
+
+	public ZooKeeperClient(String connectionString, int sessionTimeout,
+			String auth, String mode) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
 		this.auth = auth;
+		this.mode = mode;
 		isAvailable = false;
 		ZK_PATH = "/god_damn_zookeeper_" + connectionString;
-		state = new ZooKeeperState(connectionString);
+		if (!"observer".equals(mode)) {
+			state = new ZooKeeperState(connectionString);
+		}
 	}
 
 	public void createConnection() {
@@ -67,7 +76,8 @@ public class ZooKeeperClient {
 		countDownLatch = new CountDownLatch(1);
 
 		try {
-			zk = new ZooKeeper(connectionString, sessionTimeout, new MyWatcher());
+			zk = new ZooKeeper(connectionString, sessionTimeout,
+					new MyWatcher());
 			countDownLatch.await();
 		} catch (IOException e) {
 			logger.error("Create connection " + connectionString + " failed! "
@@ -78,12 +88,16 @@ public class ZooKeeperClient {
 		}
 
 		try {
-			if (!"".equals(auth)) {
-				zk.addAuthInfo(scheme, auth.getBytes());
-			}
-			if (zk.exists(ZK_PATH, false) == null) {
-				zk.create(ZK_PATH, "this is a test node.".getBytes(),
-						Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+			if ("observer".equals(mode)) {
+				zk.addAuthInfo("super", auth.getBytes());
+			} else {
+				if (!"".equals(auth)) {
+					zk.addAuthInfo(scheme, auth.getBytes());
+				}
+				if (zk.exists(ZK_PATH, false) == null) {
+					zk.create(ZK_PATH, "this is a test node.".getBytes(),
+							Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+				}
 			}
 		} catch (KeeperException e) {
 			logger.error("Create test node " + ZK_PATH + " faild! "
@@ -92,8 +106,10 @@ public class ZooKeeperClient {
 			logger.error("Create test node " + ZK_PATH + " faild! "
 					+ e.toString());
 		}
-		
-		state.update();
+
+		if (state != null) {
+			state.update();
+		}
 	}
 
 	public void releaseConnection() {
@@ -125,7 +141,7 @@ public class ZooKeeperClient {
 			}
 		}
 	}
-	
+
 	public boolean isAvailable() {
 		return isAvailable;
 	}
