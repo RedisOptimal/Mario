@@ -34,9 +34,9 @@ public class ZooKeeperCluster {
 			.getName());
 
 	private JSONObject object = null;
-	private int sessionTimeout = 10000;
 	private final String zookeeperName;
-	private String authInfo;
+	private int sessionTimeout = 10000;
+	private String observerAuth = null;
 
 	private Set<String> connectionStrings = null;
 	private Map<String, ZooKeeperClient> clients = null;
@@ -46,12 +46,49 @@ public class ZooKeeperCluster {
 	public ZooKeeperCluster(String zookeeperName, JSONObject object) {
 		this.zookeeperName = zookeeperName;
 		this.object = object;
-		authInfo = "";
 		connectionStrings = new HashSet<String>();
 		connectionStrings.clear();
 		clients = new HashMap<String, ZooKeeperClient>();
 		clients.clear();
 		observer = "";
+		observerAuth = "";
+	}
+
+	public void init() throws JSONException {
+		sessionTimeout = object.getInt("sessionTimeout");
+		connectionStrings = readJSONObject();
+		observer = object.getString("observer");
+		observerAuth = object.getString("observerAuth");
+		addClients(connectionStrings);
+		addObserverClient(observer, observerAuth);
+		
+		logger.warn("Cluster " + zookeeperName + " inited!");
+	}
+
+	public void close() {
+		deleteClients(connectionStrings);
+		observerClient.releaseConnection();
+		logger.warn("Client " + observer + " removed from " + zookeeperName
+				+ ".");
+		logger.warn("Cluster " + zookeeperName + " closed!");
+	}
+
+	public void updateClients(JSONObject object) throws JSONException {
+		this.object = object;
+		sessionTimeout = object.getInt("sessionTimeout");
+		String newObserver = object.getString("observer");
+		String newObserverAuth = object.getString("observerAuth");
+		if (!observer.equals(newObserver) || ! observerAuth.equals(newObserverAuth)) {
+			observer = newObserver;
+			observerAuth = newObserverAuth;
+			updateObserverClient(observer, observerAuth);
+		}
+		Set<String> newConnectionStrings = readJSONObject();
+		Set<String> tmp = WarioUtilTools.getIntersection(connectionStrings,
+				newConnectionStrings);
+		deleteClients(WarioUtilTools.getDifference(connectionStrings, tmp));
+		addClients(WarioUtilTools.getDifference(newConnectionStrings, tmp));
+		connectionStrings = newConnectionStrings;
 	}
 
 	/**
@@ -75,41 +112,6 @@ public class ZooKeeperCluster {
 		return observerClient;
 	}
 
-	public void init() throws JSONException {
-		sessionTimeout = object.getInt("sessionTimeout");
-		authInfo = object.getString("authInfo");
-		connectionStrings = readJSONObject();
-		observer = object.getString("observer");
-		addClients(connectionStrings);
-		addObserverClient(observer);
-		
-		logger.warn("Cluster " + zookeeperName + " inited!");
-	}
-
-	public void close() {
-		deleteClients(connectionStrings);
-		observerClient.releaseConnection();
-		logger.warn("Client " + observer + " removed from " + zookeeperName
-				+ ".");
-		logger.warn("Cluster " + zookeeperName + " closed!");
-	}
-
-	public void updateClients(JSONObject object) throws JSONException {
-		this.object = object;
-		sessionTimeout = object.getInt("sessionTimeout");
-		String newObserver = object.getString("observer");
-		if (!observer.equals(newObserver)) {
-			observer = newObserver;
-			updateObserverClient(observer);
-		}
-		Set<String> newConnectionStrings = readJSONObject();
-		Set<String> tmp = WarioUtilTools.getIntersection(connectionStrings,
-				newConnectionStrings);
-		deleteClients(WarioUtilTools.getDifference(connectionStrings, tmp));
-		addClients(WarioUtilTools.getDifference(newConnectionStrings, tmp));
-		connectionStrings = newConnectionStrings;
-	}
-
 	/**
 	 * Read JSONObject and return the connection strings of clients.
 	 * @return connectionStrings
@@ -131,7 +133,7 @@ public class ZooKeeperCluster {
 			String connectionString = it.next();
 			if (!clients.containsKey(connectionString)) {
 				ZooKeeperClient client = new ZooKeeperClient(connectionString,
-						sessionTimeout, authInfo);
+						sessionTimeout);
 				clients.put(connectionString, client);
 				AddClient add = new AddClient(client);
 				new Thread(add).start();
@@ -139,17 +141,16 @@ public class ZooKeeperCluster {
 		}
 	}
 
-	private void addObserverClient(String connectionString) {
-		observerClient = new ZooKeeperClient(connectionString, sessionTimeout, "", "observer");
-		AddClient add = new AddClient(observerClient);
-		new Thread(add).start();
-	}
-	
-	private void updateObserverClient(String connectionString) {
+	private void updateObserverClient(String connectionString, String observerAuth) {
 		observerClient.releaseConnection();
 		logger.warn("Client " + observer + " removed from " + zookeeperName
 				+ ".");
-		observerClient = new ZooKeeperClient(connectionString, sessionTimeout, "", "observer");
+		addObserverClient(connectionString, observerAuth);
+	}
+
+	private void addObserverClient(String connectionString, String observerAuth) {
+		observerClient = new ZooKeeperClient(connectionString, sessionTimeout,
+				observer, observerAuth);
 		AddClient add = new AddClient(observerClient);
 		new Thread(add).start();
 	}
@@ -165,9 +166,7 @@ public class ZooKeeperCluster {
 		@Override
 		public void run() {
 			logger.warn("Client " + client.getConnectionString() + " added to "
-					+ zookeeperName
-					+ ("".equals(authInfo) ? "" : (" with auth " + authInfo))
-					+ ".");
+					+ zookeeperName + ".");
 			client.createConnection();
 		}
 

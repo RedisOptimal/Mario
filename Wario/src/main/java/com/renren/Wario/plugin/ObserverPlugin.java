@@ -15,12 +15,51 @@
  */
 package com.renren.Wario.plugin;
 
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.data.Stat;
+
 public class ObserverPlugin extends IPlugin {
 
+	private int count = 0;
+	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		System.err.println("ObserverPlugin runs at " + client.getConnectionString());
+		System.out.println(new Date());
+		try {
+			List<String> children = client.getChildren("/");
+			Iterator<String> it = children.iterator();
+			while(it.hasNext()) {
+				dfs("/" + it.next());
+			}
+		} catch (KeeperException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println(new Date());
+		System.out.println(count);
 	}
-
+	
+	void dfs(String path) {
+		try {
+			Stat stat = new Stat();
+			client.getData(path, stat);
+			count ++;
+			List<String> children = client.getChildren(path);
+			Iterator<String> it = children.iterator();
+			while(it.hasNext()) {
+				dfs(path + "/" + it.next());
+			}
+		} catch (KeeperException e) {
+			System.err.println(path + " " + e.toString());
+			return ;
+		} catch (InterruptedException e) {
+			System.err.println(path + " " + e.toString());
+			return ;
+		}
+	}
 }

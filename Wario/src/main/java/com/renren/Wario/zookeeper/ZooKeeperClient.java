@@ -50,16 +50,11 @@ public class ZooKeeperClient {
 	private CountDownLatch countDownLatch = null;
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout) {
-		this(connectionString, sessionTimeout, "");
+		this(connectionString, sessionTimeout, "", "");
 	}
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout,
-			String auth) {
-		this(connectionString, sessionTimeout, auth, "");
-	}
-
-	public ZooKeeperClient(String connectionString, int sessionTimeout,
-			String auth, String mode) {
+			String mode, String auth) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
 		this.auth = auth;
@@ -88,16 +83,12 @@ public class ZooKeeperClient {
 		}
 
 		try {
-			if ("observer".equals(mode)) {
-				zk.addAuthInfo("super", auth.getBytes());
-			} else {
-				if (!"".equals(auth)) {
-					zk.addAuthInfo(scheme, auth.getBytes());
-				}
-				if (zk.exists(ZK_PATH, false) == null) {
-					zk.create(ZK_PATH, "this is a test node.".getBytes(),
-							Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-				}
+			if (!"".equals(auth)) {
+				zk.addAuthInfo(scheme, auth.getBytes());
+			}
+			if (!"observer".equals(mode) && zk.exists(ZK_PATH, false) == null) {
+				zk.create(ZK_PATH, "this is a test node.".getBytes(),
+						Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 			}
 		} catch (KeeperException e) {
 			logger.error("Create test node " + ZK_PATH + " faild! "
@@ -165,9 +156,9 @@ public class ZooKeeperClient {
 		return zk.exists(path, false);
 	}
 
-	public byte[] getData(String path) throws KeeperException,
+	public byte[] getData(String path, Stat stat) throws KeeperException,
 			InterruptedException {
-		return zk.getData(path, false, null);
+		return zk.getData(path, false, stat);
 	}
 
 	public List<String> getChildren(String path) throws KeeperException,
@@ -186,9 +177,9 @@ public class ZooKeeperClient {
 				CreateMode.PERSISTENT);
 	}
 
-	public byte[] testGetData(String path) throws KeeperException,
+	public byte[] testGetData(String path, Stat stat) throws KeeperException,
 			InterruptedException {
-		return zk.getData(ZK_PATH + path, false, null);
+		return zk.getData(ZK_PATH + path, false, stat);
 	}
 
 	public void testSetData(String path, byte[] data) throws KeeperException,

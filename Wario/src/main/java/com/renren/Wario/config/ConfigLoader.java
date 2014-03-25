@@ -73,17 +73,25 @@ public class ConfigLoader {
 
 		Map<String, JSONObject> tmpServerObjects = new HashMap<String, JSONObject>();
 		try {
-			String sql = "select id, zk_name, session_timeout from mario_zk_info";
+			String sql = "select id, zk_name, session_timeout, observer, observer_auth from mario_zk_info";
 			MySQLHelper helper = new MySQLHelper();
 			helper.open();
 			ResultSet rs = helper.executeQuery(sql);
 			while (rs.next()) {
 				int id = rs.getInt("id");
+				JSONArray serverIPList = getserverIPList(id);
 				String zk_name = rs.getString("zk_name");
 				int sessionTimeout = rs.getInt("session_timeout");
-
-				tmpServerObjects.put(zk_name,
-						getServerObject(id, sessionTimeout));
+				String observer = rs.getString("observer");
+				String observerAuth = rs.getString("observer_auth");
+				
+				JSONObject serverObject = new JSONObject();
+				serverObject.put("serverIPList", serverIPList);
+				serverObject.put("sessionTimeout", sessionTimeout);
+				serverObject.put("observer", observer);
+				serverObject.put("observerAuth", observerAuth);
+				
+				tmpServerObjects.put(zk_name, serverObject);
 			}
 			helper.close();
 			serverObjects = tmpServerObjects;
@@ -96,33 +104,21 @@ public class ConfigLoader {
 		}
 	}
 
-	private JSONObject getServerObject(int zkId, int sessionTimeout)
+	private JSONArray getserverIPList(int zkId)
 			throws JSONException, ClassNotFoundException, SQLException {
-		JSONObject serverObject = new JSONObject();
 		JSONArray serverIPList = new JSONArray();
-		String sql = "select id, host, port, mode "
-				+ "from mario_server_info "
+		String sql = "select id, host, port from mario_server_info "
 				+ "where zk_id = " + zkId;
 		MySQLHelper helper = new MySQLHelper();
 		helper.open();
 		ResultSet rs = helper.executeQuery(sql);
-		String observer = "";
 		while (rs.next()) {
 			String host = rs.getString("host");
 			int port = rs.getInt("port");
-			String mode = rs.getString("mode");
-			if ("Observer".equalsIgnoreCase(mode)) {
-				observer = host + ":" + port;
-			} else {
-				serverIPList.put(host + ":" + port);
-			}
+			serverIPList.put(host + ":" + port);
 		}
 		helper.close();
-		serverObject.put("serverIPList", serverIPList);
-		serverObject.put("sessionTimeout", sessionTimeout);
-		serverObject.put("authInfo", "");
-		serverObject.put("observer", observer);
-		return serverObject;
+		return serverIPList;
 	}
 
 	private void loadPluginConfig() {
