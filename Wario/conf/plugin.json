@@ -1,14 +1,14 @@
 {
 	"DefaultPlugin":[
-		{zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["number1,number2","address1,address2"],comment:"whatfor"}
+		{zkId:5,zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["number1,number2","address1,address2"],comment:"whatfor"}
 	],
 	"ReadWriteTestPlugin":[
-		{zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["numbers", "addresses"],comment:"whatfor"}
+		{zkId:5,zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["numbers", "addresses"],comment:"whatfor"}
 	],
 	"ObserverPlugin":[
-		{zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["number1,number2","address1,address2"],comment:"whatfor"}
+		{zkId:5,zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:["number1,number2","address1,address2"],comment:"whatfor"}
 	],
 	"DBPlugin":[
-		{zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:[],comment:"whatfor"}
+		{zkId:5,zooKeeperName:"ZooKeeper1",msgSender:"DebugMsgSender",mailSender:"DebugMailSender",args:[],comment:"whatfor"}
 	]
 }

@@ -44,7 +44,7 @@ public class ConfigLoader {
 
 	private String pluginConfigText = null;
 
-	private Map<String, JSONObject> serverObjects = new HashMap<String, JSONObject>();
+	private Map<Integer, JSONObject> serverObjects = new HashMap<Integer, JSONObject>();
 	private Map<String, JSONArray> pluginObjects = new HashMap<String, JSONArray>();
 
 	private ConfigLoader() {
@@ -71,7 +71,7 @@ public class ConfigLoader {
 
 	private void loadServerConfig() {
 
-		Map<String, JSONObject> tmpServerObjects = new HashMap<String, JSONObject>();
+		Map<Integer, JSONObject> tmpServerObjects = new HashMap<Integer, JSONObject>();
 		try {
 			String sql = "select id, zk_name, session_timeout, observer, observer_auth from mario_zk_info";
 			MySQLHelper helper = new MySQLHelper();
@@ -84,14 +84,15 @@ public class ConfigLoader {
 				int sessionTimeout = rs.getInt("session_timeout");
 				String observer = rs.getString("observer");
 				String observerAuth = rs.getString("observer_auth");
-				
+
 				JSONObject serverObject = new JSONObject();
+				serverObject.put("zkName", zk_name);
 				serverObject.put("serverIPList", serverIPList);
 				serverObject.put("sessionTimeout", sessionTimeout);
 				serverObject.put("observer", observer);
 				serverObject.put("observerAuth", observerAuth);
-				
-				tmpServerObjects.put(zk_name, serverObject);
+
+				tmpServerObjects.put(id, serverObject);
 			}
 			helper.close();
 			serverObjects = tmpServerObjects;
@@ -104,8 +105,8 @@ public class ConfigLoader {
 		}
 	}
 
-	private JSONArray getserverIPList(int zkId)
-			throws JSONException, ClassNotFoundException, SQLException {
+	private JSONArray getserverIPList(int zkId) throws JSONException,
+			ClassNotFoundException, SQLException {
 		JSONArray serverIPList = new JSONArray();
 		String sql = "select id, host, port from mario_server_info "
 				+ "where zk_id = " + zkId;
@@ -147,7 +148,7 @@ public class ConfigLoader {
 	/**
 	 * @return the serverObjects
 	 */
-	public Map<String, JSONObject> getServerObjects() {
+	public Map<Integer, JSONObject> getServerObjects() {
 		return serverObjects;
 	}
 

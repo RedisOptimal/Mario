@@ -42,6 +42,7 @@ public class ZooKeeperClient {
 	private final String scheme = "digest";
 	private final String auth;
 	private final String mode;
+	private final int zkId;
 
 	private volatile boolean isAvailable;
 	private final String ZK_PATH;
@@ -55,10 +56,16 @@ public class ZooKeeperClient {
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout,
 			String mode, String auth) {
+		this(connectionString, sessionTimeout, mode, auth, -1);
+	}
+
+	public ZooKeeperClient(String connectionString, int sessionTimeout,
+			String mode, String auth, int zkId) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
-		this.auth = auth;
 		this.mode = mode;
+		this.auth = auth;
+		this.zkId = zkId;
 		isAvailable = false;
 		ZK_PATH = "/god_damn_zookeeper_" + connectionString;
 		if (!"observer".equals(mode)) {
@@ -149,6 +156,10 @@ public class ZooKeeperClient {
 	 */
 	public int getSessionTimeout() {
 		return sessionTimeout;
+	}
+
+	public int getZkId() {
+		return zkId;
 	}
 
 	public Stat exists(String path) throws KeeperException,

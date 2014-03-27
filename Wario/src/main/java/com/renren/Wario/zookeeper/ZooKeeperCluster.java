@@ -34,7 +34,8 @@ public class ZooKeeperCluster {
 			.getName());
 
 	private JSONObject object = null;
-	private final String zookeeperName;
+	private final int zkId;
+	private String zkName;
 	private int sessionTimeout = 10000;
 	private String observerAuth = null;
 
@@ -43,8 +44,8 @@ public class ZooKeeperCluster {
 	private String observer = null;
 	private ZooKeeperClient observerClient = null;
 
-	public ZooKeeperCluster(String zookeeperName, JSONObject object) {
-		this.zookeeperName = zookeeperName;
+	public ZooKeeperCluster(int zkId, JSONObject object) {
+		this.zkId = zkId;
 		this.object = object;
 		connectionStrings = new HashSet<String>();
 		connectionStrings.clear();
@@ -55,22 +56,22 @@ public class ZooKeeperCluster {
 	}
 
 	public void init() throws JSONException {
+		zkName = object.getString("zkName");
 		sessionTimeout = object.getInt("sessionTimeout");
 		connectionStrings = readJSONObject();
 		observer = object.getString("observer");
 		observerAuth = object.getString("observerAuth");
 		addClients(connectionStrings);
 		addObserverClient(observer, observerAuth);
-		
-		logger.warn("Cluster " + zookeeperName + " inited!");
+
+		logger.warn("Cluster " + zkName + " inited!");
 	}
 
 	public void close() {
 		deleteClients(connectionStrings);
 		observerClient.releaseConnection();
-		logger.warn("Client " + observer + " removed from " + zookeeperName
-				+ ".");
-		logger.warn("Cluster " + zookeeperName + " closed!");
+		logger.warn("Client " + observer + " removed from " + zkName + ".");
+		logger.warn("Cluster " + zkName + " closed!");
 	}
 
 	public void updateClients(JSONObject object) throws JSONException {
@@ -78,7 +79,8 @@ public class ZooKeeperCluster {
 		sessionTimeout = object.getInt("sessionTimeout");
 		String newObserver = object.getString("observer");
 		String newObserverAuth = object.getString("observerAuth");
-		if (!observer.equals(newObserver) || ! observerAuth.equals(newObserverAuth)) {
+		if (!observer.equals(newObserver)
+				|| !observerAuth.equals(newObserverAuth)) {
 			observer = newObserver;
 			observerAuth = newObserverAuth;
 			updateObserverClient(observer, observerAuth);
@@ -92,10 +94,10 @@ public class ZooKeeperCluster {
 	}
 
 	/**
-	 * @return the zookeeperName
+	 * @return the zkName
 	 */
-	public String getZookeeperName() {
-		return zookeeperName;
+	public String getZkName() {
+		return zkName;
 	}
 
 	/**
@@ -114,6 +116,7 @@ public class ZooKeeperCluster {
 
 	/**
 	 * Read JSONObject and return the connection strings of clients.
+	 * 
 	 * @return connectionStrings
 	 * @throws JSONException
 	 */
@@ -141,20 +144,20 @@ public class ZooKeeperCluster {
 		}
 	}
 
-	private void updateObserverClient(String connectionString, String observerAuth) {
+	private void updateObserverClient(String connectionString,
+			String observerAuth) {
 		observerClient.releaseConnection();
-		logger.warn("Client " + observer + " removed from " + zookeeperName
-				+ ".");
+		logger.warn("Client " + observer + " removed from " + zkName + ".");
 		addObserverClient(connectionString, observerAuth);
 	}
 
 	private void addObserverClient(String connectionString, String observerAuth) {
 		observerClient = new ZooKeeperClient(connectionString, sessionTimeout,
-				observer, observerAuth);
+				observer, observerAuth, zkId);
 		AddClient add = new AddClient(observerClient);
 		new Thread(add).start();
 	}
-	
+
 	private class AddClient implements Runnable {
 
 		ZooKeeperClient client = null;
@@ -166,7 +169,7 @@ public class ZooKeeperCluster {
 		@Override
 		public void run() {
 			logger.warn("Client " + client.getConnectionString() + " added to "
-					+ zookeeperName + ".");
+					+ zkName + ".");
 			client.createConnection();
 		}
 
@@ -181,7 +184,7 @@ public class ZooKeeperCluster {
 				zookeeperClient.releaseConnection();
 				clients.remove(connectionString);
 				logger.warn("Client " + connectionString + " removed from "
-						+ zookeeperName + ".");
+						+ zkName + ".");
 			}
 		}
 	}
