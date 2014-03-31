@@ -15,8 +15,8 @@
  */
 package com.renren.Wario.plugin;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -38,17 +38,21 @@ public class ObserverPlugin extends IPlugin {
 
 	private static BlockingQueue<String> queue = new ArrayBlockingQueue<String>(1 << 16);
 	private Thread[] threads = new Thread[MAX_THREAD_NUM];
-
+	private int stateVersion;
+	
 	@Override
 	public void run() {
-		System.out.println("start at\t" + new Date());
-
+		if(client == null) {
+			return ;
+		}
+//		System.out.println("start at\t" + new Date());
+		
+		stateVersion = getMaxStateVersion() + 1;
+		
 		for (int i = 0; i < MAX_THREAD_NUM; i++) {
 			threads[i] = new Thread(new DBWriter());
 			threads[i].start();
 		}
-		
-		deleteAll();
 		
 		try {
 			List<String> children = client.getChildren("/");
@@ -57,9 +61,11 @@ public class ObserverPlugin extends IPlugin {
 				queue.add("/" + it.next());
 			}
 		} catch (KeeperException e) {
-			e.printStackTrace();
+			logger.error("Get children failed at /. " + e.toString());
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error("Get children failed at /. " + e.toString());
+		} catch (Exception e) {
+			logger.error("Get children failed at /. " + e.toString());
 		}
 		
 		do {
@@ -74,29 +80,41 @@ public class ObserverPlugin extends IPlugin {
 			threads[i].interrupt();
 		}
 		
-		System.out.println("end at\t" + new Date());
+//		System.out.println("end at\t" + new Date());
 	}
-
-	private void deleteAll() {
+	
+	private int getMaxStateVersion() {
+		int maxVersion = -1;
 		MySQLHelper helper = new MySQLHelper();
+		String sql = "select max(state_version) from mario_node_state";
 		try {
 			helper.open();
-			String sql = "delete from mario_node_state where zk_id = "
-					+ client.getZkId();
-			helper.execute(sql);
-			helper.close();
+			ResultSet rs = helper.executeQuery(sql);
+			while (rs.next()) {
+				maxVersion = rs.getInt("max(state_version)");
+			}
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			logger.error("MysqlHelper open failed! " + e.toString());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error("MysqlHelper open failed or execute sql " + sql
+					+ " failed! " + e.toString());
+		} finally {
+			try {
+				helper.close();
+			} catch (SQLException e) {
+				logger.error("MysqlHelper close failed! " + e.toString());
+			}
 		}
+		return maxVersion;
 	}
 
 	private class DBWriter implements Runnable {
 		
-		MySQLHelper helper = new MySQLHelper();
-		String path, sql;
-
+		private MySQLHelper helper = new MySQLHelper();
+		private Stat stat = new Stat();
+		private String path;
+		private String sql;
+		
 		@Override
 		public void run() {
 			try {
@@ -108,14 +126,15 @@ public class ObserverPlugin extends IPlugin {
 					while (it.hasNext()) {
 						queue.add(path + "/" + it.next());
 					}
-					writeToDB(path);
+					writeToDB();
 				}
 			} catch (ClassNotFoundException e) {
 				logger.error("MysqlHelper open failed! " + e.toString());
 			} catch (SQLException e) {
 				logger.error("MysqlHelper open failed! " + e.toString());
 			} catch (KeeperException e) {
-				logger.error("Get children failed at " + path + ". " + e.toString());
+				logger.error("Get children failed at " + path + ". "
+						+ e.toString());
 			} catch (InterruptedException e) {
 			} finally {
 				try {
@@ -126,26 +145,77 @@ public class ObserverPlugin extends IPlugin {
 			}
 		}
 		
-		private void writeToDB(String path) {
-			Stat stat = new Stat();
-			String data = "";
+		private void writeToDB() {
+			
 			try {
-				client.getData(path, stat);
-				sql = "insert into mario_node_state (zk_id, path, data, data_length, num_children) values " + "("
-						+ client.getZkId() + ", '"
-						+ path + "', '"
-						+ data + "', "
-						+ stat.getDataLength() + ", "
-						+ stat.getNumChildren() + ")";
+				byte[] data = client.getData(path, stat);
+				
+				if(existPath(path)) {
+					sql = "update mario_node_state set data = '" + getString(data) 
+							+ "', data_length = " + stat.getDataLength()
+							+ ", num_children = " + stat.getNumChildren()
+							+ ", version = " + stat.getVersion()
+							+ ", aversion = " + stat.getAversion()
+							+ ", cversion = " + stat.getCversion()
+							+ ", ctime = " + stat.getCtime()
+							+ ", mtime = " + stat.getMtime()
+							+ ", czxid = " + stat.getCzxid()
+							+ ", mzxid = " + stat.getMzxid()
+							+ ", pzxid = " + stat.getMzxid()
+							+ ", ephemeral_owner = " + stat.getEphemeralOwner()
+							+ ", state_version = " + stateVersion
+							+ " where zk_id = " + client.getZkId()
+							+ " and path = '" + path + "'";
+				} else {
+					sql = "insert into mario_node_state (zk_id, path, data, data_length, num_children, version, aversion, cversion, ctime, mtime, czxid, mzxid, pzxid, ephemeral_owner, state_version) values " + "("
+							+ client.getZkId() + ", '"
+							+ path + "', '"
+							+ getString(data) + "', "
+							+ stat.getDataLength() + ", "
+							+ stat.getNumChildren() + ", " 
+							+ stat.getVersion() + ", " 
+							+ stat.getAversion() + ", " 
+							+ stat.getCversion() + ", " 
+							+ stat.getCtime() + ", " 
+							+ stat.getMtime() + ", " 
+							+ stat.getCzxid() + ", " 
+							+ stat.getMzxid() + ", " 
+							+ stat.getPzxid() + ", " 
+							+ stat.getEphemeralOwner() + ", "
+							+ stateVersion + ")";
+				}
 				helper.execute(sql);
 			} catch (KeeperException e) {
 				logger.error("Get data failed at " + path + ". " + e.toString());
 			} catch (InterruptedException e) {
 				logger.error("Get data failed at " + path + ". " + e.toString());
 			} catch (SQLException e) {
-				logger.error("Execute sql '" + sql + "' failed! " + e.toString());
+				logger.error("Execute sql '" + sql + "' failed! "
+						+ e.toString());
 			}
 		}
 		
+		private String getString(byte[] data) {
+			String res = "";
+			if (data != null && data.length < 255) {
+				for (int i = 0; i < data.length && (int) data[i] > 0; i++) {
+					res += (char) data[i];
+				}
+			}
+			return res;
+		}
+		
+		private boolean existPath(String path) throws SQLException {
+			boolean exist = false;
+			sql = "select count(1) from mario_node_state where zk_id = "
+					+ client.getZkId() + " and path = '" + path + "'";
+			ResultSet rs = helper.executeQuery(sql);
+			while (rs.next()) {
+				if (rs.getInt("count(1)") > 0) {
+					exist = true;
+				}
+			}
+			return exist;
+		}
 	}
 }

@@ -146,7 +146,9 @@ public class ZooKeeperCluster {
 
 	private void updateObserverClient(String connectionString,
 			String observerAuth) {
-		observerClient.releaseConnection();
+		if (observerClient != null) {
+			observerClient.releaseConnection();
+		}
 		logger.warn("Client " + observer + " removed from " + zkName + ".");
 		addObserverClient(connectionString, observerAuth);
 	}
@@ -154,8 +156,10 @@ public class ZooKeeperCluster {
 	private void addObserverClient(String connectionString, String observerAuth) {
 		observerClient = new ZooKeeperClient(connectionString, sessionTimeout,
 				observer, observerAuth, zkId);
-		AddClient add = new AddClient(observerClient);
-		new Thread(add).start();
+		if (observerClient != null) {
+			AddClient add = new AddClient(observerClient);
+			new Thread(add).start();
+		}
 	}
 
 	private class AddClient implements Runnable {
