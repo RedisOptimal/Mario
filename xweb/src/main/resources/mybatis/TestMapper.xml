@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.renren.infra.xweb.repository.TestMybatisDao">
+	<select id="getTestById" parameterType="int" resultType="Test">
+		select
+		id, msg, detail
+		from xweb_test
+		where id=#{id}
+	</select>
+
+	<select id="findAll" resultType="Test">
+		select id, msg, detail from xweb_test
+	</select>
+	
+	<select id="find" parameterType="map" resultType="Test">
+		select id, msg, detail from xweb_test
+		<where>
+			<if test="msg != null and msg != ''">
+				msg like '%${msg}%'
+			</if>
+		</where>
+	</select>
+
+	<select id="findTotalNum" parameterType="Test" resultType="int">
+		select count(1) from xweb_test
+		<where>
+			<if test="msg != null and msg != ''">
+				msg like '%${msg}%'
+			</if>
+		</where>
+	</select>
+
+	<insert id="insert" parameterType="Test" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into xweb_test(msg, detail) values (#{msg}, #{detail})
+	</insert>
+	
+	<insert id="insertBatch">
+		insert into xweb_test(msg, detail) values
+		<foreach collection="list" item="test" separator=",">
+			(#{test.msg}, #{test.detail})
+		</foreach>
+	</insert>
+
+	<update id="update" parameterType="Test">
+		update xweb_test set msg = #{msg}, detail = #{detail}
+		where id = #{id}
+	</update>
+
+	<delete id="delete" parameterType="int">
+		delete from xweb_test where id =
+		#{id}
+	</delete>
+	
+	<delete id="deleteAll">
+		delete from xweb_test
+	</delete>
+</mapper>

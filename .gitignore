@@ -14,6 +14,7 @@
 **/bin
 
 #log4j log file
+**/log
 *.log
 *.log.*
 
@@ -25,4 +26,5 @@ Wario.out
 Wario_Daemon.pid
 
 #xweb
-xweb
+xweb/FTL_helloworld.txt
+xweb/root

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.renren.infra.xweb.repository.Mario_zk_infoMybatisDao">
+
+    <select id="findById" resultType="Mario_zk_info">
+        select 
+        id        , zk_name        , session_timeout        , observer        , observer_auth        from mario_zk_info
+        where 
+        id = #{id}        
+    </select>
+
+    <select id="findAll" resultType="Mario_zk_info">
+           select 
+        id        , zk_name        , session_timeout        , observer        , observer_auth        from mario_zk_info
+        order by 
+        id desc        
+    </select>
+
+    <select id="find" parameterType="map" resultType="Mario_zk_info">
+        select 
+        id        , zk_name        , session_timeout        , observer        , observer_auth        from mario_zk_info
+           <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="zk_name != null and zk_name != ''">
+                and zk_name = #{zk_name}
+            </if>
+            <if test="session_timeout != null and session_timeout != ''">
+                and session_timeout = #{session_timeout}
+            </if>
+            <if test="observer != null and observer != ''">
+                and observer = #{observer}
+            </if>
+            <if test="observer_auth != null and observer_auth != ''">
+                and observer_auth = #{observer_auth}
+            </if>
+        </where>
+    </select>
+    
+    <select id="findTotalNum" parameterType="Mario_zk_info" resultType="int">
+        select count(1) from mario_zk_info
+    </select>
+
+    <insert id="insert" parameterType="Mario_zk_info">
+        insert into mario_zk_info
+        (
+        id        , zk_name        , session_timeout        , observer        , observer_auth        )
+        values (
+        #{id}        , #{zk_name}        , #{session_timeout}        , #{observer}        , #{observer_auth}        )
+    </insert>
+
+    <update id="update" parameterType="Mario_zk_info">
+        update mario_zk_info		set         id = #{id}        , zk_name = #{zk_name}        , session_timeout = #{session_timeout}        , observer = #{observer}        , observer_auth = #{observer_auth}		where         id = #{id}        
+    </update>
+
+    <delete id="delete" parameterType="Mario_zk_info">
+        delete from mario_zk_info where         id = #{id}        
+    </delete>
+</mapper> 

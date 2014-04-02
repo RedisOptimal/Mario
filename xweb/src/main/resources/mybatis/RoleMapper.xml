@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.renren.infra.xweb.repository.RoleMybatisDao">
+
+	<!-- findRoleById -->
+	<select id="findRoleById" resultType="Role">
+		select id, name, detail
+		from xweb_role
+		where id = #{id}
+	</select>
+
+	<!-- findRoleByName -->
+	<select id="findRoleByName" resultType="Role">
+		select id, name, detail
+		from xweb_role
+		where name = #{name}
+	</select>
+
+	<!-- findAll -->
+	<select id="findAll" resultType="Role">
+		select id, name, detail from
+		xweb_role
+	</select>
+
+	<!-- findRoleByUserID 根据用户ID查找角色 -->
+	<select id="findRoleByUserID" resultType="Role">
+		select r.id, r.name
+		from xweb_user u, xweb_user_role ur, xweb_role r
+		where u.id =
+		ur.user_id and ur.role_id = r.id and u.id = #{id}
+	</select>
+
+	<!-- findRoleByMenuID 根据菜单ID查找角色 -->
+	<select id="findRoleByMenuID" resultType="Role">
+		select r.id
+		from
+		xweb_role r, xweb_role_menu rm, xweb_menu m
+		where r.id = rm.role_id and
+		rm.menu_id = m.id and m.id = #{id} 
+	</select>
+
+	<select id="find" parameterType="map" resultType="Role">
+		select id, name, detail
+		from xweb_role
+		<where>
+			<if test="name != null">
+				name like '%${name}%'
+			</if>
+		</where>
+	</select>
+
+	<select id="findTotalNum" parameterType="map" resultType="int">
+		select count(1) from xweb_role
+		<where>
+			<if test="name != null">
+				name like '%${name}%'
+			</if>
+		</where>
+	</select>
+
+	<!-- 新增角色 -->
+	<insert id="insert" parameterType="Role" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into xweb_role (name, detail) values (#{name},
+		#{detail})
+	</insert>
+
+	<!-- 更新角色 -->
+	<update id="update" parameterType="Role">
+		update xweb_role set name =
+		#{name}, detail = #{detail} where id = #{id}
+	</update>
+
+	<!-- 删除角色 -->
+	<delete id="delete" parameterType="Role">
+		delete from xweb_role where id
+		= #{id}
+	</delete>
+
+	<!-- 新增角色菜单 -->
+	<insert id="insertRoleMenu" parameterType="Role">
+		insert into xweb_role_menu (role_id, menu_id) values
+		<foreach collection="menuList" item="menu" separator=",">
+			(#{id},
+			#{menu.id})
+		</foreach>
+	</insert>
+
+	<!-- 删除角色菜单 -->
+	<delete id="deleteRoleMenu" parameterType="Role">
+		delete from
+		xweb_role_menu where role_id = #{id}
+	</delete>
+
+</mapper> 

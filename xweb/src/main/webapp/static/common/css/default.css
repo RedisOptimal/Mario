@@ -1,0 +1,45 @@
+/* header */
+#header {margin-bottom:15px;}
+
+#header h1 {color: #5BB75B;}
+
+#header h1 small {color: #BACE87;}
+
+/* footer */
+#footer {
+	margin-top: 15px;
+	padding: 15px 0px 0px 0px;
+	font-size: 95%;
+	text-align: center;
+	border-top: 2px solid #08C;
+}
+
+#footer a {color: #999;}
+
+.form-signin-heading{font-size:36px;margin-bottom:20px;color:#08C; text-align:center; margin-top: 50px;}
+.form-signin{position:relative;text-align:left;width:300px;padding:25px 29px 29px;margin:0 auto 20px;background-color:#fff;border:1px solid #e5e5e5;
+        	-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;-webkit-box-shadow:0 1px 2px rgba(0,0,0,.05);-moz-box-shadow:0 1px 2px rgba(0,0,0,.05);box-shadow:0 1px 2px rgba(0,0,0,.05);}
+.form-signin .checkbox{margin-bottom:10px;color:#0663a2;} .form-signin .input-label{font-size:16px;line-height:23px;color:#999;}
+.form-signin .input-block-level{font-size:16px;height:auto;margin-bottom:15px;padding:7px;*width:283px;*padding-bottom:0;_padding:7px 7px 9px 7px;}
+.form-signin .btn.btn-large{font-size:16px;} .form-signin #themeSwitch{position:absolute;right:15px;bottom:10px;}
+.form-signin div.validateCode {padding-bottom:15px;} .mid{vertical-align:middle;}
+
+.footer{text-align:center;}
+
+/* change disabled & readonly cursor */
+input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] {
+	cursor: auto;
+	background-color: #F3F3F3;
+}
+/* menu main */
+#main {padding:0;margin:0;} #main .container{padding:0 7px 0 10px;}
+#header {margin:0 0 10px;position:static;} #header li {font-size:14px;_font-size:12px;}
+#header .brand {font-family:Helvetica, Georgia, Arial, sans-serif, 黑体;font-size:26px;padding-left:33px;}
+#footer {margin:8px 0 0 0;padding:3px 0 0 0;font-size:11px;text-align:center;border-top:2px solid #0663A2;}
+#footer, #footer a {color:#999;} 
+.bs-docs-nav {
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, .15);
+	background-color: #0663A2;
+	border-color: #463265;
+	box-shadow: 0 1px 0 rgba(255,255,255,.1);
+}
