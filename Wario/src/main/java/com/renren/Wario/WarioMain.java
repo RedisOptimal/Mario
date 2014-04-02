@@ -19,7 +19,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -53,8 +52,8 @@ public class WarioMain extends Thread {
 	private ConfigLoader configLoader = null;
 	// <zkId, cluster>
 	private Map<Integer, ZooKeeperCluster> clusters = null;
-	// <pluginName, <ZooKeeperName, context> >
-	private final Map<String, Map<String, byte[]>> contexts;
+	// <pluginName, <zkId, context> >
+	private final Map<String, Map<Integer, byte[]>> contexts;
 
 	public WarioMain() {
 		if (System.getProperty("default.plugin.path") == null) {
@@ -64,7 +63,7 @@ public class WarioMain extends Thread {
 		}
 		configLoader = ConfigLoader.getInstance();
 		clusters = new HashMap<Integer, ZooKeeperCluster>();
-		contexts = new TreeMap<String, Map<String, byte[]>>();
+		contexts = new TreeMap<String, Map<Integer, byte[]>>();
 	}
 
 	public void init() {
@@ -132,7 +131,7 @@ public class WarioMain extends Thread {
 				try {
 					cluster.updateClients(object);
 				} catch (JSONException e) {
-					logger.error(cluster.getZkName() + " update failed! "
+					logger.error(cluster.getZkId() + " update failed! "
 							+ e.toString());
 				}
 			}
@@ -151,7 +150,7 @@ public class WarioMain extends Thread {
 			String pluginName = entry.getKey();
 			JSONArray arrary = entry.getValue();
 			if (!contexts.containsKey(pluginName)) {
-				contexts.put(pluginName, new TreeMap<String, byte[]>());
+				contexts.put(pluginName, new TreeMap<Integer, byte[]>());
 			}
 
 			for (int i = 0; i < arrary.length(); ++i) {
@@ -180,16 +179,15 @@ public class WarioMain extends Thread {
 	private void processPlugin(String pluginName, JSONObject object)
 			throws JSONException {
 		int zkId = object.getInt("zkId");
-		String zooKeeperName = object.getString("zooKeeperName");
 		ZooKeeperCluster cluster = null;
 		if (clusters.containsKey(zkId)) {
 			cluster = clusters.get(zkId);
 		} else {
-			logger.error("Wrong zooKeeperName! " + zooKeeperName);
+			logger.error("Wrong zkId! " + zkId);
 			return;
 		}
-		if (!contexts.get(pluginName).containsKey(zooKeeperName)) {
-			contexts.get(pluginName).put(zooKeeperName, new byte[1 << 20]); // 1M
+		if (!contexts.get(pluginName).containsKey(zkId)) {
+			contexts.get(pluginName).put(zkId, new byte[1 << 20]); // 1M
 		}
 
 		Iterator<Entry<String, ZooKeeperClient>> it = cluster.getClients()
@@ -198,7 +196,7 @@ public class WarioMain extends Thread {
 		while (it.hasNext()) {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();
 			ZooKeeperClient client = entry.getValue();
-			byte[] context = contexts.get(pluginName).get(zooKeeperName);
+			byte[] context = contexts.get(pluginName).get(zkId);
 			try {
 				IPlugin plugin = createPlugin(pluginName, object, client,
 						context);
@@ -223,20 +221,19 @@ public class WarioMain extends Thread {
 	private void processObserverPlugin(String pluginName, JSONObject object)
 			throws JSONException {
 		int zkId = object.getInt("zkId");
-		String zooKeeperName = object.getString("zooKeeperName");
 		ZooKeeperCluster cluster = null;
 		if (clusters.containsKey(zkId)) {
 			cluster = clusters.get(zkId);
 		} else {
-			logger.error("Wrong zooKeeperName! " + zooKeeperName);
+			logger.error("Wrong zkId! " + zkId);
 			return;
 		}
-		if (!contexts.get(pluginName).containsKey(zooKeeperName)) {
-			contexts.get(pluginName).put(zooKeeperName, new byte[1 << 20]); // 1M
+		if (!contexts.get(pluginName).containsKey(zkId)) {
+			contexts.get(pluginName).put(zkId, new byte[1 << 20]); // 1M
 		}
 
 		ZooKeeperClient client = cluster.getObserverClient();
-		byte[] context = contexts.get(pluginName).get(zooKeeperName);
+		byte[] context = contexts.get(pluginName).get(zkId);
 		try {
 			IPlugin plugin = createPlugin(pluginName, object, client, context);
 			plugin.run();
@@ -255,7 +252,9 @@ public class WarioMain extends Thread {
 		IPlugin plugin = null;
 		String msgSenderName = object.getString("msgSender");
 		String mailSenderName = object.getString("mailSender");
-		JSONArray array = object.getJSONArray("args");
+		String phoneNumber = object.getString("phoneNumber");
+		String emailAddress = object.getString("emailAddress");
+		String args = object.getString("args");
 
 		URL pluginUrl = new File(pluginPathPrefix + File.separator + pluginName
 				+ ".jar").toURI().toURL();
@@ -272,16 +271,11 @@ public class WarioMain extends Thread {
 				msgSenderPackage + msgSenderName).newInstance();
 		plugin.mailSender = (IMailSender) classLoader.loadClass(
 				mailSenderPackage + mailSenderName).newInstance();
+		plugin.numbers = phoneNumber.split(",");
+		plugin.addresses = emailAddress.split(",");
+		plugin.args = args.split(",");
 		plugin.client = client;
 		plugin.clusterContext = context;
-
-		ArrayList<String> args = new ArrayList<String>();
-		args.clear();
-		for (int i = 0; i < array.length(); i++) {
-			args.add(array.getString(i));
-		}
-		plugin.args = new String[args.size()];
-		plugin.args = args.toArray(plugin.args);
 		return plugin;
 	}
 }

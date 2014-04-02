@@ -18,9 +18,6 @@ package com.renren.Wario.plugin;
 import java.util.Scanner;
 
 public class DefaultPlugin extends IPlugin {
-
-	private String[] numbers;
-	private String[] addresses;
 	
 	private final int maxOutStanding = 30;
 	
@@ -57,8 +54,6 @@ public class DefaultPlugin extends IPlugin {
 		outStanding = newOutStanding;
 
 		if (!"".equals(message)) {
-			numbers = args[0].split(",");
-			addresses = args[1].split(",");
 			for (String number : numbers) {
 				msgSender.sendMessage(number, message);
 			}

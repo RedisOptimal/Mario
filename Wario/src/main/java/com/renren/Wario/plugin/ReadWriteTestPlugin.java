@@ -20,9 +20,6 @@ import org.apache.zookeeper.data.Stat;
 
 public class ReadWriteTestPlugin extends IPlugin {
 
-	private String[] numbers;
-	private String[] addresses;
-
 	private static String path = "/test";
 	private static String INITIAL = "I'm the initial data.";
 	private static String UPDATED = "I'm the updated data.";
@@ -66,8 +63,6 @@ public class ReadWriteTestPlugin extends IPlugin {
 		}		
 		
 		if (!"".equals(message)) {
-			numbers = args[0].split(",");
-			addresses = args[1].split(",");
 
 			for (String address : addresses) {
 				mailSender.sendMail(address, message);

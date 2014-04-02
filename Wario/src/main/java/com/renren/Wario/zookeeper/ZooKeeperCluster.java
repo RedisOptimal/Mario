@@ -35,7 +35,6 @@ public class ZooKeeperCluster {
 
 	private JSONObject object = null;
 	private final int zkId;
-	private String zkName;
 	private int sessionTimeout = 10000;
 	private String observerAuth = null;
 
@@ -56,7 +55,6 @@ public class ZooKeeperCluster {
 	}
 
 	public void init() throws JSONException {
-		zkName = object.getString("zkName");
 		sessionTimeout = object.getInt("sessionTimeout");
 		connectionStrings = readJSONObject();
 		observer = object.getString("observer");
@@ -64,14 +62,14 @@ public class ZooKeeperCluster {
 		addClients(connectionStrings);
 		addObserverClient(observer, observerAuth);
 
-		logger.warn("Cluster " + zkName + " inited!");
+		logger.warn("Cluster " + zkId + " inited!");
 	}
 
 	public void close() {
 		deleteClients(connectionStrings);
 		observerClient.releaseConnection();
-		logger.warn("Client " + observer + " removed from " + zkName + ".");
-		logger.warn("Cluster " + zkName + " closed!");
+		logger.warn("Client " + observer + " removed from " + zkId + ".");
+		logger.warn("Cluster " + zkId + " closed!");
 	}
 
 	public void updateClients(JSONObject object) throws JSONException {
@@ -93,13 +91,10 @@ public class ZooKeeperCluster {
 		connectionStrings = newConnectionStrings;
 	}
 
-	/**
-	 * @return the zkName
-	 */
-	public String getZkName() {
-		return zkName;
+	public int getZkId() {
+		return zkId;
 	}
-
+	
 	/**
 	 * @return the clients
 	 */
@@ -149,7 +144,7 @@ public class ZooKeeperCluster {
 		if (observerClient != null) {
 			observerClient.releaseConnection();
 		}
-		logger.warn("Client " + observer + " removed from " + zkName + ".");
+		logger.warn("Client " + observer + " removed from " + zkId + ".");
 		addObserverClient(connectionString, observerAuth);
 	}
 
@@ -173,7 +168,7 @@ public class ZooKeeperCluster {
 		@Override
 		public void run() {
 			logger.warn("Client " + client.getConnectionString() + " added to "
-					+ zkName + ".");
+					+ zkId + ".");
 			client.createConnection();
 		}
 
@@ -188,7 +183,7 @@ public class ZooKeeperCluster {
 				zookeeperClient.releaseConnection();
 				clients.remove(connectionString);
 				logger.warn("Client " + connectionString + " removed from "
-						+ zkName + ".");
+						+ zkId + ".");
 			}
 		}
 	}

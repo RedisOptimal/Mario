@@ -25,7 +25,6 @@ public class DBPlugin extends IPlugin {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		client.state.update();
 		
 		try {
@@ -67,7 +66,7 @@ public class DBPlugin extends IPlugin {
 
 	private int getServerId(String host, int port) throws ClassNotFoundException, SQLException {
 		int serverId = -1;
-		String sql = "select zk_id from mario_server_info where host = '" + host + "' and port = " + port;
+		String sql = "select id from mario_server_info where host = '" + host + "' and port = " + port;
 		helper.open();
 		ResultSet result = helper.executeQuery(sql);
 		while(result.next()) {

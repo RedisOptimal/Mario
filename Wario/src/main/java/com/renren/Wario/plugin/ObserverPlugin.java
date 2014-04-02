@@ -149,8 +149,8 @@ public class ObserverPlugin extends IPlugin {
 			
 			try {
 				byte[] data = client.getData(path, stat);
-				
-				if(existPath(path)) {
+				long mzxid = getMaxMzxid(path);
+				if(mzxid == stat.getMzxid()) {
 					sql = "update mario_node_state set data = '" + getString(data) 
 							+ "', data_length = " + stat.getDataLength()
 							+ ", num_children = " + stat.getNumChildren()
@@ -164,10 +164,12 @@ public class ObserverPlugin extends IPlugin {
 							+ ", pzxid = " + stat.getMzxid()
 							+ ", ephemeral_owner = " + stat.getEphemeralOwner()
 							+ ", state_version = " + stateVersion
+							+ ", state_time = " + "now()"
 							+ " where zk_id = " + client.getZkId()
-							+ " and path = '" + path + "'";
+							+ " and path = '" + path + "'"
+							+ " and mzxid = " + mzxid;
 				} else {
-					sql = "insert into mario_node_state (zk_id, path, data, data_length, num_children, version, aversion, cversion, ctime, mtime, czxid, mzxid, pzxid, ephemeral_owner, state_version) values " + "("
+					sql = "insert into mario_node_state (zk_id, path, data, data_length, num_children, version, aversion, cversion, ctime, mtime, czxid, mzxid, pzxid, ephemeral_owner, state_version, state_time) values " + "("
 							+ client.getZkId() + ", '"
 							+ path + "', '"
 							+ getString(data) + "', "
@@ -182,7 +184,8 @@ public class ObserverPlugin extends IPlugin {
 							+ stat.getMzxid() + ", " 
 							+ stat.getPzxid() + ", " 
 							+ stat.getEphemeralOwner() + ", "
-							+ stateVersion + ")";
+							+ stateVersion + ", "
+							+ "now()"+ ")";
 				}
 				helper.execute(sql);
 			} catch (KeeperException e) {
@@ -205,17 +208,15 @@ public class ObserverPlugin extends IPlugin {
 			return res;
 		}
 		
-		private boolean existPath(String path) throws SQLException {
-			boolean exist = false;
-			sql = "select count(1) from mario_node_state where zk_id = "
+		private long getMaxMzxid(String path) throws SQLException {
+			long maxZxid = 0L;
+			sql = "select max(mzxid) from mario_node_state where zk_id = "
 					+ client.getZkId() + " and path = '" + path + "'";
 			ResultSet rs = helper.executeQuery(sql);
 			while (rs.next()) {
-				if (rs.getInt("count(1)") > 0) {
-					exist = true;
-				}
+				maxZxid = rs.getLong("max(mzxid)");
 			}
-			return exist;
+			return maxZxid;
 		}
 	}
 }
