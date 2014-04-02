@@ -11,6 +11,26 @@ A ZooKeeper monitor platform.
 导入数据库表结构和基础数据
 `mysql -u root -p db_name < Mario.sql`
 
+##xweb工程
+
+修改数据库配置文件
+```
+xweb/src/main/resources/application.properties
+```
+
+将工程打成war包
+```
+cd xweb
+mvn package -Dmaven.test.skip=true
+```
+
+运行
+```
+cd xweb
+cp target/xweb.jar $JETTY_HOME/webapps/xweb.jar
+$JETTY_HOME/bin/jetty.sh restart
+```
+
 ##Wario工程
 
 修改数据库配置文件
@@ -31,23 +51,3 @@ cd Wario
 ```
 
 ###添加自定义扩展插件
-
-##xweb工程
-
-修改数据库配置文件
-```
-xweb/src/main/resources/application.properties
-```
-
-将工程打成war包
-```
-cd xweb
-mvn package -Dmaven.test.skip=true
-```
-
-运行
-```
-cd xweb
-cp target/ $JETTY_HOME/webapps/
-$JETTY_HOME//bin/jetty.sh restart
-```
