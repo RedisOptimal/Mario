@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.1.73, for redhat-linux-gnu (x86_64)
 --
--- Host: localhost    Database: xweb2
+-- Host: localhost    Database: xweb
 -- ------------------------------------------------------
 -- Server version	5.1.73-log
 
@@ -41,7 +41,7 @@ CREATE TABLE `mario_node_state` (
   `state_version` int(10) unsigned zerofill NOT NULL,
   `state_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=340754 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -71,7 +71,7 @@ CREATE TABLE `mario_plugin_info` (
   `args` varchar(45) DEFAULT '',
   `commit` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -96,7 +96,7 @@ CREATE TABLE `mario_server_info` (
   `host` varchar(45) NOT NULL,
   `port` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1 COMMENT='服务器信息';
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='服务器信息';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -131,7 +131,7 @@ CREATE TABLE `mario_server_state` (
   `client_number` int(11) DEFAULT NULL,
   `time_stamp` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=65501 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -157,7 +157,7 @@ CREATE TABLE `mario_zk_info` (
   `observer` varchar(45) DEFAULT NULL,
   `observer_auth` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='ZK集群信息';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ZK集群信息';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -341,4 +341,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-04-02 14:18:12
+-- Dump completed on 2014-04-02 19:57:19
