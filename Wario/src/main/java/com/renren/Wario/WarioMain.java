@@ -19,7 +19,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -51,10 +50,10 @@ public class WarioMain extends Thread {
 	private final String pluginPathPrefix;
 
 	private ConfigLoader configLoader = null;
-	// <zooKeeperName, cluster>
-	private Map<String, ZooKeeperCluster> clusters = null;
-	// <pluginName, <ZooKeeperName, context> >
-	private final Map<String, Map<String, byte[]>> contexts;
+	// <zkId, cluster>
+	private Map<Integer, ZooKeeperCluster> clusters = null;
+	// <pluginName, <zkId, context> >
+	private final Map<String, Map<Integer, byte[]>> contexts;
 
 	public WarioMain() {
 		if (System.getProperty("default.plugin.path") == null) {
@@ -63,8 +62,8 @@ public class WarioMain extends Thread {
 			pluginPathPrefix = System.getProperty("default.plugin.path");
 		}
 		configLoader = ConfigLoader.getInstance();
-		clusters = new HashMap<String, ZooKeeperCluster>();
-		contexts = new TreeMap<String, Map<String, byte[]>>();
+		clusters = new HashMap<Integer, ZooKeeperCluster>();
+		contexts = new TreeMap<String, Map<Integer, byte[]>>();
 	}
 
 	public void init() {
@@ -79,15 +78,15 @@ public class WarioMain extends Thread {
 
 			configLoader.loadConfig();
 
-			Set<String> uselessClusters = WarioUtilTools
-					.getDifference(clusters.keySet(), configLoader
+			Set<Integer> uselessClusters = WarioUtilTools
+					.getDifferenceByInteger(clusters.keySet(), configLoader
 							.getServerObjects().keySet());
-			Iterator<String> it = uselessClusters.iterator();
+			Iterator<Integer> it = uselessClusters.iterator();
 			while (it.hasNext()) {
-				String zooKeeperName = it.next();
-				ZooKeeperCluster cluster = clusters.get(zooKeeperName);
+				int zkId = it.next();
+				ZooKeeperCluster cluster = clusters.get(zkId);
 				cluster.close();
-				clusters.remove(zooKeeperName);
+				clusters.remove(zkId);
 			}
 
 			Set<String> uselessContexts = WarioUtilTools
@@ -98,7 +97,7 @@ public class WarioMain extends Thread {
 			updateServerConfig(configLoader.getServerObjects());
 
 			try {
-				sleep(300 << 10);
+				sleep(10 << 10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -107,39 +106,41 @@ public class WarioMain extends Thread {
 		}
 	}
 
-	private void updateServerConfig(Map<String, JSONObject> serverObjects) {
+	private void updateServerConfig(Map<Integer, JSONObject> serverObjects) {
 		ZooKeeperCluster cluster = null;
 
-		Iterator<Entry<String, JSONObject>> it = serverObjects.entrySet()
+		Iterator<Entry<Integer, JSONObject>> it = serverObjects.entrySet()
 				.iterator();
 		while (it.hasNext()) {
-			Map.Entry<String, JSONObject> entry = (Map.Entry<String, JSONObject>) it
+			Map.Entry<Integer, JSONObject> entry = (Map.Entry<Integer, JSONObject>) it
 					.next();
 
-			String zookeeperName = entry.getKey();
+			Integer zkId = entry.getKey();
 			JSONObject object = entry.getValue();
 
-			if (!clusters.containsKey(zookeeperName)) {
-				cluster = new ZooKeeperCluster(zookeeperName, object);
+			if (!clusters.containsKey(zkId)) {
+				cluster = new ZooKeeperCluster(zkId, object);
 				try {
 					cluster.init();
 				} catch (JSONException e) {
-					logger.error(zookeeperName + " init failed! "
-							+ e.toString());
+					logger.error(zkId + " init failed! " + e.toString());
 				}
-				clusters.put(zookeeperName, cluster);
+				clusters.put(zkId, cluster);
 			} else {
-				cluster = clusters.get(zookeeperName);
+				cluster = clusters.get(zkId);
 				try {
 					cluster.updateClients(object);
 				} catch (JSONException e) {
-					logger.error(zookeeperName + " update failed! "
+					logger.error(cluster.getZkId() + " update failed! "
 							+ e.toString());
 				}
 			}
 		}
 	}
 
+	/**
+	 * Run plugins on every cluseter.
+	 */
 	private void runPlugins() {
 		Iterator<Entry<String, JSONArray>> it = configLoader.getPluginObjects()
 				.entrySet().iterator();
@@ -149,13 +150,17 @@ public class WarioMain extends Thread {
 			String pluginName = entry.getKey();
 			JSONArray arrary = entry.getValue();
 			if (!contexts.containsKey(pluginName)) {
-				contexts.put(pluginName, new TreeMap<String, byte[]>());
+				contexts.put(pluginName, new TreeMap<Integer, byte[]>());
 			}
 
 			for (int i = 0; i < arrary.length(); ++i) {
 				try {
 					JSONObject object = arrary.getJSONObject(i);
-					processPlugin(pluginName, object);
+					if ("ObserverPlugin".equals(pluginName)) {
+						processObserverPlugin(pluginName, object);
+					} else {
+						processPlugin(pluginName, object);
+					}
 				} catch (JSONException e) {
 					logger.error("Failed to process json string : "
 							+ pluginName + " " + i + "th line. " + e.toString());
@@ -164,27 +169,34 @@ public class WarioMain extends Thread {
 		}
 	}
 
+	/**
+	 * Process the plugin on every client of the cluster except the observer.
+	 * 
+	 * @param pluginName
+	 * @param object
+	 * @throws JSONException
+	 */
 	private void processPlugin(String pluginName, JSONObject object)
 			throws JSONException {
-		String zooKeeperName = object.getString("zooKeeperName");
+		int zkId = object.getInt("zkId");
 		ZooKeeperCluster cluster = null;
-		if (clusters.containsKey(zooKeeperName)) {
-			cluster = clusters.get(zooKeeperName);
+		if (clusters.containsKey(zkId)) {
+			cluster = clusters.get(zkId);
 		} else {
-			logger.error("Wrong zooKeeperName! " + zooKeeperName);
+			logger.error("Wrong zkId! " + zkId);
 			return;
 		}
+		if (!contexts.get(pluginName).containsKey(zkId)) {
+			contexts.get(pluginName).put(zkId, new byte[1 << 20]); // 1M
+		}
+
 		Iterator<Entry<String, ZooKeeperClient>> it = cluster.getClients()
 				.entrySet().iterator();
-
-		if (!contexts.get(pluginName).containsKey(zooKeeperName)) {
-			contexts.get(pluginName).put(zooKeeperName, new byte[1 << 20]);  // 1M
-		}
 
 		while (it.hasNext()) {
 			Map.Entry<String, ZooKeeperClient> entry = it.next();
 			ZooKeeperClient client = entry.getValue();
-			byte[] context = contexts.get(pluginName).get(zooKeeperName);
+			byte[] context = contexts.get(pluginName).get(zkId);
 			try {
 				IPlugin plugin = createPlugin(pluginName, object, client,
 						context);
@@ -199,6 +211,40 @@ public class WarioMain extends Thread {
 		}
 	}
 
+	/**
+	 * Process ObserverPlugin on the observer client.
+	 * 
+	 * @param pluginName
+	 * @param object
+	 * @throws JSONException
+	 */
+	private void processObserverPlugin(String pluginName, JSONObject object)
+			throws JSONException {
+		int zkId = object.getInt("zkId");
+		ZooKeeperCluster cluster = null;
+		if (clusters.containsKey(zkId)) {
+			cluster = clusters.get(zkId);
+		} else {
+			logger.error("Wrong zkId! " + zkId);
+			return;
+		}
+		if (!contexts.get(pluginName).containsKey(zkId)) {
+			contexts.get(pluginName).put(zkId, new byte[1 << 20]); // 1M
+		}
+
+		ZooKeeperClient client = cluster.getObserverClient();
+		byte[] context = contexts.get(pluginName).get(zkId);
+		try {
+			IPlugin plugin = createPlugin(pluginName, object, client, context);
+			plugin.run();
+			logger.info(pluginName + " runs at " + client.getConnectionString()
+					+ " successfully!");
+		} catch (Exception e) {
+			logger.error(pluginName + " runs at "
+					+ client.getConnectionString() + " failed! " + e.toString());
+		}
+	}
+
 	private IPlugin createPlugin(String pluginName, JSONObject object,
 			ZooKeeperClient client, byte[] context)
 			throws InstantiationException, IllegalAccessException,
@@ -206,7 +252,9 @@ public class WarioMain extends Thread {
 		IPlugin plugin = null;
 		String msgSenderName = object.getString("msgSender");
 		String mailSenderName = object.getString("mailSender");
-		JSONArray array = object.getJSONArray("args");
+		String phoneNumber = object.getString("phoneNumber");
+		String emailAddress = object.getString("emailAddress");
+		String args = object.getString("args");
 
 		URL pluginUrl = new File(pluginPathPrefix + File.separator + pluginName
 				+ ".jar").toURI().toURL();
@@ -223,16 +271,11 @@ public class WarioMain extends Thread {
 				msgSenderPackage + msgSenderName).newInstance();
 		plugin.mailSender = (IMailSender) classLoader.loadClass(
 				mailSenderPackage + mailSenderName).newInstance();
+		plugin.numbers = phoneNumber.split(",");
+		plugin.addresses = emailAddress.split(",");
+		plugin.args = args.split(",");
 		plugin.client = client;
 		plugin.clusterContext = context;
-		
-		ArrayList<String> args = new ArrayList<String>();
-		args.clear();
-		for (int i = 0; i < array.length(); i++) {
-			args.add(array.getString(i));
-		}
-		plugin.args = new String[args.size()];
-		plugin.args = args.toArray(plugin.args);
 		return plugin;
 	}
 }

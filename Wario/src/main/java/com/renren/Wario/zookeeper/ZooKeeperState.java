@@ -99,6 +99,14 @@ public class ZooKeeperState {
 		scannerForCons.close();
 	}
 
+	public String getHost() {
+		return host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
 	public boolean ruok() {
 		return "imok\n".equals(cmd("ruok"));
 	}

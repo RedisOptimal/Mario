@@ -16,11 +16,9 @@
 package com.renren.Wario.plugin;
 
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.data.Stat;
 
 public class ReadWriteTestPlugin extends IPlugin {
-
-	private String[] numbers;
-	private String[] addresses;
 
 	private static String path = "/test";
 	private static String INITIAL = "I'm the initial data.";
@@ -45,12 +43,12 @@ public class ReadWriteTestPlugin extends IPlugin {
 				if (client.testExists(path) == null) {
 					client.testCreate(path, INITIAL.getBytes());
 				}
-				if (!INITIAL.equals(new String(client.testGetData(path)))) {
+				if (!INITIAL.equals(new String(client.testGetData(path, new Stat())))) {
 					message += "ZooKeeper: " + client.getConnectionString()
 							+ "\nRead error.\n";
 				}
 				client.testSetData(path, UPDATED.getBytes());
-				if (!UPDATED.equals(new String(client.testGetData(path)))) {
+				if (!UPDATED.equals(new String(client.testGetData(path, new Stat())))) {
 					message += "ZooKeeper: " + client.getConnectionString()
 							+ "\nRead error.\n";
 				}
@@ -65,8 +63,6 @@ public class ReadWriteTestPlugin extends IPlugin {
 		}		
 		
 		if (!"".equals(message)) {
-			numbers = args[0].split(",");
-			addresses = args[1].split(",");
 
 			for (String address : addresses) {
 				mailSender.sendMail(address, message);

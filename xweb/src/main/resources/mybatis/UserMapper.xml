@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.renren.infra.xweb.repository.UserMybatisDao">
+	<!-- 获取用户: 输出直接映射到对象, login_name列要"as loginName"以方便映射 ,team_id as "team.id"创建team对象并赋值 -->
+	<select id="findById" parameterType="int" resultType="User">
+		select id,
+		name,
+		email,
+		login_name as loginName, status, staff_no as
+		staffNo, phone,
+		mobile
+		from xweb_user
+		where
+		id=#{id}
+	</select>
+
+	<!-- findUserByLoginName -->
+	<select id="findByLoginName" parameterType="String" resultType="User">
+		select id, name, email, login_name as loginName,
+		password,
+		status, salt,
+		staff_no as
+		staffNo, phone,
+		mobile
+		from xweb_user
+		where
+		login_name=#{loginName}
+	</select>
+	
+	<!-- findByStaffNo -->
+	<select id="findByStaffNo" parameterType="String" resultType="User">
+		select id, name, email, login_name as loginName,
+		password,
+		status, salt,
+		staff_no as
+		staffNo, phone,
+		mobile
+		from xweb_user
+		where
+		staff_no=#{staffNo}
+	</select>
+
+	<!-- 查询用户,演示: 1.输入用map传入多个参数 2.<where>语句, 智能添加where和and关键字 3.输出直接映射对象 -->
+	<select id="find" parameterType="map" resultType="User">
+		select id, name, email,
+		login_name as loginName, status, staff_no as
+		staffNo, phone, mobile
+		from xweb_user
+		<where>
+			<if test="loginName != null and loginName != ''">
+				login_name like '%${loginName}%'
+			</if>
+			<if test="name != null and name != ''">
+				and name like '%${name}%'
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询用户的总数 -->
+	<select id="findTotalNum" parameterType="map" resultType="int">
+		select count(1) from xweb_user
+		<where>
+			<if test="loginName != null and loginName != ''">
+				login_name like '%${loginName}%'
+			</if>
+			<if test="name != null and name != ''">
+				and name like '%${name}%'
+			</if>
+		</where>
+	</select>
+
+	<!-- 插入用户： 由数据库生成id并赋值到user对象 -->
+	<insert id="insert" parameterType="User" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into xweb_user (
+		login_name, name, password, salt,
+		email,
+		status,
+		staff_no, phone, mobile
+		)
+		values (
+		#{loginName}, #{name}, #{password}, #{salt}, #{email},
+		#{status},
+		#{staffNo}, #{phone}, #{mobile}
+		)
+	</insert>
+
+	<!-- 更新用户 -->
+	<update id="update" parameterType="User">
+		update xweb_user set name =
+		#{name}, email = #{email}, status =
+		#{status}, staff_No= #{staffNo}, phone = #{phone}, mobile = #{mobile}
+		<if test="plainPassword != null">
+			,password = #{password},
+			salt = #{salt}
+		</if>
+		where id = #{id}
+	</update>
+
+	<!-- 更新用户资料 -->
+	<update id="updateProfile" parameterType="User">
+		update xweb_user set name =	#{name}, email = #{email}, phone = #{phone}, mobile = #{mobile}
+		<if test="plainPassword != null and plainPassword != ''">
+			,password = #{password},
+			salt = #{salt}
+		</if>
+		where id = #{id}
+	</update>
+
+	<!-- 删除用户 -->
+	<delete id="delete" parameterType="int">
+		delete from xweb_user where
+		id=#{id}
+	</delete>
+	
+	<!-- 根据用户 -->
+	<select id="findUserByRoleId" parameterType="Role" resultType="User">
+		select user_id as id from xweb_user_role 
+		where role_id = #{id}
+	</select>
+	
+	<!-- 新增用户角色关系 -->
+	<insert id="insertUserRole" parameterType="user">
+		insert into xweb_user_role(user_id, role_id) values 
+		<foreach collection="roleList" item="role" separator=",">
+			(#{id}, #{role.id})
+		</foreach>
+	</insert>
+	
+	<!-- 删除用户角色关系 -->
+	<delete id="deleteUserRole" parameterType="user">
+		delete from xweb_user_role where user_id = #{id}
+	</delete>
+	
+		
+</mapper> 

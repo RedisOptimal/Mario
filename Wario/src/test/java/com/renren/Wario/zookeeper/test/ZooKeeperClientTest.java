@@ -32,6 +32,7 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
+import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.junit.Assert;
@@ -119,10 +120,10 @@ public class ZooKeeperClientTest {
 					CreateMode.PERSISTENT);
 
 			ZooKeeperClient zooKeeperClient2 = new ZooKeeperClient(
-					"localhost:2181", 2000, "admin:admin");
+					"localhost:2181", 2000, "", "admin:admin");
 			zooKeeperClient2.createConnection();
 			Assert.assertEquals("testACL",
-					new String(zooKeeperClient2.getData("/testACL")));
+					new String(zooKeeperClient2.getData("/testACL", new Stat())));
 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();

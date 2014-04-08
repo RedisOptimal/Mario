@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.renren.infra.xweb.repository.MenuMybatisDao">
+
+	<select id="findById" resultType="Menu">
+		select id, parent_id as
+		parentId, parent_ids as parentIds, name, href, sort,
+		is_show as
+		isShow,
+		permission from xweb_menu x where id = #{id}
+	</select>
+
+	<select id="findAll" resultType="Menu">
+		select id, parent_id as
+		parentId, parent_ids as parentIds, name, href, sort, is_show as
+		isShow, permission from xweb_menu x order by sort desc
+	</select>
+
+	<select id="findMenuByRoleID" parameterType="Role" resultType="Menu">
+		select m.id, m.parent_id as parentid, m.parent_ids as parentIds,
+		m.name, m.href, m.sort, m.is_show as isShow, m.permission
+		from
+		xweb_role r, xweb_role_menu rm, xweb_menu m
+		where r.id = rm.role_id and
+		rm.menu_id = m.id and r.id = #{id} 
+	</select>
+
+	<select id="findMenuByUserID" resultType="Menu">
+		select distinct m.id,
+		m.parent_id as parentid, m.parent_ids as parentIds,
+		m.name,
+		m.href,
+		m.sort, m.is_show as isShow, m.permission
+		from xweb_user u,
+		xweb_user_role ur, xweb_role r, xweb_role_menu rm, xweb_menu m
+		where
+		u.id = ur.user_id and ur.role_id = r.id and r.id = rm.role_id and m.id
+		= rm.menu_id
+		and u.id = #{id} and m.is_Show = 1
+	</select>
+
+	<select id="findMenuByName" parameterType="Menu" resultType="Menu">
+		select id, parent_id as
+		parentId, parent_ids as parentIds, name, href,
+		sort,
+		is_show as
+		isShow, permission from xweb_menu x where name =
+		#{name} 
+	</select>
+
+	<select id="find" parameterType="map" resultType="Menu">
+		select id, parent_id as
+		parentId, parent_ids as parentIds, name, href,
+		sort,
+		is_show as
+		isShow, permission from xweb_menu x
+		<where>
+			<if test="name != null">
+				name like '%${name}%'
+			</if>
+			<if test="isShow != null">
+				and isShow = #{isShow}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insert" parameterType="Menu">
+		insert into xweb_menu
+		(parent_id, parent_ids, name, href, sort, is_show, permission)
+		values
+		(#{parentId}, #{parentIds}, #{name}, #{href}, #{sort}, #{isShow},
+		#{permission})
+	</insert>
+
+	<update id="update" parameterType="Menu">
+		update xweb_menu
+		set parent_id
+		= #{parentId}, parent_ids = #{parentIds}, name = #{name},
+		href =
+		#{href},
+		sort = #{sort}, is_show = #{isShow}, permission =
+		#{permission}
+		where id = #{id}
+	</update>
+
+	<delete id="delete" parameterType="Menu">
+		delete from xweb_menu where id
+		= #{id}
+	</delete>
+
+	<delete id="deleteChildMenu">
+		delete from xweb_menu where parent_ids like #{parentIds}
+	</delete>
+</mapper> 

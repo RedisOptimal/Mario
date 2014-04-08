@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd"
+	default-lazy-init="true">
+
+	<description>Spring公共配置</description>
+
+	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
+	<context:component-scan base-package="com.renren.infra.xweb">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- 自定义paginationInterceptor的MyBatis分页拦截器 -->
+	<bean id="paginationInterceptor" class="com.renren.infra.xweb.util.PaginationInterceptor"></bean>
+
+	<!-- MyBatis配置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
+		<property name="typeAliasesPackage" value="com.renren.infra.xweb.entity" />
+		<!-- 显式指定Mapper文件位置 -->
+		<property name="mapperLocations" value="classpath:/mybatis/*Mapper.xml" />
+		<!-- 自定义Plugins的Interceptor -->
+		<property name="plugins">
+			<ref bean="paginationInterceptor" />
+		</property>
+	</bean>
+
+	<!-- 扫描basePackage下所有以@MyBatisRepository标识的 接口 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.renren.infra.xweb" />
+		<property name="annotationClass"
+			value="com.renren.infra.xweb.repository.MyBatisRepository" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+
+	<!-- 事务管理器配置, 单数据源事务 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="dataSource" />
+
+	<!-- 使用annotation定义事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager"
+		proxy-target-class="true" />
+
+	<!-- 定义aspectj -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+
+	<!-- JSR303 validator -->
+	<bean id="validator"
+		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+
+	<!-- production环境 -->
+	<beans profile="production">
+		<context:property-placeholder
+			ignore-resource-not-found="true"
+			location="classpath*:/application.properties,
+          			  classpath*:/application.production.properties" />
+
+		<!-- 数据源配置,使用应用内的Tomcat JDBC连接池 -->
+		<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
+			destroy-method="close">
+			<!-- Connection Info -->
+			<property name="driverClassName" value="${jdbc.driver}" />
+			<property name="url" value="${jdbc.url}" />
+			<property name="username" value="${jdbc.username}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="maxActive" value="${jdbc.pool.maxActive}" />
+			<property name="maxIdle" value="${jdbc.pool.maxIdle}" />
+			<property name="defaultAutoCommit" value="false" />
+			<!-- 连接Idle半个小时后超时，每15分钟检查一次 -->
+			<property name="timeBetweenEvictionRunsMillis" value="900000" />
+			<property name="minEvictableIdleTimeMillis" value="1800000" />
+			<property name="validationQuery" value="SELECT 1" />
+			<property name="validationInterval" value="5000" />
+			<property name="testOnBorrow" value="true" />
+			<property name="removeAbandoned" value="true" />
+			<property name="removeAbandonedTimeout" value="50000" />
+		</bean>
+	</beans>
+
+	<!-- local development环境 -->
+	<beans profile="development">
+		<context:property-placeholder
+			ignore-resource-not-found="true"
+			location="classpath*:/application.properties,
+          			  classpath*:/application.development.properties" />
+
+		<!-- DBCP连接池 -->
+		<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
+			destroy-method="close">
+			<property name="driverClassName" value="${jdbc.driver}" />
+			<property name="url" value="${jdbc.url}" />
+			<property name="username" value="${jdbc.username}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="defaultAutoCommit" value="false" />
+		</bean>
+	</beans>
+
+	<!-- unit test环境 -->
+	<beans profile="test">
+		<context:property-placeholder
+			ignore-resource-not-found="true"
+			location="classpath*:/application.properties,
+					  classpath*:/application.test.properties" />
+
+		<bean id="dataSource"
+			class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="username" value="${unit.test.jdbc.username}" />
+			<property name="password" value="${unit.test.jdbc.password}" />
+			<property name="driverClassName" value="${unit.test.jdbc.driver}" />
+			<property name="url" value="${unit.test.jdbc.url}" />
+		</bean>
+	</beans>
+
+	<!-- functional test环境 -->
+	<beans profile="functional">
+		<context:property-placeholder
+			ignore-resource-not-found="true"
+			location="classpath*:/application.properties,
+          			  classpath*:/application.functional.properties" />
+
+		<!-- DBCP连接池 -->
+		<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
+			destroy-method="close">
+			<property name="driverClassName" value="${jdbc.driver}" />
+			<property name="url" value="${jdbc.url}" />
+			<property name="username" value="${jdbc.username}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="defaultAutoCommit" value="false" />
+		</bean>
+	</beans>
+</beans>

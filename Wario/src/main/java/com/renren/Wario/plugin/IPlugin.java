@@ -26,5 +26,8 @@ public abstract class IPlugin implements Runnable {
 	public ZooKeeperClient client = null;
 	public byte[] clusterContext;
 
+	public String[] numbers;
+	public String[] addresses;
+	
 	public String[] args = null;
 }

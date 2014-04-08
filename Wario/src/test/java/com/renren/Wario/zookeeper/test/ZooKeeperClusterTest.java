@@ -29,15 +29,16 @@ import com.renren.Wario.zookeeper.ZooKeeperClient;
 import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public class ZooKeeperClusterTest {
-	private final String correctConfigString = "{serverIPList:[\"localhost:2181\", \"localhost:2182\"],sessionTimeout:6000}";
-	private final String wrongConfigString = "{serverIPList:[\"localhost:2181\"]}";
+	private final String correctConfigString = "{zkName:\"test\",serverIPList:[\"localhost:2181\", \"localhost:2182\"],sessionTimeout:6000,observer:\"\",observerAuth:\"\"}";
+	private final String wrongConfigString = "{zkName:\"test\",serverIPList:[\"localhost:2181\"]}";
+
 	private static class ZooKeeperBackgroundServer extends Thread {
 		private final String port;
-		
+
 		public ZooKeeperBackgroundServer(String port) {
 			this.port = port;
 		}
-		
+
 		@Override
 		public void run() {
 			String[] args = new String[2];
@@ -46,7 +47,7 @@ public class ZooKeeperClusterTest {
 			QuorumPeerMain.main(args);
 		}
 	}
-	
+
 	@BeforeClass
 	public static void init() {
 		new File("Wario.log").delete();
@@ -55,13 +56,11 @@ public class ZooKeeperClusterTest {
 				.configure(System.getProperty("user.dir") + File.separator
 						+ "conf" + File.separator + "log4j.properties");
 	}
-	
-	
+
 	@Test
 	public void generalTest() throws JSONException {
 		JSONObject object = new JSONObject(wrongConfigString);
-		ZooKeeperCluster cluster = new ZooKeeperCluster("test", object);
-		Assert.assertEquals("test", cluster.getZookeeperName());
+		ZooKeeperCluster cluster = new ZooKeeperCluster(0, object);
 		try {
 			cluster.init();
 			Assert.fail();
@@ -84,11 +83,13 @@ public class ZooKeeperClusterTest {
 		for (ZooKeeperClient client : cluster.getClients().values()) {
 			Assert.assertFalse(client.isAvailable());
 		}
-		
-		ZooKeeperBackgroundServer server1 = new ZooKeeperBackgroundServer("2181");
+
+		ZooKeeperBackgroundServer server1 = new ZooKeeperBackgroundServer(
+				"2181");
 		server1.setDaemon(true);
 		server1.start();
-		ZooKeeperBackgroundServer server2 = new ZooKeeperBackgroundServer("2182");
+		ZooKeeperBackgroundServer server2 = new ZooKeeperBackgroundServer(
+				"2182");
 		server2.setDaemon(true);
 		server2.start();
 		try {
@@ -96,7 +97,7 @@ public class ZooKeeperClusterTest {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		for (ZooKeeperClient client : cluster.getClients().values()) {
 			Assert.assertTrue(client.isAvailable());
 		}

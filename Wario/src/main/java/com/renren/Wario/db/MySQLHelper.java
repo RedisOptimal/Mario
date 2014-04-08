@@ -21,26 +21,26 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class MySQLHelper extends DBHelper {
+import com.renren.Wario.config.ApplicationProperties;
 
-	private String ip = "localhost";
-	private int port = 3306;
-	private String user = "root";
-	private String password = "123456";
-	private String dbName = "Mario";
+public class MySQLHelper extends DBHelper {
 	
-	private String url;
+	private static final String JDBC = ApplicationProperties.getJdbcDriver();
+	private static final String URL = ApplicationProperties.getJdbcUrl();
+	private static final String USERNAME = ApplicationProperties.getJdbcUsername();
+	private static final String PASSWORD = ApplicationProperties.getJdbcPassword();
+	
 	private Connection connection;
 	private Statement statement;
 	
 	public MySQLHelper() {
-		url = "jdbc:mysql://" + ip + ":" + port + "/" + dbName;
+		
 	}
 	
 	@Override
 	public void open() throws SQLException, ClassNotFoundException {
-		Class.forName("com.mysql.jdbc.Driver");
-		connection = DriverManager.getConnection(url, user, password);
+		Class.forName(JDBC);
+		connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 		statement = connection.createStatement();
 	}
 

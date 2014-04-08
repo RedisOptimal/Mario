@@ -36,6 +36,15 @@ public class WarioUtilTools {
 		return res;
 	}
 
+	public static Set<Integer> getDifferenceByInteger(Set<Integer> a,
+			Set<Integer> b) {
+		Set<Integer> res = new HashSet<Integer>();
+		res.clear();
+		res.addAll(a);
+		res.removeAll(b);
+		return res;
+	}
+
 	public static Set<String> getIntersection(Set<String> a, Set<String> b) {
 		Set<String> res = new HashSet<String>();
 		res.clear();

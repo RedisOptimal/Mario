@@ -41,6 +41,8 @@ public class ZooKeeperClient {
 	private final int sessionTimeout;
 	private final String scheme = "digest";
 	private final String auth;
+	private final String mode;
+	private final int zkId;
 
 	private volatile boolean isAvailable;
 	private final String ZK_PATH;
@@ -49,17 +51,26 @@ public class ZooKeeperClient {
 	private CountDownLatch countDownLatch = null;
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout) {
-		this(connectionString, sessionTimeout, "");
+		this(connectionString, sessionTimeout, "", "");
 	}
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout,
-			String auth) {
+			String mode, String auth) {
+		this(connectionString, sessionTimeout, mode, auth, -1);
+	}
+
+	public ZooKeeperClient(String connectionString, int sessionTimeout,
+			String mode, String auth, int zkId) {
 		this.connectionString = connectionString;
 		this.sessionTimeout = sessionTimeout;
+		this.mode = mode;
 		this.auth = auth;
+		this.zkId = zkId;
 		isAvailable = false;
 		ZK_PATH = "/god_damn_zookeeper_" + connectionString;
-		state = new ZooKeeperState(connectionString);
+		if (!"observer".equals(mode)) {
+			state = new ZooKeeperState(connectionString);
+		}
 	}
 
 	public void createConnection() {
@@ -67,7 +78,8 @@ public class ZooKeeperClient {
 		countDownLatch = new CountDownLatch(1);
 
 		try {
-			zk = new ZooKeeper(connectionString, sessionTimeout, new MyWatcher());
+			zk = new ZooKeeper(connectionString, sessionTimeout,
+					new MyWatcher());
 			countDownLatch.await();
 		} catch (IOException e) {
 			logger.error("Create connection " + connectionString + " failed! "
@@ -81,7 +93,7 @@ public class ZooKeeperClient {
 			if (!"".equals(auth)) {
 				zk.addAuthInfo(scheme, auth.getBytes());
 			}
-			if (zk.exists(ZK_PATH, false) == null) {
+			if (!"observer".equals(mode) && zk.exists(ZK_PATH, false) == null) {
 				zk.create(ZK_PATH, "this is a test node.".getBytes(),
 						Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 			}
@@ -92,8 +104,10 @@ public class ZooKeeperClient {
 			logger.error("Create test node " + ZK_PATH + " faild! "
 					+ e.toString());
 		}
-		
-		state.update();
+
+		if (state != null) {
+			state.update();
+		}
 	}
 
 	public void releaseConnection() {
@@ -125,7 +139,7 @@ public class ZooKeeperClient {
 			}
 		}
 	}
-	
+
 	public boolean isAvailable() {
 		return isAvailable;
 	}
@@ -144,14 +158,18 @@ public class ZooKeeperClient {
 		return sessionTimeout;
 	}
 
+	public int getZkId() {
+		return zkId;
+	}
+
 	public Stat exists(String path) throws KeeperException,
 			InterruptedException {
 		return zk.exists(path, false);
 	}
 
-	public byte[] getData(String path) throws KeeperException,
+	public byte[] getData(String path, Stat stat) throws KeeperException,
 			InterruptedException {
-		return zk.getData(path, false, null);
+		return zk.getData(path, false, stat);
 	}
 
 	public List<String> getChildren(String path) throws KeeperException,
@@ -170,9 +188,9 @@ public class ZooKeeperClient {
 				CreateMode.PERSISTENT);
 	}
 
-	public byte[] testGetData(String path) throws KeeperException,
+	public byte[] testGetData(String path, Stat stat) throws KeeperException,
 			InterruptedException {
-		return zk.getData(ZK_PATH + path, false, null);
+		return zk.getData(ZK_PATH + path, false, stat);
 	}
 
 	public void testSetData(String path, byte[] data) throws KeeperException,
