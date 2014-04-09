@@ -64,7 +64,11 @@ public class Mario_zk_infoService {
     	if (mario_zk_info.getid() == null) {
     		return false;
     	}
-    	mario_zk_infoDao.update(mario_zk_info);
+    	try {
+    		mario_zk_infoDao.update(mario_zk_info);
+    	} catch (Throwable e) {
+    		return false;
+    	}
     	return true;
     }
     

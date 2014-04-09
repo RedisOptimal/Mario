@@ -64,7 +64,11 @@ public class Mario_server_infoService {
     	if (mario_server_info.getid() == null) {
     		return false;
     	}
-    	mario_server_infoDao.update(mario_server_info);
+    	try {
+    		mario_server_infoDao.update(mario_server_info);
+    	} catch (Throwable e) {
+    		return false;
+    	}
     	return true;
     }
     
