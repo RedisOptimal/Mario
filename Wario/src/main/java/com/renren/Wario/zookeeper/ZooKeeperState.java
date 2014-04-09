@@ -35,7 +35,7 @@ public class ZooKeeperState {
 	private long received = -1;
 	private long sent = -1;
 	private int outStanding = -1;
-	private String zxid = null;
+	private long zxid;
 	private String mode = null;
 	private int nodeCount = -1;
 	private int totalWatches = -1;
@@ -67,7 +67,7 @@ public class ZooKeeperState {
 			} else if (line.startsWith("Outstanding:")) {
 				outStanding = Integer.parseInt(getStringValueFromLine(line));
 			} else if (line.startsWith("Zxid:")) {
-				zxid = getStringValueFromLine(line);
+				zxid = Long.parseLong(getStringValueFromLine(line), 16);
 			} else if (line.startsWith("Mode:")) {
 				mode = getStringValueFromLine(line);
 			} else if (line.startsWith("Node count:")) {
@@ -135,7 +135,7 @@ public class ZooKeeperState {
 		return outStanding;
 	}
 
-	public String getZxid() {
+	public long getZxid() {
 		return zxid;
 	}
 
@@ -157,7 +157,7 @@ public class ZooKeeperState {
 
 	private String getStringValueFromLine(String line) {
 		return line.substring(line.indexOf(":") + 1, line.length()).replaceAll(
-				" ", "");
+				" ", "").trim();
 	}
 
 	private class SendThread extends Thread {
