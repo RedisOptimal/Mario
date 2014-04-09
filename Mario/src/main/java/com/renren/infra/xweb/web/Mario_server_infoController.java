@@ -1,6 +1,7 @@
 
 package com.renren.infra.xweb.web;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public class Mario_server_infoController {
     @Autowired
     private Mario_server_infoService service;
     @Autowired
-    private Mario_zk_infoService zk_service;
+    private Mario_zk_infoService zkInfoService;
     
     @RequestMapping(value = { "", "/list" })
     public String list(@RequestParam(value = "page", defaultValue = "1") int pageNumber,
@@ -52,7 +53,7 @@ public class Mario_server_infoController {
 
     @RequestMapping(value = "create", method = RequestMethod.GET)
     public String createForm(Model model) {
-        List<Mario_zk_info> mario_zk_infoList = zk_service.getAllMario_zk_info();
+        List<Mario_zk_info> mario_zk_infoList = zkInfoService.getAllMario_zk_info();
         Page<Mario_zk_info> mario_zk_infos = new PageImpl<Mario_zk_info>(mario_zk_infoList, new PageRequest(0, mario_zk_infoList.size()), mario_zk_infoList.size());
         model.addAttribute("mario_zk_infos", mario_zk_infos);
         
@@ -70,6 +71,12 @@ public class Mario_server_infoController {
 
     @RequestMapping(value = "update/{id}", method = RequestMethod.GET)
     public String updateForm( @PathVariable("id") Integer id, Model model) {
+    	Mario_zk_info mario_zk_info = zkInfoService.getMario_zk_info(id);
+    	List<Mario_zk_info> mario_zk_infoList = new ArrayList<Mario_zk_info>();
+    	mario_zk_infoList.add(mario_zk_info);
+    	Page<Mario_zk_info> mario_zk_infos = new PageImpl<Mario_zk_info>(mario_zk_infoList, new PageRequest(0, mario_zk_infoList.size()), mario_zk_infoList.size());
+    	model.addAttribute("mario_zk_infos", mario_zk_infos);
+    	
         model.addAttribute("mario_server_info", service.getMario_server_info(id));
         model.addAttribute("action", "update");
         return "mario_server_info/mario_server_infoForm";
