@@ -2,11 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.renren.infra</groupId>
-	<artifactId>xweb</artifactId>
+	<artifactId>Mario</artifactId>
 	<version>1.2</version>
 	<packaging>war</packaging>
-	<name>xweb</name>
-	<url>http://wiki.d.xiaonei.com/pages/viewpage.action?pageId=24783746</url>
+	<name>Mario</name>
 
 	<properties>
 		<!-- 主要依赖库的版本定义 -->
@@ -49,33 +48,6 @@
 		<jdbc.driver.artifactId>mysql-connector-java</jdbc.driver.artifactId>
 		<jdbc.driver.version>5.1.21</jdbc.driver.version>
 	</properties>
-	
-	<repositories>
-		<!-- 指向校内的Maven仓库地址 -->
-		<repository>
-			<id>renren</id>
-			<name>Team Nexus Repository</name>
-			<url>http://repos.d.xiaonei.com/nexus/content/groups/public</url> 
-		</repository>
-		
-		<repository>
-			<id>central</id>
-			<name>Central Repository</name>
-			<url>http://repo.maven.apache.org/maven2</url>	
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		
-		<repository>
-			<id>repo.springsource.org</id>
-			<name>repo.springsource.org-releases</name>
-			<url>http://repo.springsource.org/libs-milestone-local</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-	    </repository>
-	</repositories>
 
 	<!-- 依赖项定义 -->
 	<dependencies>
@@ -524,27 +496,6 @@
 				</dependencies>
 			</plugin>
 
-			<!-- 增加functional test的Source目录 -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>add-functional-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-test-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>src/test/functional</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 			<!-- cobertura插件, 设置不需要计算覆盖率的类 -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -674,7 +625,7 @@
 				<artifactId>tomcat-maven-plugin</artifactId>
 				<version>1.1</version>
 				<configuration>
-					<url>http://10.3.18.205:8088/manager/text</url>
+					<url>http://127.0.0.1:8088/manager/text</url>
 					<username>tomcat</username>
 					<password>123456</password>
 					<!-- xweb 为部署stable version时的 path -->
