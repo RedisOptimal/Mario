@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `mario_node_state`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `mario_node_state` (
   `zk_id` int(10) unsigned NOT NULL,
-  `path` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `path` varchar(255) NOT NULL,
   `data` mediumblob NOT NULL,
   `data_length` int(10) unsigned DEFAULT '0',
   `num_children` int(10) unsigned DEFAULT '0',
@@ -39,8 +39,7 @@ CREATE TABLE `mario_node_state` (
   `ephemeral_owner` bigint(20) unsigned DEFAULT NULL,
   `state_version` int(10) unsigned zerofill NOT NULL,
   `state_time` datetime NOT NULL,
-  PRIMARY KEY (`zk_id`,`path`,`mzxid`),
-  UNIQUE KEY `UnionKeys` (`zk_id`,`path`,`mzxid`)
+  PRIMARY KEY (`zk_id`,`path`,`mzxid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='节点数据表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -62,14 +61,14 @@ DROP TABLE IF EXISTS `mario_plugin_info`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `mario_plugin_info` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `plugin_name` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `plugin_name` varchar(45) NOT NULL,
   `zk_id` int(10) unsigned NOT NULL,
-  `msg_sender` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `mail_sender` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `phone_number` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `email_address` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `args` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `commit` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `msg_sender` varchar(45) NOT NULL,
+  `mail_sender` varchar(45) NOT NULL,
+  `phone_number` varchar(45) DEFAULT NULL,
+  `email_address` varchar(45) DEFAULT NULL,
+  `args` varchar(45) DEFAULT NULL,
+  `commit` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 0 kB';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -93,7 +92,7 @@ DROP TABLE IF EXISTS `mario_server_info`;
 CREATE TABLE `mario_server_info` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '机器id',
   `zk_id` int(10) unsigned NOT NULL,
-  `host` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `host` varchar(45) NOT NULL,
   `port` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `zk_id` (`zk_id`)
@@ -126,7 +125,7 @@ CREATE TABLE `mario_server_state` (
   `sent` bigint(20) DEFAULT NULL,
   `outstanding` int(11) DEFAULT NULL,
   `zxid` bigint(45) DEFAULT NULL,
-  `mode` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `mode` varchar(45) DEFAULT NULL,
   `node_count` int(11) DEFAULT NULL,
   `total_watches` int(11) DEFAULT NULL,
   `client_number` int(11) DEFAULT NULL,
