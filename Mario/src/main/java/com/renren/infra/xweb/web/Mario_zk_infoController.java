@@ -52,7 +52,17 @@ public class Mario_zk_infoController {
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public String create(@Valid Mario_zk_info newMario_zk_info, RedirectAttributes redirectAttributes) {
-        if (service.saveMario_zk_info(newMario_zk_info)) {
+    	if (newMario_zk_info.getzk_name() == null || newMario_zk_info.getzk_name().trim().equals("")) {
+            redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:必须填写ZooKeeper名字");
+    		return "redirect:/mario_zk_info/";
+    	}
+    	if (newMario_zk_info.getsession_timeout() == null) {
+            redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:必须填写ZooKeeper Session Timeout");
+    		return "redirect:/mario_zk_info/";
+    	}
+        if (service.saveNewRecord(newMario_zk_info)) {
         	redirectAttributes.addFlashAttribute("alertType", "alert-success");
         	redirectAttributes.addFlashAttribute("message", "创建成功");        	
         } else {
@@ -74,15 +84,15 @@ public class Mario_zk_infoController {
             RedirectAttributes redirectAttributes) {
     	if (mario_zk_info.getzk_name() == null || mario_zk_info.getzk_name().trim().equals("")) {
             redirectAttributes.addFlashAttribute("alertType", "alert-danger");
-    		redirectAttributes.addFlashAttribute("message", "更新失败:请填写ZooKeeper名字");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:必须填写ZooKeeper名字");
     		return "redirect:/mario_zk_info/";
     	}
     	if (mario_zk_info.getsession_timeout() == null) {
             redirectAttributes.addFlashAttribute("alertType", "alert-danger");
-    		redirectAttributes.addFlashAttribute("message", "更新失败:请填写ZooKeeper Session Timeout");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:必须填写ZooKeeper Session Timeout");
     		return "redirect:/mario_zk_info/";
     	}
-    	if (service.saveMario_zk_info(mario_zk_info)) {
+    	if (service.updateRecord(mario_zk_info)) {
     		redirectAttributes.addFlashAttribute("alertType", "alert-success");
     		redirectAttributes.addFlashAttribute("message", "更新成功");
     	} else {

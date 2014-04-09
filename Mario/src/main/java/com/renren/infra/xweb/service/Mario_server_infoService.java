@@ -1,6 +1,7 @@
 
 package com.renren.infra.xweb.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,17 +60,23 @@ public class Mario_server_infoService {
         return new RowBounds((pageNumber - 1) * pageSize, pageSize);
     }
 
-    /**
-     * 保存Mario_server_info.
-     * 
-     * @param newMario_server_info
-     */
-    public void saveMario_server_info(Mario_server_info newMario_server_info) {
-        if (newMario_server_info.getid() != null     ) {
-            mario_server_infoDao.update(newMario_server_info);
-        } else {
-            mario_server_infoDao.insert(newMario_server_info);
-        }
+    public boolean updateRecord(Mario_server_info mario_server_info) {
+    	if (mario_server_info.getid() == null) {
+    		return false;
+    	}
+    	mario_server_infoDao.update(mario_server_info);
+    	return true;
+    }
+    
+    public boolean saveNewRecord(Mario_server_info newMario_server_info) {
+    	Map<String, Object> paramMap = new HashMap<String, Object>();
+    	paramMap.put("host", newMario_server_info.gethost());
+    	paramMap.put("port", newMario_server_info.getport());
+    	if (mario_server_infoDao.find(paramMap, new RowBounds()).isEmpty()) {
+	        mario_server_infoDao.insert(newMario_server_info);
+	        return true;
+	    }
+    	return false;
     }
 
     /**

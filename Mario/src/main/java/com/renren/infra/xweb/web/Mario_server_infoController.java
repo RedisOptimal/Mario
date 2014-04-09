@@ -64,8 +64,23 @@ public class Mario_server_infoController {
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public String create(@Valid Mario_server_info newMario_server_info, RedirectAttributes redirectAttributes) {
-        service.saveMario_server_info(newMario_server_info);
-        redirectAttributes.addFlashAttribute("message", "创建成功");
+    	if (newMario_server_info.gethost() == null || newMario_server_info.gethost().trim().equals("")) {
+            redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:必须填写IP或者域名");
+    		return "redirect:/mario_server_info/";
+    	}
+    	if (newMario_server_info.getport() == null) {
+            redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:必须填写端口号");
+    		return "redirect:/mario_server_info/";
+    	}
+        if (service.saveNewRecord(newMario_server_info)) {
+	        redirectAttributes.addFlashAttribute("alertType", "alert-success");
+	        redirectAttributes.addFlashAttribute("message", "创建成功");
+        } else {
+        	redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "IP和端口号已经被占用");         	
+        }
         return "redirect:/mario_server_info/";
     }
 
@@ -85,14 +100,30 @@ public class Mario_server_infoController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public String update(@Valid @ModelAttribute("preloadMario_server_info") Mario_server_info mario_server_info,
             RedirectAttributes redirectAttributes) {
-        service.saveMario_server_info(mario_server_info);
-        redirectAttributes.addFlashAttribute("message", "更新成功");
+    	if (mario_server_info.gethost() == null || mario_server_info.gethost().trim().equals("")) {
+            redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:必须填写IP或者域名");
+    		return "redirect:/mario_server_info/";
+    	}
+    	if (mario_server_info.getport() == null) {
+            redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:必须填写端口号");
+    		return "redirect:/mario_server_info/";
+    	}
+        if (service.updateRecord(mario_server_info)) {
+	        redirectAttributes.addFlashAttribute("alertType", "alert-success");
+	        redirectAttributes.addFlashAttribute("message", "创建成功");
+        } else {
+        	redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "IP和端口号已经被占用");         	
+        }
         return "redirect:/mario_server_info/";
     }
 
     @RequestMapping(value = "delete/{id}")
     public String delete( @PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
         service.deleteMario_server_info(id);
+        redirectAttributes.addFlashAttribute("alertType", "alert-success");
         redirectAttributes.addFlashAttribute("message", "删除成功");
         return "redirect:/mario_server_info";
     }
