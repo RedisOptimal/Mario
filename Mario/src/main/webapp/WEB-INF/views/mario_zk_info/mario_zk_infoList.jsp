@@ -16,7 +16,7 @@
 
 <body>
     <c:if test="${not empty message}">
-        <div id="message" class="row alert alert-success alert-dismissable"><button data-dismiss="alert" class="close">×</button>${message}</div>
+        <div id="message" class="row alert ${alertType} alert-dismissable"><button data-dismiss="alert" class="close">×</button>${message}</div>
     </c:if>
     <div class="row">
         <form class="form-inline" action="" id="form">

@@ -1,6 +1,7 @@
 
 package com.renren.infra.xweb.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,12 +65,18 @@ public class Mario_zk_infoService {
      * 
      * @param newMario_zk_info
      */
-    public void saveMario_zk_info(Mario_zk_info newMario_zk_info) {
-        if (newMario_zk_info.getid() != null     ) {
-            mario_zk_infoDao.update(newMario_zk_info);
-        } else {
-            mario_zk_infoDao.insert(newMario_zk_info);
-        }
+    public boolean saveMario_zk_info(Mario_zk_info newMario_zk_info) {
+    	Map<String, Object> paramMap = new HashMap<String, Object>();
+    	paramMap.put("zk_name", newMario_zk_info.getzk_name());
+    	if (mario_zk_infoDao.find(paramMap, new RowBounds()).isEmpty()) {
+	        if (newMario_zk_info.getid() != null     ) {
+	            mario_zk_infoDao.update(newMario_zk_info);
+	        } else {
+	            mario_zk_infoDao.insert(newMario_zk_info);
+	        }
+	        return true;
+    	}
+    	return false;
     }
 
     /**

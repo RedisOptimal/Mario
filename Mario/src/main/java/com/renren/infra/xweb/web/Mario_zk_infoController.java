@@ -52,8 +52,13 @@ public class Mario_zk_infoController {
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public String create(@Valid Mario_zk_info newMario_zk_info, RedirectAttributes redirectAttributes) {
-        service.saveMario_zk_info(newMario_zk_info);
-        redirectAttributes.addFlashAttribute("message", "创建成功");
+        if (service.saveMario_zk_info(newMario_zk_info)) {
+        	redirectAttributes.addFlashAttribute("alertType", "alert-success");
+        	redirectAttributes.addFlashAttribute("message", "创建成功");        	
+        } else {
+        	redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:名字冲突");        	
+        }
         return "redirect:/mario_zk_info/";
     }
 
@@ -67,14 +72,31 @@ public class Mario_zk_infoController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public String update(@Valid @ModelAttribute("preloadMario_zk_info") Mario_zk_info mario_zk_info,
             RedirectAttributes redirectAttributes) {
-        service.saveMario_zk_info(mario_zk_info);
-        redirectAttributes.addFlashAttribute("message", "更新成功");
+    	if (mario_zk_info.getzk_name() == null || mario_zk_info.getzk_name().trim().equals("")) {
+            redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:请填写ZooKeeper名字");
+    		return "redirect:/mario_zk_info/";
+    	}
+    	if (mario_zk_info.getsession_timeout() == null) {
+            redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:请填写ZooKeeper Session Timeout");
+    		return "redirect:/mario_zk_info/";
+    	}
+    	if (service.saveMario_zk_info(mario_zk_info)) {
+    		redirectAttributes.addFlashAttribute("alertType", "alert-success");
+    		redirectAttributes.addFlashAttribute("message", "更新成功");
+    	} else {
+        	redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+    		redirectAttributes.addFlashAttribute("message", "更新失败:名字冲突");      		
+    	}
         return "redirect:/mario_zk_info/";
     }
 
     @RequestMapping(value = "delete/{id}")
     public String delete( @PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
-        service.deleteMario_zk_info(id);
+        // TODO 删除其他表中的信息
+    	service.deleteMario_zk_info(id);
+        redirectAttributes.addFlashAttribute("alertType", "alert-success");
         redirectAttributes.addFlashAttribute("message", "删除成功");
         return "redirect:/mario_zk_info";
     }
