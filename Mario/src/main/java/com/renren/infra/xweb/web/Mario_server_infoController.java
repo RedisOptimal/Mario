@@ -1,6 +1,7 @@
 
 package com.renren.infra.xweb.web;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -8,6 +9,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,7 +22,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springside.modules.web.Servlets;
 
 import com.renren.infra.xweb.entity.Mario_server_info;
+import com.renren.infra.xweb.entity.Mario_zk_info;
 import com.renren.infra.xweb.service.Mario_server_infoService;
+import com.renren.infra.xweb.service.Mario_zk_infoService;
 import com.renren.infra.xweb.util.Const;
 
 @Controller
@@ -28,7 +33,9 @@ public class Mario_server_infoController {
 
     @Autowired
     private Mario_server_infoService service;
-
+    @Autowired
+    private Mario_zk_infoService zk_service;
+    
     @RequestMapping(value = { "", "/list" })
     public String list(@RequestParam(value = "page", defaultValue = "1") int pageNumber,
             Model model, ServletRequest request) {
@@ -45,6 +52,10 @@ public class Mario_server_infoController {
 
     @RequestMapping(value = "create", method = RequestMethod.GET)
     public String createForm(Model model) {
+        List<Mario_zk_info> mario_zk_infoList = zk_service.getAllMario_zk_info();
+        Page<Mario_zk_info> mario_zk_infos = new PageImpl<Mario_zk_info>(mario_zk_infoList, new PageRequest(0, mario_zk_infoList.size()), mario_zk_infoList.size());
+        model.addAttribute("mario_zk_infos", mario_zk_infos);
+        
         model.addAttribute("mario_server_info", new Mario_server_info());
         model.addAttribute("action", "create");
         return "mario_server_info/mario_server_infoForm";

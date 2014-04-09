@@ -25,7 +25,11 @@
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">zk_id:</label>
                 <div class="col-sm-10">
-                    <input type="text" id="zk_id" name="zk_id"  value="${mario_server_info.zk_id}" class="form-control required"/>
+                    <select type="text" name="zk_id" class="form-control required">
+                        <c:forEach items="${mario_zk_infos.content}" var="mario_zk_info">
+                            <option value="${mario_zk_info.id}" title="${mario_zk_info.id}">${mario_zk_info.zk_name}</option>
+                        </c:forEach>
+                    </select>
                 </div>
             </div>
             <div class="form-group">
