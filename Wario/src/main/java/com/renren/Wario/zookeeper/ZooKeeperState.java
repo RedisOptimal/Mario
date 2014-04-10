@@ -67,7 +67,7 @@ public class ZooKeeperState {
 			} else if (line.startsWith("Outstanding:")) {
 				outStanding = Integer.parseInt(getStringValueFromLine(line));
 			} else if (line.startsWith("Zxid:")) {
-				zxid = Long.parseLong(getStringValueFromLine(line), 16);
+				zxid = Long.parseLong(getStringValueFromLine(line).substring(2), 16);
 			} else if (line.startsWith("Mode:")) {
 				mode = getStringValueFromLine(line);
 			} else if (line.startsWith("Node count:")) {
