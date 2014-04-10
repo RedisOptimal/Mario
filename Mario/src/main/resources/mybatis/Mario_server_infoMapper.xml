@@ -56,4 +56,8 @@
     <delete id="delete" parameterType="Mario_server_info">
         delete from mario_server_info where         id = #{id}        
     </delete>
+    
+    <delete id="deleteByZkid" parameterType="Mario_zk_info">
+    	delete from mario_server_info where			zk_id = #{id}
+    </delete>
 </mapper> 

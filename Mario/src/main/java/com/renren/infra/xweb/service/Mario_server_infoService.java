@@ -102,4 +102,8 @@ public class Mario_server_infoService {
         mario_server_infoDao.delete(id);
     }
 
+    public void deleteMario_server_infoByZkid(Integer zk_id) {
+    	mario_server_infoDao.deleteByZkid(zk_id);
+    }
+    
 }
