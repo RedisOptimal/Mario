@@ -33,4 +33,6 @@ public interface Mario_plugin_infoMybatisDao {
     void update(Mario_plugin_info mario_plugin_info);
     
     void delete(Integer id);
+    
+    void deleteByZkid(Integer zk_id);
 }

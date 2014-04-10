@@ -69,7 +69,8 @@ CREATE TABLE `mario_plugin_info` (
   `email_address` varchar(45) DEFAULT NULL,
   `args` varchar(45) DEFAULT NULL,
   `commit` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `zk_id_index` (`zk_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -344,4 +345,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-04-10  2:45:29
+-- Dump completed on 2014-04-10 17:17:50

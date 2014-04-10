@@ -1,7 +1,10 @@
 
 package com.renren.infra.xweb.entity;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * 
@@ -79,6 +82,8 @@ public class Mario_plugin_info {
     * get方法
     *
     */
+    @NotNull(message = "必须指定PluginName")
+    @NotBlank(message = "必须指定PluginName")
     public String getplugin_name(){
         return this.plugin_name;
     }
@@ -95,6 +100,7 @@ public class Mario_plugin_info {
     * get方法
     *
     */
+    @NotNull(message = "必须指定ZooKeeper集群")
     public Integer getzk_id(){
         return this.zk_id;
     }
@@ -111,6 +117,8 @@ public class Mario_plugin_info {
     * get方法
     *
     */
+    @NotNull(message = "必须制定MssageSender，可以指定DebugMsgSender")
+    @NotBlank(message = "必须制定MssageSender，可以指定DebugMsgSender")
     public String getmsg_sender(){
         return this.msg_sender;
     }
@@ -127,6 +135,8 @@ public class Mario_plugin_info {
     * get方法
     *
     */
+    @NotNull(message = "必须制定MailSender，可以指定DebugMailSender")
+    @NotBlank(message = "必须制定MailSender，可以指定DebugMailSender")
     public String getmail_sender(){
         return this.mail_sender;
     }

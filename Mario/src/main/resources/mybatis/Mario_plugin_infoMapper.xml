@@ -71,4 +71,8 @@
     <delete id="delete" parameterType="Mario_plugin_info">
         delete from mario_plugin_info where         id = #{id}        
     </delete>
+    
+    <delete id="deleteByZkid" parameterType="Mario_zk_info">
+    	delete from mario_plugin_info where			zk_id = #{id}
+    </delete>
 </mapper> 

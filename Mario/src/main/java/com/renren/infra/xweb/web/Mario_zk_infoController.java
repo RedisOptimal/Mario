@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springside.modules.web.Servlets;
 
 import com.renren.infra.xweb.entity.Mario_zk_info;
+import com.renren.infra.xweb.service.Mario_plugin_infoService;
 import com.renren.infra.xweb.service.Mario_server_infoService;
 import com.renren.infra.xweb.service.Mario_zk_infoService;
 import com.renren.infra.xweb.util.Const;
@@ -33,6 +34,9 @@ public class Mario_zk_infoController {
 	@Autowired
 	private Mario_server_infoService serverInfoService;
 
+	@Autowired
+	private Mario_plugin_infoService pluginInfoService;
+	
 	@RequestMapping(value = {"", "/list"})
 	public String list(
 			@RequestParam(value = "page", defaultValue = "1") int pageNumber,
@@ -103,6 +107,7 @@ public class Mario_zk_infoController {
 			RedirectAttributes redirectAttributes) {
 		service.deleteMario_zk_info(id);
 		serverInfoService.deleteMario_server_infoByZkid(id);
+		pluginInfoService.deleteMario_plugin_infoByZkid(id);
 		redirectAttributes.addFlashAttribute("alertType", "alert-success");
 		redirectAttributes.addFlashAttribute("message", "删除成功");
 		return "redirect:/mario_zk_info";

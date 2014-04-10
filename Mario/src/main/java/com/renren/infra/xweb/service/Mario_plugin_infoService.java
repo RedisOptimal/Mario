@@ -90,5 +90,9 @@ public class Mario_plugin_infoService {
     public void deleteMario_plugin_info(Integer id) {
         mario_plugin_infoDao.delete(id);
     }
+    
+    public void deleteMario_plugin_infoByZkid(Integer zk_id) {
+    	mario_plugin_infoDao.deleteByZkid(zk_id);
+    }
 
 }

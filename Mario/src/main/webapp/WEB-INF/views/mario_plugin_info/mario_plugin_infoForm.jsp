@@ -26,24 +26,31 @@
                 <label for="name" class="col-sm-2 control-label">plugin_name:</label>
                 <div class="col-sm-10">
                     <input type="text" id="plugin_name" name="plugin_name"  value="${mario_plugin_info.plugin_name}" class="form-control required"/>
+                    <form:errors path="plugin_name" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">zk_id:</label>
                 <div class="col-sm-10">
-                    <input type="text" id="zk_id" name="zk_id"  value="${mario_plugin_info.zk_id}" class="form-control required"/>
+                    <select type="text" id="zk_id" name="zk_id" class="form-control required">
+                        <c:forEach items="${mario_zk_infos.content}" var="mario_zk_info">
+                            <option value="${mario_zk_info.id}" title="${mario_zk_info.id}">${mario_zk_info.zk_name}</option>
+                        </c:forEach>
+                    </select>
                 </div>
             </div>
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">msg_sender:</label>
                 <div class="col-sm-10">
                     <input type="text" id="msg_sender" name="msg_sender"  value="${mario_plugin_info.msg_sender}" class="form-control required"/>
+                    <form:errors path="msg_sender" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">mail_sender:</label>
                 <div class="col-sm-10">
                     <input type="text" id="mail_sender" name="mail_sender"  value="${mario_plugin_info.mail_sender}" class="form-control required"/>
+                    <form:errors path="mail_sender" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
