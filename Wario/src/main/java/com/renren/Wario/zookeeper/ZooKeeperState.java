@@ -35,7 +35,7 @@ public class ZooKeeperState {
 	private long received = -1;
 	private long sent = -1;
 	private int outStanding = -1;
-	private long zxid;
+	private long zxid = -1;
 	private String mode = null;
 	private int nodeCount = -1;
 	private int totalWatches = -1;
@@ -52,51 +52,57 @@ public class ZooKeeperState {
 
 	public void update() {
 		String statText = cmd("srvr");
-		Scanner scannerForStat = new Scanner(statText);
-		while (scannerForStat.hasNext()) {
-			String line = scannerForStat.nextLine();
-			if (line.startsWith("Latency min/avg/max:")) {
-				String[] latencys = getStringValueFromLine(line).split("/");
-				minLatency = Integer.parseInt(latencys[0]);
-				avgLatency = Integer.parseInt(latencys[1]);
-				maxLatency = Integer.parseInt(latencys[2]);
-			} else if (line.startsWith("Received:")) {
-				received = Long.parseLong(getStringValueFromLine(line));
-			} else if (line.startsWith("Sent:")) {
-				sent = Long.parseLong(getStringValueFromLine(line));
-			} else if (line.startsWith("Outstanding:")) {
-				outStanding = Integer.parseInt(getStringValueFromLine(line));
-			} else if (line.startsWith("Zxid:")) {
-				zxid = Long.parseLong(getStringValueFromLine(line).substring(2), 16);
-			} else if (line.startsWith("Mode:")) {
-				mode = getStringValueFromLine(line);
-			} else if (line.startsWith("Node count:")) {
-				nodeCount = Integer.parseInt(getStringValueFromLine(line));
+		if (!"".equals(statText)) {
+			Scanner scannerForStat = new Scanner(statText);
+			while (scannerForStat.hasNext()) {
+				String line = scannerForStat.nextLine();
+				if (line.startsWith("Latency min/avg/max:")) {
+					String[] latencys = getStringValueFromLine(line).split("/");
+					minLatency = Integer.parseInt(latencys[0]);
+					avgLatency = Integer.parseInt(latencys[1]);
+					maxLatency = Integer.parseInt(latencys[2]);
+				} else if (line.startsWith("Received:")) {
+					received = Long.parseLong(getStringValueFromLine(line));
+				} else if (line.startsWith("Sent:")) {
+					sent = Long.parseLong(getStringValueFromLine(line));
+				} else if (line.startsWith("Outstanding:")) {
+					outStanding = Integer.parseInt(getStringValueFromLine(line));
+				} else if (line.startsWith("Zxid:")) {
+					zxid = Long.parseLong(getStringValueFromLine(line).substring(2), 16);
+				} else if (line.startsWith("Mode:")) {
+					mode = getStringValueFromLine(line);
+				} else if (line.startsWith("Node count:")) {
+					nodeCount = Integer.parseInt(getStringValueFromLine(line));
+				}
 			}
+			scannerForStat.close();
 		}
-		scannerForStat.close();
 
 		String wchsText = cmd("wchs");
-		Scanner scannerForWchs = new Scanner(wchsText);
-		while (scannerForWchs.hasNext()) {
-			String line = scannerForWchs.nextLine();
-			if (line.startsWith("Total watches:")) {
-				totalWatches = Integer.parseInt(getStringValueFromLine(line));
+		if (!"".equals(wchsText)) {
+			Scanner scannerForWchs = new Scanner(wchsText);
+			while (scannerForWchs.hasNext()) {
+				String line = scannerForWchs.nextLine();
+				if (line.startsWith("Total watches:")) {
+					totalWatches = Integer.parseInt(getStringValueFromLine(line));
+				}
 			}
+			scannerForWchs.close();
 		}
-		scannerForWchs.close();
-
+		
 		String consText = cmd("cons");
-		Scanner scannerForCons = new Scanner(consText);
 		if (!"".equals(consText)) {
-			clientNumber = 0;
+			Scanner scannerForCons = new Scanner(consText);
+			if (!"".equals(consText)) {
+				clientNumber = 0;
+			}
+			while (scannerForCons.hasNext()) {
+				@SuppressWarnings("unused")
+				String line = scannerForCons.nextLine();
+				++clientNumber;
+			}
+			scannerForCons.close();
 		}
-		while (scannerForCons.hasNext()) {
-			@SuppressWarnings("unused")
-			String line = scannerForCons.nextLine();
-			++clientNumber;
-		}
-		scannerForCons.close();
 	}
 
 	public String getHost() {
@@ -161,13 +167,11 @@ public class ZooKeeperState {
 	}
 
 	private class SendThread extends Thread {
-		private CountDownLatch countDownLatch;
 		private String cmd;
 
 		public String ret = "";
 
-		public SendThread(CountDownLatch countDownLatch, String cmd) {
-			this.countDownLatch = countDownLatch;
+		public SendThread(String cmd) {
 			this.cmd = cmd;
 		}
 
@@ -178,25 +182,21 @@ public class ZooKeeperState {
 			} catch (IOException e) {
 				return;
 			}
-			countDownLatch.countDown();
 		}
 
 	}
 
 	private String cmd(String cmd) {
 		final int waitTimeout = 5;
-		CountDownLatch countDownLatch = new CountDownLatch(1);
-		SendThread sendThread = new SendThread(countDownLatch, cmd);
+		SendThread sendThread = new SendThread(cmd);
 		sendThread.start();
 		try {
-			if (!countDownLatch.await(waitTimeout, TimeUnit.SECONDS)) {
-				sendThread.interrupt();
-				logger.error("Send " + cmd + " to client " + host + ":" + port
-						+ " failed!");
-			}
+			sendThread.join(waitTimeout * 1000);
+			return sendThread.ret;
 		} catch (InterruptedException e) {
-			logger.error("This will not happen.");
+			logger.error("Send " + cmd + " to client " + host + ":" + port
+					+ " failed!");
 		}
-		return sendThread.ret;
+		return "";
 	}
 }
