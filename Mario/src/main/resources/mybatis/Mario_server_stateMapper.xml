@@ -4,86 +4,69 @@
 <!-- namespace必须指向Dao接口 -->
 <mapper namespace="com.renren.infra.xweb.repository.Mario_server_stateMybatisDao">
 
-    <select id="findById" resultType="Mario_server_state">
-        select 
-        id        , server_id        , min_latency        , ave_latency        , max_latency        , received        , sent        , outstanding        , zxid        , mode        , node_count        , total_watches        , client_number        , time_stamp        from mario_server_state
-        where 
-        id = #{id}        
-    </select>
+	<select id="findAll" resultType="Mario_server_state">
+		select
+		id , server_id , min_latency , ave_latency , max_latency , received ,
+		sent , outstanding , zxid , mode , node_count , total_watches ,
+		client_number , time_stamp from mario_server_state
+		order by
+		id desc
+	</select>
 
-    <select id="findAll" resultType="Mario_server_state">
-           select 
-        id        , server_id        , min_latency        , ave_latency        , max_latency        , received        , sent        , outstanding        , zxid        , mode        , node_count        , total_watches        , client_number        , time_stamp        from mario_server_state
-        order by 
-        id desc        
-    </select>
+	<select id="find" parameterType="map" resultType="Mario_server_state">
+		select
+		id , server_id , min_latency , ave_latency , max_latency , received ,
+		sent , outstanding , zxid , mode , node_count , total_watches ,
+		client_number , time_stamp from mario_server_state
+		<where>
+			<if test="id != null and id != ''">
+				and id = #{id}
+			</if>
+			<if test="server_id != null and server_id != ''">
+				and server_id = #{server_id}
+			</if>
+			<if test="min_latency != null and min_latency != ''">
+				and min_latency = #{min_latency}
+			</if>
+			<if test="ave_latency != null and ave_latency != ''">
+				and ave_latency = #{ave_latency}
+			</if>
+			<if test="max_latency != null and max_latency != ''">
+				and max_latency = #{max_latency}
+			</if>
+			<if test="received != null and received != ''">
+				and received = #{received}
+			</if>
+			<if test="sent != null and sent != ''">
+				and sent = #{sent}
+			</if>
+			<if test="outstanding != null and outstanding != ''">
+				and outstanding = #{outstanding}
+			</if>
+			<if test="zxid != null and zxid != ''">
+				and zxid = #{zxid}
+			</if>
+			<if test="mode != null and mode != ''">
+				and mode = #{mode}
+			</if>
+			<if test="node_count != null and node_count != ''">
+				and node_count = #{node_count}
+			</if>
+			<if test="total_watches != null and total_watches != ''">
+				and total_watches = #{total_watches}
+			</if>
+			<if test="client_number != null and client_number != ''">
+				and client_number = #{client_number}
+			</if>
+			<if test="time_stamp != null and time_stamp != ''">
+				and time_stamp = #{time_stamp}
+			</if>
+		</where>
+	</select>
 
-    <select id="find" parameterType="map" resultType="Mario_server_state">
-        select 
-        id        , server_id        , min_latency        , ave_latency        , max_latency        , received        , sent        , outstanding        , zxid        , mode        , node_count        , total_watches        , client_number        , time_stamp        from mario_server_state
-           <where>
-            <if test="id != null and id != ''">
-                and id = #{id}
-            </if>
-            <if test="server_id != null and server_id != ''">
-                and server_id = #{server_id}
-            </if>
-            <if test="min_latency != null and min_latency != ''">
-                and min_latency = #{min_latency}
-            </if>
-            <if test="ave_latency != null and ave_latency != ''">
-                and ave_latency = #{ave_latency}
-            </if>
-            <if test="max_latency != null and max_latency != ''">
-                and max_latency = #{max_latency}
-            </if>
-            <if test="received != null and received != ''">
-                and received = #{received}
-            </if>
-            <if test="sent != null and sent != ''">
-                and sent = #{sent}
-            </if>
-            <if test="outstanding != null and outstanding != ''">
-                and outstanding = #{outstanding}
-            </if>
-            <if test="zxid != null and zxid != ''">
-                and zxid = #{zxid}
-            </if>
-            <if test="mode != null and mode != ''">
-                and mode = #{mode}
-            </if>
-            <if test="node_count != null and node_count != ''">
-                and node_count = #{node_count}
-            </if>
-            <if test="total_watches != null and total_watches != ''">
-                and total_watches = #{total_watches}
-            </if>
-            <if test="client_number != null and client_number != ''">
-                and client_number = #{client_number}
-            </if>
-            <if test="time_stamp != null and time_stamp != ''">
-                and time_stamp = #{time_stamp}
-            </if>
-        </where>
-    </select>
-    
-    <select id="findTotalNum" parameterType="Mario_server_state" resultType="int">
-        select count(id) from mario_server_state
-    </select>
+	<select id="findTotalNum" parameterType="Mario_server_state"
+		resultType="int">
+		select count(id) from mario_server_state
+	</select>
 
-    <insert id="insert" parameterType="Mario_server_state">
-        insert into mario_server_state
-        (
-        id        , server_id        , min_latency        , ave_latency        , max_latency        , received        , sent        , outstanding        , zxid        , mode        , node_count        , total_watches        , client_number        , time_stamp        )
-        values (
-        #{id}        , #{server_id}        , #{min_latency}        , #{ave_latency}        , #{max_latency}        , #{received}        , #{sent}        , #{outstanding}        , #{zxid}        , #{mode}        , #{node_count}        , #{total_watches}        , #{client_number}        , #{time_stamp}        )
-    </insert>
-
-    <update id="update" parameterType="Mario_server_state">
-        update mario_server_state		set         id = #{id}        , server_id = #{server_id}        , min_latency = #{min_latency}        , ave_latency = #{ave_latency}        , max_latency = #{max_latency}        , received = #{received}        , sent = #{sent}        , outstanding = #{outstanding}        , zxid = #{zxid}        , mode = #{mode}        , node_count = #{node_count}        , total_watches = #{total_watches}        , client_number = #{client_number}        , time_stamp = #{time_stamp}		where         id = #{id}        
-    </update>
-
-    <delete id="delete" parameterType="Mario_server_state">
-        delete from mario_server_state where         id = #{id}        
-    </delete>
 </mapper> 

@@ -20,20 +20,14 @@ import com.renren.infra.xweb.entity.Mario_server_state;
 @MyBatisRepository
 public interface Mario_server_stateMybatisDao {
 
-    Mario_server_state findById(Integer id);
-
     List<Mario_server_state> findAll();
 
     List<Mario_server_state> find(Map<String, Object> parameters);
 
-    void insert(Mario_server_state mario_server_state);
-
-    void update(Mario_server_state mario_server_state);
-    
-    void delete(Integer id);
 	List<Mario_server_state> find(Map<String, Object> filterParams,
 			RowBounds buildRowBounds);
 
 	int findTotalNum(Map<String, Object> filterParams);
 	
-	Mario_server_state getMario_server_stateById(Integer id);}
+	Mario_server_state getMario_server_stateById(Integer id);
+}
