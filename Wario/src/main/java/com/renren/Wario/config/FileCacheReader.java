@@ -27,7 +27,15 @@ import java.util.Map;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
+/**
+ * Use for cache configuration file.
+ * 
+ * @deprecated Save configuration in DB.
+ * 
+ * @author zhe.yuan
+ *
+ */
+@Deprecated
 public class FileCacheReader {
 
 	private static Logger logger = LogManager.getLogger(FileCacheReader.class
