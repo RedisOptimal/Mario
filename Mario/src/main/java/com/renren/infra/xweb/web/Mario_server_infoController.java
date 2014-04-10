@@ -84,7 +84,10 @@ public class Mario_server_infoController {
 			model.addAttribute("mario_zk_infos", mario_zk_infos);
 			return "mario_server_info/mario_server_infoForm";
 		}
-		if (service.saveNewRecord(newMario_server_info)) {
+		if (zkInfoService.getMario_zk_info(newMario_server_info.getzk_id()) == null) {
+			redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+			redirectAttributes.addFlashAttribute("message", "集群已经不存在");			
+		} else if (service.saveNewRecord(newMario_server_info)) {
 			redirectAttributes.addFlashAttribute("alertType", "alert-success");
 			redirectAttributes.addFlashAttribute("message", "创建成功");
 		} else {
@@ -131,7 +134,10 @@ public class Mario_server_infoController {
 			model.addAttribute("action", "update");
 			return "mario_server_info/mario_server_infoForm";
 		}
-		if (service.updateRecord(mario_server_info)) {
+		if (zkInfoService.getMario_zk_info(mario_server_info.getzk_id()) == null) {
+			redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+			redirectAttributes.addFlashAttribute("message", "集群已经不存在");			
+		} else if (service.updateRecord(mario_server_info)) {
 			redirectAttributes.addFlashAttribute("alertType", "alert-success");
 			redirectAttributes.addFlashAttribute("message", "创建成功");
 		} else {
