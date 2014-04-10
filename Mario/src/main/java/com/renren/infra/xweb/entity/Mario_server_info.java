@@ -1,7 +1,10 @@
 
 package com.renren.infra.xweb.entity;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * 
@@ -75,6 +78,8 @@ public class Mario_server_info {
     * get方法
     *
     */
+    @NotNull(message = "必须填写IP或者域名")
+    @NotBlank(message = "必须填写IP或者域名")
     public String gethost(){
         return this.host;
     }
@@ -91,6 +96,7 @@ public class Mario_server_info {
     * get方法
     *
     */
+    @NotNull(message = "必须填写端口号")
     public Integer getport(){
         return this.port;
     }

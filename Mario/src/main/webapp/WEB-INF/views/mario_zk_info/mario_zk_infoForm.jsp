@@ -26,12 +26,14 @@
                 <label for="name" class="col-sm-2 control-label">zk_name:</label>
                 <div class="col-sm-10">
                     <input type="text" id="zk_name" name="zk_name"  value="${mario_zk_info.zk_name}" class="form-control required"/>
+                    <form:errors path="zk_name" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">session_timeout:</label>
                 <div class="col-sm-10">
                     <input type="text" id="session_timeout" name="session_timeout"  value="${mario_zk_info.session_timeout}" class="form-control required"/>
+                    <form:errors path="session_timeout" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">

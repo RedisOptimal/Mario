@@ -36,12 +36,14 @@
                 <label for="name" class="col-sm-2 control-label">host:</label>
                 <div class="col-sm-10">
                     <input type="text" id="host" name="host"  value="${mario_server_info.host}" class="form-control required"/>
+                    <form:errors path="host" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">port:</label>
                 <div class="col-sm-10">
                     <input type="text" id="port" name="port"  value="${mario_server_info.port}" class="form-control required"/>
+                    <form:errors path="port" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">

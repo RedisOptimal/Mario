@@ -1,7 +1,10 @@
 
 package com.renren.infra.xweb.entity;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * 
@@ -63,6 +66,8 @@ public class Mario_zk_info {
     * get方法
     *
     */
+    @NotNull(message = "必须填写ZooKeeper名字")
+    @NotBlank(message = "必须填写ZooKeeper名字")
     public String getzk_name(){
         return this.zk_name;
     }
@@ -79,6 +84,7 @@ public class Mario_zk_info {
     * get方法
     *
     */
+    @NotNull(message = "必须填写ZooKeeper Session Timeout")
     public Integer getsession_timeout(){
         return this.session_timeout;
     }
