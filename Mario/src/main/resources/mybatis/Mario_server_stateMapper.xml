@@ -68,7 +68,7 @@
     </select>
     
     <select id="findTotalNum" parameterType="Mario_server_state" resultType="int">
-        select count(1) from mario_server_state
+        select count(id) from mario_server_state
     </select>
 
     <insert id="insert" parameterType="Mario_server_state">
