@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.renren.infra.xweb.repository.Mario_server_infoMybatisDao">
+
+    <select id="findById" resultType="Mario_server_info">
+        select 
+        id        , zk_id        , host        , port        from mario_server_info
+        where 
+        id = #{id}        
+    </select>
+
+    <select id="findAll" resultType="Mario_server_info">
+           select 
+        id        , zk_id        , host        , port        from mario_server_info
+        order by 
+        id desc        
+    </select>
+
+    <select id="find" parameterType="map" resultType="Mario_server_info">
+        select 
+        id        , zk_id        , host        , port        from mario_server_info
+           <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="zk_id != null and zk_id != ''">
+                and zk_id = #{zk_id}
+            </if>
+            <if test="host != null and host != ''">
+                and host = #{host}
+            </if>
+            <if test="port != null and port != ''">
+                and port = #{port}
+            </if>
+        </where>
+    </select>
+    
+    <select id="findTotalNum" parameterType="Mario_server_info" resultType="int">
+        select count(1) from mario_server_info
+    </select>
+
+    <insert id="insert" parameterType="Mario_server_info">
+        insert into mario_server_info
+        (
+        id        , zk_id        , host        , port        )
+        values (
+        #{id}        , #{zk_id}        , #{host}        , #{port}        )
+    </insert>
+
+    <update id="update" parameterType="Mario_server_info">
+        update mario_server_info		set         id = #{id}        , zk_id = #{zk_id}        , host = #{host}        , port = #{port}		where         id = #{id}        
+    </update>
+
+    <delete id="delete" parameterType="Mario_server_info">
+        delete from mario_server_info where         id = #{id}        
+    </delete>
+    
+    <delete id="deleteByZkid" parameterType="Mario_zk_info">
+    	delete from mario_server_info where			zk_id = #{id}
+    </delete>
+</mapper> 

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.renren.infra.xweb.repository.Mario_plugin_infoMybatisDao">
+
+    <select id="findById" resultType="Mario_plugin_info">
+        select 
+        id        , plugin_name        , zk_id        , msg_sender        , mail_sender        , phone_number        , email_address        , args        , commit        from mario_plugin_info
+        where 
+        id = #{id}        
+    </select>
+
+    <select id="findAll" resultType="Mario_plugin_info">
+           select 
+        id        , plugin_name        , zk_id        , msg_sender        , mail_sender        , phone_number        , email_address        , args        , commit        from mario_plugin_info
+        order by 
+        id desc        
+    </select>
+
+    <select id="find" parameterType="map" resultType="Mario_plugin_info">
+        select 
+        id        , plugin_name        , zk_id        , msg_sender        , mail_sender        , phone_number        , email_address        , args        , commit        from mario_plugin_info
+           <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="plugin_name != null and plugin_name != ''">
+                and plugin_name = #{plugin_name}
+            </if>
+            <if test="zk_id != null and zk_id != ''">
+                and zk_id = #{zk_id}
+            </if>
+            <if test="msg_sender != null and msg_sender != ''">
+                and msg_sender = #{msg_sender}
+            </if>
+            <if test="mail_sender != null and mail_sender != ''">
+                and mail_sender = #{mail_sender}
+            </if>
+            <if test="phone_number != null and phone_number != ''">
+                and phone_number = #{phone_number}
+            </if>
+            <if test="email_address != null and email_address != ''">
+                and email_address = #{email_address}
+            </if>
+            <if test="args != null and args != ''">
+                and args = #{args}
+            </if>
+            <if test="commit != null and commit != ''">
+                and commit = #{commit}
+            </if>
+        </where>
+    </select>
+    
+    <select id="findTotalNum" parameterType="Mario_plugin_info" resultType="int">
+        select count(1) from mario_plugin_info
+    </select>
+
+    <insert id="insert" parameterType="Mario_plugin_info">
+        insert into mario_plugin_info
+        (
+        id        , plugin_name        , zk_id        , msg_sender        , mail_sender        , phone_number        , email_address        , args        , commit        )
+        values (
+        #{id}        , #{plugin_name}        , #{zk_id}        , #{msg_sender}        , #{mail_sender}        , #{phone_number}        , #{email_address}        , #{args}        , #{commit}        )
+    </insert>
+
+    <update id="update" parameterType="Mario_plugin_info">
+        update mario_plugin_info		set         id = #{id}        , plugin_name = #{plugin_name}        , zk_id = #{zk_id}        , msg_sender = #{msg_sender}        , mail_sender = #{mail_sender}        , phone_number = #{phone_number}        , email_address = #{email_address}        , args = #{args}        , commit = #{commit}		where         id = #{id}        
+    </update>
+
+    <delete id="delete" parameterType="Mario_plugin_info">
+        delete from mario_plugin_info where         id = #{id}        
+    </delete>
+    
+    <delete id="deleteByZkid" parameterType="Mario_zk_info">
+    	delete from mario_plugin_info where			zk_id = #{id}
+    </delete>
+</mapper> 

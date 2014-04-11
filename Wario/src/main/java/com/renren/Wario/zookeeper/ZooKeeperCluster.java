@@ -150,7 +150,7 @@ public class ZooKeeperCluster {
 
 	private void addObserverClient(String connectionString, String observerAuth) {
 		observerClient = new ZooKeeperClient(connectionString, sessionTimeout,
-				observer, observerAuth, zkId);
+				"observer", observerAuth, zkId);
 		if (observerClient != null) {
 			AddClient add = new AddClient(observerClient);
 			new Thread(add).start();
