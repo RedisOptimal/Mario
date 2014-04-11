@@ -20,17 +20,10 @@ import com.renren.infra.xweb.entity.Mario_node_state;
 @MyBatisRepository
 public interface Mario_node_stateMybatisDao {
 
-    Mario_node_state findById(Integer id);
-
     List<Mario_node_state> find(Map<String, Object> parameters, RowBounds rowBounds);
 
     List<Mario_node_state> findAll();
 
     int findTotalNum(Map<String, Object> filterParams);
     
-    void insert(Mario_node_state mario_node_state);
-
-    void update(Mario_node_state mario_node_state);
-    
-    void delete(Integer id);
 }

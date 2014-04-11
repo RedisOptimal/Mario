@@ -75,7 +75,8 @@
                     <td>${mario_server_state.outstanding}</td>
                     
                     
-                    <td>${mario_server_state.zxid}</td>
+                    <td><script type="text/javascript">var zkid = ${mario_server_state.zxid};
+                    document.write("0x" + zkid.toString(16))</script></td>
                     
                     
                     <td>${mario_server_state.mode}</td>
@@ -90,7 +91,9 @@
                     <td>${mario_server_state.client_number}</td>
                     
                     
-                    <td>${mario_server_state.time_stamp}</td>
+                    <td><script type="text/javascript">var unixtime = ${mario_server_state.time_stamp};
+                    var unixtimestamp = new Date(unixtime);
+                    document.write(unixtimestamp.toLocaleString())</script></td>
                     
                 </tr>
             </c:forEach>

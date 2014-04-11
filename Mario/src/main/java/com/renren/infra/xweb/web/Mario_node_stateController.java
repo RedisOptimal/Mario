@@ -38,14 +38,6 @@ public class Mario_node_stateController {
         Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
         Page<Mario_node_state> mario_node_states = service.getMario_node_state(searchParams, pageNumber, Const.PAGE_SIZE);
 			
-        Iterator<Mario_node_state> it = mario_node_states.iterator();
-			while(it.hasNext()) {
-				Mario_node_state mario_node_state = it.next();
-				mario_node_state.setMtimeString(new Date(mario_node_state.getmtime()).toString());
-				mario_node_state.setCtimeString(new Date(mario_node_state.getctime()).toString());
-				
-			}
-			
         model.addAttribute("mario_node_states", mario_node_states);
         model.addAttribute("searchParams",
                 Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
@@ -53,53 +45,22 @@ public class Mario_node_stateController {
         return "mario_node_state/mario_node_stateList";
     }
 
-    @RequestMapping(value = "create", method = RequestMethod.GET)
-    public String createForm(Model model) {
-        model.addAttribute("mario_node_state", new Mario_node_state());
-        model.addAttribute("action", "create");
-        return "mario_node_state/mario_node_stateForm";
-    }
-
-    @RequestMapping(value = "create", method = RequestMethod.POST)
-    public String create(@Valid Mario_node_state newMario_node_state, RedirectAttributes redirectAttributes) {
-        service.saveMario_node_state(newMario_node_state);
-        redirectAttributes.addFlashAttribute("message", "创建成功");
-        return "redirect:/mario_node_state/";
-    }
-
     @RequestMapping(value = "update/{id}", method = RequestMethod.GET)
     public String updateForm( @PathVariable("id") Integer id, Model model) {
-    	
-    	Mario_node_state mario_node_state = service.getMario_node_state(id);
-		mario_node_state.setMtimeString(new Date(mario_node_state.getmtime()).toString());
-		mario_node_state.setCtimeString(new Date(mario_node_state.getctime()).toString());
-		
-        model.addAttribute("mario_node_state", mario_node_state);
+    	// TODO 跳转节点展示
+//    	Mario_node_state mario_node_state = service.getMario_node_state(id);
+//		
+//        model.addAttribute("mario_node_state", mario_node_state);
         model.addAttribute("action", "update");
         return "mario_node_state/mario_node_stateForm";
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("preloadMario_node_state") Mario_node_state mario_node_state,
+    public String update(@Valid Mario_node_state mario_node_state,
             RedirectAttributes redirectAttributes) {
-        service.saveMario_node_state(mario_node_state);
+//        service.saveMario_node_state(mario_node_state);
         redirectAttributes.addFlashAttribute("message", "更新成功");
         return "redirect:/mario_node_state/";
-    }
-
-    @RequestMapping(value = "delete/{id}")
-    public String delete( @PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
-        service.deleteMario_node_state(id);
-        redirectAttributes.addFlashAttribute("message", "删除成功");
-        return "redirect:/mario_node_state";
-    }
-
-    @ModelAttribute("preloadMario_node_state")
-    public Mario_node_state getMario_node_state( @RequestParam(value = "id", required = false) Integer id) {
-        if (id != null) {
-            return service.getMario_node_state(id);
-        }
-        return null;
     }
 
 }

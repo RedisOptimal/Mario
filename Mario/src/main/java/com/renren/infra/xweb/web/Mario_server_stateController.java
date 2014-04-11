@@ -43,48 +43,4 @@ public class Mario_server_stateController {
         return "mario_server_state/mario_server_stateList";
     }
 
-    @RequestMapping(value = "create", method = RequestMethod.GET)
-    public String createForm(Model model) {
-        model.addAttribute("mario_server_state", new Mario_server_state());
-        model.addAttribute("action", "create");
-        return "mario_server_state/mario_server_stateForm";
-    }
-
-    @RequestMapping(value = "create", method = RequestMethod.POST)
-    public String create(@Valid Mario_server_state newMario_server_state, RedirectAttributes redirectAttributes) {
-        service.saveMario_server_state(newMario_server_state);
-        redirectAttributes.addFlashAttribute("message", "创建成功");
-        return "redirect:/mario_server_state/";
-    }
-
-    @RequestMapping(value = "update/{id}", method = RequestMethod.GET)
-    public String updateForm( @PathVariable("id") Integer id, Model model) {
-        model.addAttribute("mario_server_state", service.getMario_server_state(id));
-        model.addAttribute("action", "update");
-        return "mario_server_state/mario_server_stateForm";
-    }
-
-    @RequestMapping(value = "update", method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("preloadMario_server_state") Mario_server_state mario_server_state,
-            RedirectAttributes redirectAttributes) {
-        service.saveMario_server_state(mario_server_state);
-        redirectAttributes.addFlashAttribute("message", "更新成功");
-        return "redirect:/mario_server_state/";
-    }
-
-    @RequestMapping(value = "delete/{id}")
-    public String delete( @PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
-        service.deleteMario_server_state(id);
-        redirectAttributes.addFlashAttribute("message", "删除成功");
-        return "redirect:/mario_server_state";
-    }
-
-    @ModelAttribute("preloadMario_server_state")
-    public Mario_server_state getMario_server_state( @RequestParam(value = "id", required = false) Integer id) {
-        if (id != null) {
-            return service.getMario_server_state(id);
-        }
-        return null;
-    }
-
 }

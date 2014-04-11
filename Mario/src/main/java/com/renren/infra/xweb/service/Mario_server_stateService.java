@@ -59,6 +59,7 @@ public class Mario_server_stateService {
         return new RowBounds((pageNumber - 1) * pageSize, pageSize);
     }
 
+<<<<<<< HEAD
     /**
      * 保存Mario_server_state.
      * 
@@ -96,4 +97,6 @@ public class Mario_server_stateService {
 		return mario_server_stateDao.findBetweenTimeStamp(server_id,
 				start_time_stamp, end_time_stamp);
 	}
+=======
+>>>>>>> 00ccda2ea00ba1c0c48834e19f463f2162077c87
 }
