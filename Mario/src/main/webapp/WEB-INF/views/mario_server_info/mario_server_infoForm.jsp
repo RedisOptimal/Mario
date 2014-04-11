@@ -6,7 +6,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <html>
 <head>
-    <title>管理</title>
+    <title>服务器管理</title>
     <script>
         $(document).ready(function() {
             //聚焦第一个输入框
