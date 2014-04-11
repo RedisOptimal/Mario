@@ -54,7 +54,7 @@
                 <tr>
                     <tr>
                     
-                    <td>${mario_server_state.server_id}</td>
+                    <td><a href="${ctx}/graph/server_state?server_id=${mario_server_state.server_id}">${mario_server_state.server_id}</a></td>
                     
                     
                     <td>${mario_server_state.min_latency}</td>
