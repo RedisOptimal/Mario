@@ -4,97 +4,82 @@
 <!-- namespace必须指向Dao接口 -->
 <mapper namespace="com.renren.infra.xweb.repository.Mario_node_stateMybatisDao">
 
-    <select id="findById" resultType="Mario_node_state">
-        select 
-        id        , zk_id        , path        , data        , data_length        , num_children        , version        , aversion        , cversion        , ctime        , mtime        , czxid        , mzxid        , pzxid        , ephemeral_owner,	state_version, state_time        from mario_node_state
-        where 
-        id = #{id}        
-    </select>
+	<select id="findAll" resultType="Mario_node_state">
+		select
+		zk_id , path , data ,
+		data_length , num_children , version , aversion , cversion , ctime ,
+		mtime , czxid , mzxid , pzxid , ephemeral_owner,
+		state_version ,
+		state_time from mario_node_state
+		order by path
+	</select>
 
-    <select id="findAll" resultType="Mario_node_state">
-           select 
-        id        , zk_id        , path        , data        , data_length        , num_children        , version        , aversion        , cversion        , ctime        , mtime        , czxid        , mzxid        , pzxid        , ephemeral_owner,	state_version, state_time        from mario_node_state
-        order by 
-        path        
-    </select>
+	<select id="find" parameterType="map" resultType="Mario_node_state">
+		select
+		zk_id , path , data , data_length , num_children , version ,
+		aversion , cversion , ctime , mtime , czxid , mzxid , pzxid ,
+		ephemeral_owner, state_version, state_time from mario_node_state
+		<where>
+			<if test="zk_id != null and zk_id != ''">
+				and zk_id = #{zk_id}
+			</if>
+			<if test="path != null and path != ''">
+				and path like '${path}%'
+			</if>
+			<if test="data != null and data != ''">
+				and data = #{data}
+			</if>
+			<if test="data_length != null and data_length != ''">
+				and data_length = #{data_length}
+			</if>
+			<if test="num_children != null and num_children != ''">
+				and num_children = #{num_children}
+			</if>
+			<if test="version != null and version != ''">
+				and version = #{version}
+			</if>
+			<if test="aversion != null and aversion != ''">
+				and aversion = #{aversion}
+			</if>
+			<if test="cversion != null and cversion != ''">
+				and cversion = #{cversion}
+			</if>
+			<if test="ctime != null and ctime != ''">
+				and ctime = #{ctime}
+			</if>
+			<if test="mtime != null and mtime != ''">
+				and mtime = #{mtime}
+			</if>
+			<if test="czxid != null and czxid != ''">
+				and czxid = #{czxid}
+			</if>
+			<if test="mzxid != null and mzxid != ''">
+				and mzxid = #{mzxid}
+			</if>
+			<if test="pzxid != null and pzxid != ''">
+				and pzxid = #{pzxid}
+			</if>
+			<if test="ephemeral_owner != null and ephemeral_owner != ''">
+				and ephemeral_owner = #{ephemeral_owner}
+			</if>
+			<if test="state_version != null and state_version != ''">
+				and state_version = #{state_version}
+			</if>
+			<if test="state_time != null and state_time != ''">
+				and state_time = #{state_time}
+			</if>
+		</where>
+		order by
+		path
+	</select>
 
-    <select id="find" parameterType="map" resultType="Mario_node_state">
-        select 
-        id        , zk_id        , path        , data        , data_length        , num_children        , version        , aversion        , cversion        , ctime        , mtime        , czxid        , mzxid        , pzxid        , ephemeral_owner,	state_version, state_time        from mario_node_state
-           <where>
-            <if test="id != null and id != ''">
-                and id = #{id}
-            </if>
-            <if test="zk_id != null and zk_id != ''">
-                and zk_id = #{zk_id}
-            </if>
-            <if test="path != null and path != ''">
-                and path like '${path}%'
-            </if>
-            <if test="data != null and data != ''">
-                and data = #{data}
-            </if>
-            <if test="data_length != null and data_length != ''">
-                and data_length = #{data_length}
-            </if>
-            <if test="num_children != null and num_children != ''">
-                and num_children = #{num_children}
-            </if>
-            <if test="version != null and version != ''">
-                and version = #{version}
-            </if>
-            <if test="aversion != null and aversion != ''">
-                and aversion = #{aversion}
-            </if>
-            <if test="cversion != null and cversion != ''">
-                and cversion = #{cversion}
-            </if>
-            <if test="ctime != null and ctime != ''">
-                and ctime = #{ctime}
-            </if>
-            <if test="mtime != null and mtime != ''">
-                and mtime = #{mtime}
-            </if>
-            <if test="czxid != null and czxid != ''">
-                and czxid = #{czxid}
-            </if>
-            <if test="mzxid != null and mzxid != ''">
-                and mzxid = #{mzxid}
-            </if>
-            <if test="pzxid != null and pzxid != ''">
-                and pzxid = #{pzxid}
-            </if>
-            <if test="ephemeral_owner != null and ephemeral_owner != ''">
-                and ephemeral_owner = #{ephemeral_owner}
-            </if>
-            <if test="state_version != null and state_version != ''">
-                and state_version = #{state_version}
-            </if>
-            <if test="state_time != null and state_time != ''">
-                and state_time = #{state_time}
-            </if>
-        </where>
-        order by
-        	path
-    </select>
-    
-    <select id="findTotalNum" parameterType="Mario_node_state" resultType="int">
-        select count(1) from mario_node_state
-    </select>
+	<select id="findTotalNum" parameterType="Mario_node_state"
+		resultType="int">
+		select count(zk_id) from mario_node_state
+	</select>
 
-    <insert id="insert" parameterType="Mario_node_state">
-        insert into mario_node_state
-        (
-        id        , zk_id        , path        , data        , data_length        , num_children        , version        , aversion        , cversion        , ctime        , mtime        , czxid        , mzxid        , pzxid        , ephemeral_owner,	state_version, state_time        )
-        values (
-        #{id}        , #{zk_id}        , #{path}        , #{data}        , #{data_length}        , #{num_children}        , #{version}        , #{aversion}        , #{cversion}        , #{ctime}        , #{mtime}        , #{czxid}        , #{mzxid}        , #{pzxid}        , #{ephemeral_owner} ,	#{state_version}, #{state_time}       )
-    </insert>
-
-    <update id="update" parameterType="Mario_node_state">
-        update mario_node_state		set         id = #{id}        , zk_id = #{zk_id}        , path = #{path}        , data = #{data}        , data_length = #{data_length}        , num_children = #{num_children}        , version = #{version}        , aversion = #{aversion}        , cversion = #{cversion}        , ctime = #{ctime}        , mtime = #{mtime}        , czxid = #{czxid}        , mzxid = #{mzxid}        , pzxid = #{pzxid}        , ephemeral_owner = #{ephemeral_owner},	state_version = #{state_version}	, state_time = #{state_time}	where         id = #{id}        
-    </update>
-
-    <delete id="delete" parameterType="Mario_node_state">
-        delete from mario_node_state where         id = #{id}        
-    </delete>
+	<delete id="deleteByZkid" parameterType="Mario_node_state">
+		delete from mario_node_state
+		where zk_id = #{zk_id}
+	</delete>
 </mapper> 

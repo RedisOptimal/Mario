@@ -59,36 +59,4 @@ public class Mario_node_stateService {
         return new RowBounds((pageNumber - 1) * pageSize, pageSize);
     }
 
-    /**
-     * 保存Mario_node_state.
-     * 
-     * @param newMario_node_state
-     */
-    public void saveMario_node_state(Mario_node_state newMario_node_state) {
-        if (newMario_node_state.getid() != null     ) {
-            mario_node_stateDao.update(newMario_node_state);
-        } else {
-            mario_node_stateDao.insert(newMario_node_state);
-        }
-    }
-
-    /**
-     * 根据主键获取Mario_node_state
-     * 
-     * @param id
-     * @return Mario_node_state
-     */
-    public Mario_node_state getMario_node_state(Integer id    ) {
-        return mario_node_stateDao.findById	(id);
-    }
-
-    /**
-     * 根据主键删除Mario_node_state
-     * 
-     * @param id
-     */
-    public void deleteMario_node_state(Integer id) {
-        mario_node_stateDao.delete(id);
-    }
-
 }

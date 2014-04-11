@@ -22,10 +22,6 @@ public class Mario_node_state {
     /**
     * 
     */
-    private Integer id;
-    /**
-    * 
-    */
     private Integer zk_id;
     /**
     * 
@@ -59,12 +55,10 @@ public class Mario_node_state {
     * 
     */
     private Long ctime;
-    private String ctimeString;
     /**
     * 
     */
     private long mtime;
-    private String mtimeString;
     /**
     * 
     */
@@ -91,23 +85,7 @@ public class Mario_node_state {
     */
     public Mario_node_state () {
     }
-    
-    /**
-    *
-    * get方法
-    *
-    */
-    public Integer getid(){
-        return this.id;
-    }
-    /**
-    *
-    * set方法
-    *
-    */
-    public void setid(Integer id){
-        this.id = id;
-    }
+
     /**
     *
     * get方法
@@ -252,12 +230,6 @@ public class Mario_node_state {
     public void setctime(long ctime){
         this.ctime = ctime;
     }
-    public String getCtimeString() {
-    	return this.ctimeString;
-    }
-    public void setCtimeString(String ctimeString) {
-    	this.ctimeString = ctimeString;
-    }
     /**
     *
     * get方法
@@ -274,13 +246,6 @@ public class Mario_node_state {
     public void setmtime(Long mtime){
         this.mtime = mtime;
     }
-    public String getMtimeString() {
-		return mtimeString;
-	}
-
-	public void setMtimeString(String mtimeString) {
-		this.mtimeString = mtimeString;
-	}
 
 	/**
     *

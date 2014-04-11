@@ -62,6 +62,7 @@
 				and time_stamp = #{time_stamp}
 			</if>
 		</where>
+			order by id desc
 	</select>
 
 	<select id="findTotalNum" parameterType="Mario_server_state"
