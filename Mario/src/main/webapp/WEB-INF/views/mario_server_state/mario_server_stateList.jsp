@@ -6,6 +6,9 @@
 <html>
 <head>
     <title>服务器状态信息</title>
+    <script type="text/javascript" src="${ctx}/static/jquery-jsjava/text/Format.js"></script>
+    <script type="text/javascript" src="${ctx}/static/jquery-jsjava/text/DateFormat.js"></script>
+    <script type="text/javascript" src="${ctx}/static/jquery-jsjava/text/SimpleDateFormat.js"></script>
     <script type="text/javascript">
     $(document).ready(function(){
     
@@ -54,7 +57,7 @@
                 <tr>
                     <tr>
                     
-                    <td>${mario_server_state.server_id}</td>
+                    <td><a href="${ctx}/graph/server_state?server_id=${mario_server_state.server_id}">${mario_server_state.server_id}</a></td>
                     
                     
                     <td>${mario_server_state.min_latency}</td>
@@ -75,8 +78,12 @@
                     <td>${mario_server_state.outstanding}</td>
                     
                     
-                    <td><script type="text/javascript">var zkid = ${mario_server_state.zxid};
-                    document.write("0x" + zkid.toString(16))</script></td>
+                    <td>
+                        <script type="text/javascript">
+                            var zkid = ${mario_server_state.zxid};
+                            document.write("0x" + zkid.toString(16))
+                        </script>
+                    </td>
                     
                     
                     <td>${mario_server_state.mode}</td>
@@ -91,9 +98,14 @@
                     <td>${mario_server_state.client_number}</td>
                     
                     
-                    <td><script type="text/javascript">var unixtime = ${mario_server_state.time_stamp};
-                    var unixtimestamp = new Date(unixtime);
-                    document.write(unixtimestamp.toLocaleString())</script></td>
+                    <td>
+                        <script type="text/javascript">
+                            var format = new SimpleDateFormat();
+                            var pattern = "yyyy-MM-dd HH:mm:ss";
+                            format.applyPattern(pattern); 
+                            document.write(format.format(new Date(${mario_server_state.time_stamp})))
+                        </script>
+                    </td>                   
                     
                 </tr>
             </c:forEach>

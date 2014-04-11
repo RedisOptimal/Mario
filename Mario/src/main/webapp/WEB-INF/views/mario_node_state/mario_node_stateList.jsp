@@ -52,7 +52,7 @@
                 <tr>
                     <tr>
                     <td>${mario_node_state.zk_id}</td>
-                    <td><a href="${ctx}/mario_node_state/update/${mario_node_state.id}">${mario_node_state.path}</a></td>
+                    <td>${mario_node_state.path}</td>
                     <td>${mario_node_state.data}</td>
                     <td>${mario_node_state.data_length}</td>
                     <td>${mario_node_state.num_children}</td>

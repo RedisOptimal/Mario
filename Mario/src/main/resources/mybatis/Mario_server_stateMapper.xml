@@ -70,4 +70,9 @@
 		select count(id) from mario_server_state
 	</select>
 
+    <select id="findBetweenTimeStamp" resultType="Mario_server_state">
+    		select 
+        id        , server_id        , min_latency        , ave_latency        , max_latency        , received        , sent        , outstanding        , zxid        , mode        , node_count        , total_watches        , client_number        , time_stamp        from mario_server_state 
+        where server_id = #{server_id} and #{end_time_stamp} &gt; time_stamp and time_stamp &gt; #{start_time_stamp}
+    </select>
 </mapper> 
