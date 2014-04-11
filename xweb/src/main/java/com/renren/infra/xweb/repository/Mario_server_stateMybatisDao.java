@@ -4,6 +4,7 @@ package com.renren.infra.xweb.repository;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
 import com.renren.infra.xweb.entity.Mario_server_state;
@@ -36,4 +37,11 @@ public interface Mario_server_stateMybatisDao {
 
 	int findTotalNum(Map<String, Object> filterParams);
 	
-	Mario_server_state getMario_server_stateById(Integer id);}
+	Mario_server_state getMario_server_stateById(Integer id);
+	
+	List<Mario_server_state> findBetweenTimeStamp(
+			@Param(value = "server_id") int server_id,
+			@Param(value = "start_time_stamp") Long start_time_stamp,
+			@Param(value = "end_time_stamp") Long end_time_stamp);
+	
+}

@@ -90,5 +90,10 @@ public class Mario_server_stateService {
     public void deleteMario_server_state(Integer id) {
         mario_server_stateDao.delete(id);
     }
-
+    
+	public List<Mario_server_state> getMario_server_state(int server_id,
+			Long start_time_stamp, Long end_time_stamp) {
+		return mario_server_stateDao.findBetweenTimeStamp(server_id,
+				start_time_stamp, end_time_stamp);
+	}
 }
