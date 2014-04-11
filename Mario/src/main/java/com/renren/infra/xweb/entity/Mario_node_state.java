@@ -1,7 +1,8 @@
 
 package com.renren.infra.xweb.entity;
 
-import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -72,7 +73,7 @@ public class Mario_node_state {
     */
     private Long ephemeral_owner;
     private int state_version;
-    private Timestamp state_time;
+    private Date state_time;
     
     /**
     *
@@ -316,11 +317,11 @@ public class Mario_node_state {
 		this.state_version = state_version;
 	}
 
-	public Timestamp getState_time() {
-		return state_time;
+	public String getState_time() {
+		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(state_time);
 	}
 
-	public void setState_time(Timestamp state_time) {
+	public void setState_time(Date state_time) {
 		this.state_time = state_time;
 	}
 
