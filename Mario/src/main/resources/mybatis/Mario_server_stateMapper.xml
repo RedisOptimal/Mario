@@ -70,28 +70,9 @@
 		select count(id) from mario_server_state
 	</select>
 
-<<<<<<< HEAD
-    <insert id="insert" parameterType="Mario_server_state">
-        insert into mario_server_state
-        (
-        id        , server_id        , min_latency        , ave_latency        , max_latency        , received        , sent        , outstanding        , zxid        , mode        , node_count        , total_watches        , client_number        , time_stamp        )
-        values (
-        #{id}        , #{server_id}        , #{min_latency}        , #{ave_latency}        , #{max_latency}        , #{received}        , #{sent}        , #{outstanding}        , #{zxid}        , #{mode}        , #{node_count}        , #{total_watches}        , #{client_number}        , #{time_stamp}        )
-    </insert>
-
-    <update id="update" parameterType="Mario_server_state">
-        update mario_server_state		set         id = #{id}        , server_id = #{server_id}        , min_latency = #{min_latency}        , ave_latency = #{ave_latency}        , max_latency = #{max_latency}        , received = #{received}        , sent = #{sent}        , outstanding = #{outstanding}        , zxid = #{zxid}        , mode = #{mode}        , node_count = #{node_count}        , total_watches = #{total_watches}        , client_number = #{client_number}        , time_stamp = #{time_stamp}		where         id = #{id}        
-    </update>
-
-    <delete id="delete" parameterType="Mario_server_state">
-        delete from mario_server_state where         id = #{id}        
-    </delete>
-    
     <select id="findBetweenTimeStamp" resultType="Mario_server_state">
     		select 
         id        , server_id        , min_latency        , ave_latency        , max_latency        , received        , sent        , outstanding        , zxid        , mode        , node_count        , total_watches        , client_number        , time_stamp        from mario_server_state 
         where server_id = #{server_id} and #{end_time_stamp} &gt; time_stamp and time_stamp &gt; #{start_time_stamp}
     </select>
-=======
->>>>>>> 00ccda2ea00ba1c0c48834e19f463f2162077c87
 </mapper> 
