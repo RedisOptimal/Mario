@@ -6,9 +6,6 @@
 <html>
 <head>
     <title>服务器状态信息</title>
-    <script type="text/javascript" src="${ctx}/static/jquery-jsjava/text/Format.js"></script>
-    <script type="text/javascript" src="${ctx}/static/jquery-jsjava/text/DateFormat.js"></script>
-    <script type="text/javascript" src="${ctx}/static/jquery-jsjava/text/SimpleDateFormat.js"></script>
     <script type="text/javascript">
     $(document).ready(function(){
     
@@ -98,14 +95,7 @@
                     <td>${mario_server_state.client_number}</td>
                     
                     
-                    <td>
-                        <script type="text/javascript">
-                            var format = new SimpleDateFormat();
-                            var pattern = "yyyy-MM-dd HH:mm:ss";
-                            format.applyPattern(pattern); 
-                            document.write(format.format(new Date(${mario_server_state.time_stamp})))
-                        </script>
-                    </td>                   
+                    <td>${mario_server_state.time_stamp}</td>                   
                     
                 </tr>
             </c:forEach>

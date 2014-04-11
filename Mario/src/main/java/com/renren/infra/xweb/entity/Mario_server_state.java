@@ -1,6 +1,9 @@
 
 package com.renren.infra.xweb.entity;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -291,8 +294,8 @@ public class Mario_server_state {
     * get方法
     *
     */
-    public Long getTime_stamp(){
-        return this.time_stamp;
+    public String getTime_stamp(){
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(time_stamp));
     }
     /**
     *
