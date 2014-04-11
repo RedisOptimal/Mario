@@ -84,9 +84,11 @@ public class ZooKeeperClient {
 		} catch (IOException e) {
 			logger.error("Create connection " + connectionString + " failed! "
 					+ e.toString());
+			createConnection();
 		} catch (InterruptedException e) {
 			logger.error("Create connection " + connectionString + " failed! "
 					+ e.toString());
+			createConnection();
 		}
 
 		try {
