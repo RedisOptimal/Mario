@@ -17,13 +17,14 @@ package com.renren.Wario.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.renren.Wario.config.ApplicationProperties;
 
-public class MySQLHelper extends DBHelper {
+public class MySQLHelper implements DBHelper {
 	
 	private static final String JDBC = ApplicationProperties.getJdbcDriver();
 	private static final String URL = ApplicationProperties.getJdbcUrl();
@@ -63,6 +64,14 @@ public class MySQLHelper extends DBHelper {
 	@Override
 	public boolean execute(String sql) throws SQLException {
 		return statement.execute(sql);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.renren.Wario.db.DBHelper#getPreparedStatement()
+	 */
+	@Override
+	public PreparedStatement getPreparedStatement(String sql) throws SQLException {
+		return connection.prepareStatement(sql);
 	}
 
 }

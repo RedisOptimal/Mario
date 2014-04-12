@@ -15,14 +15,15 @@
  */
 package com.renren.Wario.db;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class DBHelper {
-
-	public abstract void open() throws SQLException, ClassNotFoundException;
-	public abstract void close() throws SQLException;
-	public abstract ResultSet executeQuery(String sql) throws SQLException;
-	public abstract int executeUpdate(String sql) throws SQLException;
-	public abstract boolean execute(String sql) throws SQLException;
+public interface DBHelper {
+	public void open() throws SQLException, ClassNotFoundException;
+	public void close() throws SQLException;
+	public PreparedStatement getPreparedStatement(String sql) throws SQLException;
+	public ResultSet executeQuery(String sql) throws SQLException;
+	public int executeUpdate(String sql) throws SQLException;
+	public boolean execute(String sql) throws SQLException;
 }
