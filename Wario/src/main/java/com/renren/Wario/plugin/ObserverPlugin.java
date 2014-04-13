@@ -15,6 +15,8 @@
  */
 package com.renren.Wario.plugin;
 
+import java.sql.Blob;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -23,6 +25,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import javax.sql.rowset.serial.SerialBlob;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -35,7 +39,7 @@ public class ObserverPlugin extends IPlugin {
 
 	private static final Logger logger = LogManager
 			.getLogger(ObserverPlugin.class.getName());
-	
+
 	private static final int MAX_THREAD_NUM = 2;
 	private Thread[] dumpThreads = new Thread[MAX_THREAD_NUM];
 
@@ -67,18 +71,18 @@ public class ObserverPlugin extends IPlugin {
 			return stat;
 		}
 	}
-	
+
 	private final BlockingQueue<PathAndStat> trackQueue = new LinkedBlockingQueue<PathAndStat>();
 	private final BlockingQueue<PathAndStat> saveQueue = new LinkedBlockingQueue<PathAndStat>();
-	
+
 	private final CountDownLatch keyFieldLatch = new CountDownLatch(1);
-	
+
 	@Override
 	public void run() {
-		if(client == null) {
-			return ;
+		if (client == null) {
+			return;
 		}
-		
+
 		Long startTime = System.currentTimeMillis();
 		int stateVersion = getNextStateVersion();
 
@@ -96,11 +100,12 @@ public class ObserverPlugin extends IPlugin {
 		trackQueue.offer(root);
 		saveQueue.offer(root);
 
-		for (int i = 0;i < dumpThreads.length; ++i) {
+		for (int i = 0; i < dumpThreads.length; ++i) {
 			dumpThreads[i] = new Thread(new DBWriter(stateVersion));
 			dumpThreads[i].start();
 		}
-		logger.error("Init finished " + (System.currentTimeMillis() - startTime));
+		logger.error("Init finished "
+				+ (System.currentTimeMillis() - startTime));
 		try {
 			PathAndStat node;
 			while (!trackQueue.isEmpty()) {
@@ -109,7 +114,8 @@ public class ObserverPlugin extends IPlugin {
 				try {
 					children = client.getChildren(node.getPath());
 				} catch (KeeperException e) {
-					logger.error("Exception when track path " + node.getPath() + e);
+					logger.error("Exception when track path " + node.getPath()
+							+ e);
 					continue;
 				}
 				Iterator<String> it = children.iterator();
@@ -117,12 +123,19 @@ public class ObserverPlugin extends IPlugin {
 					String child = it.next();
 					stat = new Stat();
 					try {
-						data = client.getData((node.getPath().endsWith("/") ? node.getPath() : node.getPath() + "/") + child, stat);
-						PathAndStat tmpNode = new PathAndStat((node.getPath().endsWith("/") ? node.getPath() : node.getPath() + "/") + child, data, stat);
+						data = client.getData((node.getPath().endsWith("/")
+								? node.getPath()
+								: node.getPath() + "/") + child, stat);
+						PathAndStat tmpNode = new PathAndStat((node.getPath()
+								.endsWith("/")
+								? node.getPath()
+								: node.getPath() + "/")
+								+ child, data, stat);
 						trackQueue.offer(tmpNode);
 						saveQueue.offer(tmpNode);
 					} catch (KeeperException e) {
-						logger.error("Exception when track path " + node.getPath() + e);
+						logger.error("Exception when track path "
+								+ node.getPath() + e);
 					}
 				}
 			}
@@ -131,23 +144,24 @@ public class ObserverPlugin extends IPlugin {
 		} finally {
 			keyFieldLatch.countDown();
 		}
-		logger.error("Track done " + (System.currentTimeMillis() - startTime));
+		logger.info("Track done " + (System.currentTimeMillis() - startTime));
 		try {
-			for (int i = 0;i < dumpThreads.length; ++i) {
+			for (int i = 0; i < dumpThreads.length; ++i) {
 				dumpThreads[i].join();
 			}
 		} catch (InterruptedException e) {
 			logger.error("Thread interrupted");
 		}
-		
-		logger.info("Run main thread " + (System.currentTimeMillis() - startTime) + " ms");
+
+		logger.info("Run main thread "
+				+ (System.currentTimeMillis() - startTime) + " ms");
 	}
-	
+
 	private int getNextStateVersion() {
 		int maxVersion = 0;
 		if (clusterContext[0] == '#' && clusterContext[5] == '#') {
-			for (int i = 1;i <= 4; ++i) {
-				maxVersion = maxVersion << 8 + (short)clusterContext[i];
+			for (int i = 1; i <= 4; ++i) {
+				maxVersion = maxVersion << 8 + (short) clusterContext[i];
 			}
 		} else {
 			MySQLHelper helper = new MySQLHelper();
@@ -172,9 +186,9 @@ public class ObserverPlugin extends IPlugin {
 			}
 		}
 		int tmp = ++maxVersion;
-		
+
 		clusterContext[0] = '#';
-		for (int i = 4;i > 0; --i) {
+		for (int i = 4; i > 0; --i) {
 			clusterContext[i] = (byte) (tmp & 0xff);
 			tmp >>= 8;
 		}
@@ -183,19 +197,48 @@ public class ObserverPlugin extends IPlugin {
 	}
 
 	private class DBWriter implements Runnable {
-		
+
 		private MySQLHelper helper = new MySQLHelper();
 		private String sql;
 		private final int nextStatVersion;
+		private PreparedStatement updatePs;
+		private PreparedStatement insertPs;
 		
 		public DBWriter(int nextStatVersion) {
 			this.nextStatVersion = nextStatVersion;
+			try {
+				helper.open();
+				updatePs = helper
+						.getPreparedStatement("update mario_node_state set data = ? "
+								+ ", data_length = ? "
+								+ ", num_children = ? "
+								+ ", version = ? "
+								+ ", aversion = ? "
+								+ ", cversion = ? "
+								+ ", ctime = ? "
+								+ ", mtime = ? "
+								+ ", czxid = ? "
+								+ ", mzxid = ? "
+								+ ", pzxid = ? "
+								+ ", ephemeral_owner = ? "
+								+ ", state_version = ? "
+								+ ", state_time = now() "
+								+ "where zk_id = ?  and path = ? and mzxid = ? ");
+				insertPs = helper
+						.getPreparedStatement("insert into mario_node_state (zk_id, " +
+								"path, data, data_length, num_children, version, aversion, " + 
+								"cversion, ctime, mtime, czxid, mzxid, pzxid, ephemeral_owner, " +
+								"state_version, state_time) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now())");
+			} catch (SQLException e) {
+				logger.error("MysqlHelper open failed! " + e.toString());
+			} catch (ClassNotFoundException e) {
+				logger.error("MysqlHelper open failed! " + e.toString());
+			}
 		}
 		
 		@Override
 		public void run() {
 			try {
-				helper.open();
 				while (true) {
 					PathAndStat node = null;
 					while (!saveQueue.isEmpty()) {
@@ -207,7 +250,12 @@ public class ObserverPlugin extends IPlugin {
 									continue;
 								}
 							}
-							writeToDB(node);
+							try {
+								writeToDB(node);
+							} catch (SQLException e) {
+								logger.error("Execute sql failed! "
+										+ e.toString());
+							}
 						} catch (InterruptedException e) {
 							logger.error("DB thread interrupted.");
 						}
@@ -217,64 +265,53 @@ public class ObserverPlugin extends IPlugin {
 							break;
 						}
 					} catch (InterruptedException e) {
-						
 					}
 				}
-			} catch (ClassNotFoundException e) {
-				logger.error("MysqlHelper open failed! " + e.toString());
-			} catch (SQLException e) {
-				logger.error("MysqlHelper open failed! " + e.toString());
 			} finally {
 				try {
+					updatePs.close();
+					insertPs.close();
 					helper.close();
 				} catch (SQLException e) {
 					logger.error("MysqlHelper close failed! " + e.toString());
 				}
 			}
 		}
-		
-		private void writeToDB(PathAndStat node) {
-			try {
-				sql = "update mario_node_state set data = '" + node.getData()
-						+ "', data_length = " + node.getStat().getDataLength()
-						+ ", num_children = " + node.getStat().getNumChildren()
-						+ ", version = " + node.getStat().getVersion()
-						+ ", aversion = " + node.getStat().getAversion()
-						+ ", cversion = " + node.getStat().getCversion()
-						+ ", ctime = " + node.getStat().getCtime()
-						+ ", mtime = " + node.getStat().getMtime()
-						+ ", czxid = " + node.getStat().getCzxid()
-						+ ", mzxid = " + node.getStat().getMzxid()
-						+ ", pzxid = " + node.getStat().getPzxid()
-						+ ", ephemeral_owner = " + node.getStat().getEphemeralOwner()
-						+ ", state_version = " + nextStatVersion
-						+ ", state_time = " + "now()"
-						+ " where zk_id = " + client.getZkId()
-						+ " and path = '" + node.getPath() + "'"
-						+ " and mzxid = " + node.getStat().getMzxid();
-				if (helper.executeUpdate(sql) == 0) {
-					sql = "insert into mario_node_state (zk_id, path, data, data_length, num_children, version, aversion, cversion, ctime, mtime, czxid, mzxid, pzxid, ephemeral_owner, state_version, state_time) values " + "("
-							+ client.getZkId() + ", '"
-							+ node.getPath() + "', '"
-							+ node.getData() + "', "
-							+ node.getStat().getDataLength() + ", "
-							+ node.getStat().getNumChildren() + ", " 
-							+ node.getStat().getVersion() + ", " 
-							+ node.getStat().getAversion() + ", " 
-							+ node.getStat().getCversion() + ", " 
-							+ node.getStat().getCtime() + ", " 
-							+ node.getStat().getMtime() + ", " 
-							+ node.getStat().getCzxid() + ", " 
-							+ node.getStat().getMzxid() + ", " 
-							+ node.getStat().getPzxid() + ", " 
-							+ node.getStat().getEphemeralOwner() + ", "
-							+ nextStatVersion + ", "
-							+ "now()"+ ")";
-					helper.execute(sql);
-				}
-			} catch (SQLException e) {
-				logger.error("Execute sql '" + sql + "' failed! "
-						+ e.toString());
+
+		private void writeToDB(PathAndStat node) throws SQLException {
+				updatePs.setBytes(1, node.getData());
+				updatePs.setInt(2, node.getStat().getDataLength());
+				updatePs.setInt(3, node.getStat().getNumChildren());
+				updatePs.setInt(4, node.getStat().getVersion());
+				updatePs.setInt(5, node.getStat().getAversion());
+				updatePs.setInt(6, node.getStat().getCversion());
+				updatePs.setLong(7, node.getStat().getCtime());
+				updatePs.setLong(8, node.getStat().getMtime());
+				updatePs.setLong(9, node.getStat().getCzxid());
+				updatePs.setLong(10, node.getStat().getMzxid());
+				updatePs.setLong(11, node.getStat().getPzxid());
+				updatePs.setLong(12, node.getStat().getEphemeralOwner());
+				updatePs.setInt(13, nextStatVersion);
+				updatePs.setInt(14, client.getZkId());
+				updatePs.setString(15, node.getPath());
+				updatePs.setLong(16, node.getStat().getMzxid());
+			if (updatePs.executeUpdate() == 0) {
+				insertPs.setInt(1, client.getZkId());
+				insertPs.setString(2, node.getPath());
+				insertPs.setBytes(3, node.getData());
+				insertPs.setInt(4, node.getStat().getDataLength());
+				insertPs.setInt(5, node.getStat().getNumChildren());
+				insertPs.setInt(6, node.getStat().getVersion());
+				insertPs.setInt(7, node.getStat().getAversion());
+				insertPs.setInt(8, node.getStat().getCversion());
+				insertPs.setLong(9, node.getStat().getCtime());
+				insertPs.setLong(10, node.getStat().getMtime());
+				insertPs.setLong(11, node.getStat().getCzxid());
+				insertPs.setLong(12, node.getStat().getMzxid());
+				insertPs.setLong(13, node.getStat().getPzxid());
+				insertPs.setLong(14, node.getStat().getEphemeralOwner());
+				insertPs.setInt(15, nextStatVersion);
+				insertPs.execute();
 			}
 		}
 	}
