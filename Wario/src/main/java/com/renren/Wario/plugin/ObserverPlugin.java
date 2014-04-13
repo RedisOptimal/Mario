@@ -15,7 +15,6 @@
  */
 package com.renren.Wario.plugin;
 
-import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,8 +24,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import javax.sql.rowset.serial.SerialBlob;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -199,7 +196,6 @@ public class ObserverPlugin extends IPlugin {
 	private class DBWriter implements Runnable {
 
 		private MySQLHelper helper = new MySQLHelper();
-		private String sql;
 		private final int nextStatVersion;
 		private PreparedStatement updatePs;
 		private PreparedStatement insertPs;
