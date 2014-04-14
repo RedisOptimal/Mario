@@ -48,7 +48,7 @@ public class ${class} {
     * ${column.remark}set方法
     *
     */
-    public void set${column.attrName}(${column.attrType} ${column.attrName?cap_first}){
+    public void set${column.attrName}(${column.attrType} ${column.attrName?lower_case}){
         this.${column.attrName?lower_case} = ${column.attrName?lower_case};
     }
 	</#list>
