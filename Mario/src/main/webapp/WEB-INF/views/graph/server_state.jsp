@@ -4,7 +4,7 @@
 
 <html>
 <head>
-    <title></title>
+    <title>服务器状态统计图</title>
     <link href="${ctx}/static/jquery-ui/jquery-ui-1.7.custom.min.css" type="text/css" rel="stylesheet" />
     <script src="${ctx}/static/jquery/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="${ctx}/static/jquery-highcharts/highcharts.js"></script>
@@ -13,15 +13,15 @@
 
         var sendObj = ""
 
-        //发送量曲线图
-        function nodeCountChart(){
+        //Node Count
+        function Chart(id, title, field){
             var chart;
                 $(document).ready(function() {
                     //定义一个HighCharts
                     chart = new Highcharts.Chart({
                         //配置chart选项
                         chart: {
-                            renderTo: 'node_count_chart',  //容器名，和body部分的div id要一致
+                            renderTo: id,  //容器名，和body部分的div id要一致
                             type: 'spline'            //图表类型，这里选择折线图
                         },
                         //配置链接及名称选项
@@ -32,7 +32,7 @@
                         },
                         //配置标题
                         title: {
-                            text: '',
+                            text: title + "统计图",
                             y:10  //默认对齐是顶部，所以这里代表距离顶部10px
                         },
                         //配置副标题
@@ -42,15 +42,17 @@
                         },
                         //配置x轴
                         xAxis: {
-                            title: {
-                                text: 'Time Stamp'
-                            },
+                            type: 'datetime',
+                            gridLineWidth: 1,
+                            labels: {
+                                step:6
+                            }, 
                             categories: sendObj["timeStamp"]
                         },
                         // 配置y轴
                         yAxis: {
                             title: {
-                                text: 'Node Count'
+                                text: title
                             },
                             labels: {  
                                 formatter: function() {
@@ -58,37 +60,35 @@
                                 }
                             }
                         },
+                        //图例 
+                        legend: {  
+                            layout: 'horizontal',  //图例显示的样式：水平（horizontal）/垂直（vertical） 
+                            backgroundColor: '#ffc', //图例背景色 
+                            align: 'right',  //图例水平对齐方式 
+                            verticalAlign: 'top',  //图例垂直对齐方式 
+                            x: -10,  //相对X位移 
+                            y: 30,   //相对Y位移 
+                            floating: true, //设置可浮动 
+                            shadow: true  //设置阴影 
+                        }, 
                         //配置数据点提示框
                         tooltip: {
                             crosshairs: true,
                         },
                         //配置数据列
                         series: [{
-                            name: 'Node Count',
+                            name: title,
                             marker: {
                                 symbol: 'diamond'
                             },
-                            data: sendObj["nodeCount"]
-                        },{
-                            name: 'Total Watches',
-                            marker: {
-                                symbol: 'diamond'
-                            },
-                            data: sendObj["totalWatches"]
-                        },{
-                            name: 'Client Number',
-                            marker: {
-                                symbol: 'diamond'
-                            },
-                            data: sendObj["clientNumber"]
+                            data: sendObj[field]
                         }]
                         });
                     });
         }
-        //获取昨天的日期
-        function getYestorday() {
+
+        function getDate() {
             var date = new Date();
-            date.setDate(date.getDate()- 1);//获取前天天的日期
 
             var year = date.getFullYear();
 
@@ -104,7 +104,7 @@
         $(function() {
 
             //设置默认日期
-            $("#date").attr("value",getYestorday());
+            $("#date").attr("value",getDate());
 
             search();
         });
@@ -127,7 +127,9 @@
                 },
                 success:function(data){
                     sendObj = $.parseJSON(data.send);
-                    nodeCountChart();
+                    Chart('node_count_chart', '节点数', 'nodeCount');
+                    Chart('total_watches_chart', 'Watcher数', 'totalWatches');
+                    Chart('client_number_chart', '客户端数', 'clientNumber');
                 },
             });
         }
@@ -164,8 +166,14 @@
             <button type="button"  onclick="search()" class="btn btn-default pull-right">查询</button>
         </form>
     </div>
-    <div id="base-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+    <div id="chart-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
         <div id="node_count_chart"></div>
+    </div>
+    <div id="chart-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+        <div id="total_watches_chart"></div>
+    </div>
+    <div id="chart-3" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+        <div id="client_number_chart"></div>
     </div>
 </body>
 

@@ -1,5 +1,4 @@
 <#--This is the list jsp template to generate list jsp file.-->
-
 <#assign class="${sqlTable.entityname?cap_first}">
 <#assign package="${prop['project.package']}">
 <#assign remark="${sqlTable.remark?default('')}">

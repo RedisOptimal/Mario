@@ -1,13 +1,13 @@
 <#--This is the mapper template to generate Mapper xml file.-->
-
 <#assign class="${sqlTable.entityname?cap_first}">
 <#assign package="${prop['project.package']}">
 <#assign remark="${sqlTable.remark?default('')}">
+
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace必须指向Dao接口 -->
-<mapper namespace="${package}.repository.${class?lower_case}MybatisDao">
+<mapper namespace="${package}.repository.${class}MybatisDao">
 
     <select id="findById" resultType="${class}">
         select 

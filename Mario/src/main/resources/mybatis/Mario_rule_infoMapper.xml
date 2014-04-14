@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace必须指向Dao接口 -->
+<mapper namespace="com.renren.infra.xweb.repository.Mario_rule_infoMybatisDao">
+
+    <select id="findById" resultType="Mario_rule_info">
+        select 
+        id        , zk_id        , path        , type        , min_children_number        , max_children_number        , phone_number        , email_address        , user_id        , enable        from mario_rule_info
+        where 
+        id = #{id}        
+    </select>
+
+    <select id="findAll" resultType="Mario_rule_info">
+           select 
+        id        , zk_id        , path        , type        , min_children_number        , max_children_number        , phone_number        , email_address        , user_id        , enable        from mario_rule_info
+        order by 
+        id desc        
+    </select>
+
+    <select id="find" parameterType="map" resultType="Mario_rule_info">
+        select 
+        id        , zk_id        , path        , type        , min_children_number        , max_children_number        , phone_number        , email_address        , user_id        , enable        from mario_rule_info
+           <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="zk_id != null and zk_id != ''">
+                and zk_id = #{zk_id}
+            </if>
+            <if test="path != null and path != ''">
+                and path = #{path}
+            </if>
+            <if test="type != null and type != ''">
+                and type = #{type}
+            </if>
+            <if test="min_children_number != null and min_children_number != ''">
+                and min_children_number = #{min_children_number}
+            </if>
+            <if test="max_children_number != null and max_children_number != ''">
+                and max_children_number = #{max_children_number}
+            </if>
+            <if test="phone_number != null and phone_number != ''">
+                and phone_number = #{phone_number}
+            </if>
+            <if test="email_address != null and email_address != ''">
+                and email_address = #{email_address}
+            </if>
+            <if test="user_id != null and user_id != ''">
+                and user_id = #{user_id}
+            </if>
+            <if test="enable != null and enable != ''">
+                and enable = #{enable}
+            </if>
+        </where>
+    </select>
+    
+    <select id="findTotalNum" parameterType="Mario_rule_info" resultType="int">
+        select count(1) from mario_rule_info
+    </select>
+
+    <insert id="insert" parameterType="Mario_rule_info">
+        insert into mario_rule_info
+        (
+        zk_id        , path        , type        , min_children_number        , max_children_number        , phone_number        , email_address        , user_id        , enable        )
+        values (
+        #{zk_id}        , #{path}        , #{type}        , #{min_children_number}        , #{max_children_number}        , #{phone_number}        , #{email_address}        , #{user_id}        , #{enable}        )
+    </insert>
+
+    <update id="update" parameterType="Mario_rule_info">
+        update mario_rule_info		set         zk_id = #{zk_id}        , path = #{path}        , type = #{type}        , min_children_number = #{min_children_number}        , max_children_number = #{max_children_number}        , phone_number = #{phone_number}        , email_address = #{email_address}        , user_id = #{user_id}        , enable = #{enable}		where         id = #{id}        
+    </update>
+
+    <delete id="delete" parameterType="Mario_rule_info">
+        delete from mario_rule_info where         id = #{id}        
+    </delete>
+</mapper> 

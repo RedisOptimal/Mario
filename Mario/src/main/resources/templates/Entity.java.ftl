@@ -1,5 +1,4 @@
 <#--This is the entity template to generate entity java class.-->
-
 <#assign class="${sqlTable.entityname?cap_first}">
 <#assign package="${prop['project.package']}">
 <#assign remark="${sqlTable.remark?default('')}">
@@ -40,16 +39,16 @@ public class ${class} {
     * ${column.remark}get方法
     *
     */
-    public ${column.attrType} get${column.attrName?cap_first}(){
-        return this.${column.attrName?lower_case};
+    public ${column.attrType} get${column.attrName}(){
+        return this.${column.attrName};
     }
     /**
     *
     * ${column.remark}set方法
     *
     */
-    public void set${column.attrName}(${column.attrType} ${column.attrName?cap_first}){
-        this.${column.attrName?lower_case} = ${column.attrName?lower_case};
+    public void set${column.attrName}(${column.attrType} ${column.attrName}){
+        this.${column.attrName} = ${column.attrName};
     }
 	</#list>
 	
