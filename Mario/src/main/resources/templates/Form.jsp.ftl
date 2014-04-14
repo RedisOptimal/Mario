@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    <form:form id="inputForm" modelAttribute="${class?lower_case}" action="${r'${ctx}'}/${class?lower_case}/${class?lower_case}/${r'${action}'}" method="post" class="form-horizontal">
+    <form:form id="inputForm" modelAttribute="${class?lower_case}" action="${r'${ctx}'}/${class?lower_case}/${r'${action}'}" method="post" class="form-horizontal">
         <#-- primary key info -->
         <#if sqlTable.primaryKeys?exists>
         <#list sqlTable.primaryKeys as key>
