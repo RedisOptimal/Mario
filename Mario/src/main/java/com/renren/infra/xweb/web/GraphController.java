@@ -56,8 +56,8 @@ public class GraphController {
     	List<Object> totalWatchesList = new ArrayList<Object>();
     	List<Object> clientNumberList = new ArrayList<Object>();
     	
-    	//采样密度，每天24个点
-		int mod = mario_server_stateList.size() / 24;
+    	//采样密度，每天12*24个点
+		int mod = mario_server_stateList.size() / (12 * 24);
 		mod = mod == 0 ? 1 : mod;
 		
 		for(int i = 0; i < mario_server_stateList.size(); i ++ ) {
