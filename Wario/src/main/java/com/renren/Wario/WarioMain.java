@@ -40,7 +40,7 @@ import com.renren.Wario.zookeeper.ZooKeeperClient;
 import com.renren.Wario.zookeeper.ZooKeeperCluster;
 
 public class WarioMain extends Thread {
-
+	// TODO BUG:当集群和插件删除时应该删除context信息
 	private static Logger logger = LogManager.getLogger(WarioMain.class
 			.getName());
 
@@ -233,15 +233,19 @@ public class WarioMain extends Thread {
 		}
 
 		ZooKeeperClient client = cluster.getObserverClient();
-		byte[] context = contexts.get(pluginName).get(zkId);
-		try {
-			IPlugin plugin = createPlugin(pluginName, object, client, context);
-			plugin.run();
-			logger.info(pluginName + " runs at " + client.getConnectionString()
-					+ " successfully!");
-		} catch (Exception e) {
-			logger.error(pluginName + " runs at "
-					+ client.getConnectionString() + " failed! " + e.toString());
+		if (client != null) {
+			byte[] context = contexts.get(pluginName).get(zkId);
+			try {
+				IPlugin plugin = createPlugin(pluginName, object, client, context);
+				plugin.run();
+				logger.info(pluginName + " runs at " + client.getConnectionString()
+						+ " successfully!");
+			} catch (Exception e) {
+				logger.error(pluginName + " runs at "
+						+ client.getConnectionString() + " failed! " + e.toString());
+			}
+		} else {
+			logger.warn(pluginName + " must run on observer, please config observer address.");
 		}
 	}
 

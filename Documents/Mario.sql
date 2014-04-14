@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `mario_node_state`;
 CREATE TABLE `mario_node_state` (
   `zk_id` int(10) unsigned NOT NULL,
   `path` varchar(255) NOT NULL,
-  `data` mediumblob NOT NULL,
+  `data` mediumblob,
   `data_length` int(10) unsigned DEFAULT '0',
   `num_children` int(10) unsigned DEFAULT '0',
   `version` int(10) unsigned DEFAULT NULL,
