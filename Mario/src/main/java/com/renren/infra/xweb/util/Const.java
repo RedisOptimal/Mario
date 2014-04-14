@@ -11,7 +11,7 @@ package com.renren.infra.xweb.util;
 public class Const {
 
     //分页记录条数
-    public static final int PAGE_SIZE = 10;
+    public static final int PAGE_SIZE = 20;
 
     
 }
