@@ -295,7 +295,10 @@ public class Mario_server_state {
     *
     */
     public String getTime_stamp(){
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(time_stamp));
+        return getTime_stamp("yyyy-MM-dd HH:mm:ss");
+    }
+    public String getTime_stamp(String pattern) {
+    	return new SimpleDateFormat(pattern).format(new Date(time_stamp)); 
     }
     /**
     *

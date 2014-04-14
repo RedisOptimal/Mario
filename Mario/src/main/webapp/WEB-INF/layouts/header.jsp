@@ -8,7 +8,7 @@
 		<div class="header-inner">
 			<!-- BEGIN LOGO -->  
 			<a class="navbar-brand" href="${ctx}">
-			<span style="font: bolder; padding-left: 30px;">展示系统</span>
+			<span style="font: bolder; padding-left: 30px;">ZooKeeper监控平台</span>
 			</a>
 			<!-- END LOGO -->
 			<!-- BEGIN TOP NAVIGATION MENU -->

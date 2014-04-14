@@ -6,7 +6,7 @@
 
 <html>
 <head>
-    <title>管理</title>
+    <title>集群管理</title>
     <script type="text/javascript">
     $(document).ready(function(){
     

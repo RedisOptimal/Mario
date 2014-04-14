@@ -3,7 +3,6 @@ package com.renren.infra.xweb.web;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +62,7 @@ public class GraphController {
 		
 		for(int i = 0; i < mario_server_stateList.size(); i ++ ) {
 			if(i % mod == 0) {
-				timeStampList.add(new SimpleDateFormat("HH:mm")
-						.format(new Date(mario_server_stateList.get(i)
-								.getTime_stamp())));
+				timeStampList.add(mario_server_stateList.get(i).getTime_stamp("HH:mm"));
 				nodeCountList.add(mario_server_stateList.get(i).getNode_count());
 				totalWatchesList.add(mario_server_stateList.get(i).getTotal_watches());
 				clientNumberList.add(mario_server_stateList.get(i).getClient_number());
