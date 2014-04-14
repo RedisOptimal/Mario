@@ -88,7 +88,7 @@ public class ${class}Service {
      * @param id
      * @return ${class}
      */
-    public Test get${class}(<#if sqlTable.primaryKeys?exists><#rt>
+    public ${class} get${class}(<#if sqlTable.primaryKeys?exists><#rt>
     	<#list sqlTable.primaryKeys as key>
     	<#if key_index!=0>, </#if>${key.attrType} ${key.attrName?lower_case}<#t>
     	</#list>

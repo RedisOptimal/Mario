@@ -7,7 +7,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace必须指向Dao接口 -->
-<mapper namespace="${package}.repository.${class?lower_case}MybatisDao">
+<mapper namespace="${package}.repository.${class}MybatisDao">
 
     <select id="findById" resultType="${class}">
         select 
