@@ -1,5 +1,4 @@
 <#--This is the controller template to generate controller class file.-->
-
 <#assign class="${sqlTable.entityname?cap_first}">
 <#assign package="${prop['project.package']}">
 <#assign remark="${sqlTable.remark?default('')}">

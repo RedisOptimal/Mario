@@ -1,5 +1,4 @@
 <#--This is the service template to generate service java class.-->
-
 <#assign class="${sqlTable.entityname?cap_first}">
 <#assign package="${prop['project.package']}">
 <#assign remark="${sqlTable.remark?default('')}">
@@ -73,7 +72,7 @@ public class ${class}Service {
     public void save${class}(${class} new${class}) {
         if (<#if sqlTable.primaryKeys?exists><#rt>
         <#list sqlTable.primaryKeys as key>
-    	<#if key_index!=0>&& </#if>new${class}.get${key.attrName?cap_first}() != null <#t>
+    	<#if key_index!=0>&& </#if>new${class}.get${key.attrName}() != null <#t>
     	</#list>
     </#if>) {
             ${class?lower_case}Dao.update(new${class});
@@ -93,7 +92,7 @@ public class ${class}Service {
     	<#if key_index!=0>, </#if>${key.attrType} ${key.attrName?lower_case}<#t>
     	</#list>
     </#if>) {
-        return ${class?lower_case}Dao.get${class}By<#rt>
+        return ${class?lower_case}Dao.findBy<#rt>
 	<#if sqlTable.primaryKeys?exists>
 		<#list sqlTable.primaryKeys as key>
 			<#if key_index!=0>And</#if>${key.attrName?cap_first}<#t>
