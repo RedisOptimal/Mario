@@ -37,7 +37,7 @@
                         },
                         //配置副标题
                         subtitle: {
-                            text: '',
+                            text: new Date().toString(),
                             y:30
                         },
                         //配置x轴
@@ -45,7 +45,7 @@
                             type: 'datetime',
                             gridLineWidth: 1,
                             labels: {
-                                step:6
+                                step:36
                             }, 
                             categories: sendObj["timeStamp"]
                         },
@@ -67,7 +67,7 @@
                             align: 'right',  //图例水平对齐方式 
                             verticalAlign: 'top',  //图例垂直对齐方式 
                             x: -10,  //相对X位移 
-                            y: 30,   //相对Y位移 
+                            y: 60,   //相对Y位移 
                             floating: true, //设置可浮动 
                             shadow: true  //设置阴影 
                         }, 
