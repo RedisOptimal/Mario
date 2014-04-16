@@ -24,10 +24,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.pattern.LogEvent;
+import org.apache.zookeeper.AsyncCallback.ChildrenCallback;
+import org.apache.zookeeper.AsyncCallback.DataCallback;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.data.Stat;
 
 import com.renren.Wario.db.MySQLHelper;
@@ -69,7 +74,7 @@ public class ObserverPlugin extends IPlugin {
 		}
 	}
 
-	private final BlockingQueue<PathAndStat> trackQueue = new LinkedBlockingQueue<PathAndStat>();
+	private final BlockingQueue<String> trackQueue = new LinkedBlockingQueue<String>();
 	private final BlockingQueue<PathAndStat> saveQueue = new LinkedBlockingQueue<PathAndStat>();
 
 	private final CountDownLatch keyFieldLatch = new CountDownLatch(1);
@@ -94,60 +99,78 @@ public class ObserverPlugin extends IPlugin {
 			logger.error("Thread interrupted");
 		}
 		PathAndStat root = new PathAndStat("/", data, stat);
-		trackQueue.offer(root);
 		saveQueue.offer(root);
-
+		final AtomicInteger inQueue = new AtomicInteger(1);
+		client.getChildren("/", false, new ChildrenCallback() {
+			
+			@Override
+			public void processResult(int rc, String path, Object ctx,
+					List<String> children) {
+	        	inQueue.decrementAndGet();
+				Code cd = KeeperException.Code.get(rc);
+				switch (cd) {
+				case OK: 
+					break;
+		        default:
+		        	logger.warn("GetChildren on path " + path + " with SESSIONEXPIRED event.");
+		            return;
+		        }
+				trackQueue.offer(path);
+				Iterator<String> iterator = children.iterator();
+				while (iterator.hasNext()) {
+					String child = iterator.next();
+					String son = (path.endsWith("/") ? path : path + "/") + child;
+					inQueue.incrementAndGet();
+					
+					client.getChildren(son, false, this, null);
+				}
+			}
+		}, null);
+		
 		for (int i = 0; i < dumpThreads.length; ++i) {
 			dumpThreads[i] = new Thread(new DBWriter(stateVersion));
 			dumpThreads[i].start();
 		}
-		logger.error("Init finished "
-				+ (System.currentTimeMillis() - startTime));
-		try {
-			PathAndStat node;
-			while (!trackQueue.isEmpty()) {
-				node = trackQueue.take();
-				List<String> children;
-				try {
-					children = client.getChildren(node.getPath());
-				} catch (KeeperException e) {
-					logger.error("Exception when track path " + node.getPath()
-							+ e);
-					continue;
-				}
-				Iterator<String> it = children.iterator();
-				while (it.hasNext()) {
-					String child = it.next();
-					stat = new Stat();
-					try {
-						data = client.getData((node.getPath().endsWith("/")
-								? node.getPath()
-								: node.getPath() + "/") + child, stat);
-						PathAndStat tmpNode = new PathAndStat((node.getPath()
-								.endsWith("/")
-								? node.getPath()
-								: node.getPath() + "/")
-								+ child, data, stat);
-						trackQueue.offer(tmpNode);
-						saveQueue.offer(tmpNode);
-					} catch (KeeperException e) {
-						logger.error("Exception when track path "
-								+ node.getPath() + e);
-					}
-				}
+		logger.info("Init finished "
+				+ (System.currentTimeMillis() - startTime) + " ms");
+
+		while (inQueue.intValue() != 0 || !trackQueue.isEmpty()) {
+			String path = null;
+			try {
+				path = trackQueue.poll(10, TimeUnit.MILLISECONDS);
+				//path = trackQueue.take();
+			} catch (InterruptedException e) {
+				logger.warn("Thread interrupted.");
 			}
-		} catch (InterruptedException e) {
-			logger.error("Thread interrupted");
-		} finally {
-			keyFieldLatch.countDown();
+			if (path != null) {
+				client.getData(path, false, new DataCallback() {
+					
+					@Override
+					public void processResult(int rc, String path, Object ctx, byte[] data,
+							Stat stat) {
+						Code cd = Code.get(rc);
+						switch (cd) {
+						case OK:
+							break;
+						default:
+							logger.warn("GetData on path " + path + " with SESSIONEXPIRED event.");
+				            return;
+						}
+						PathAndStat node = new PathAndStat(path, data, stat);
+						saveQueue.offer(node);
+					}
+				}, null);
+			}
 		}
-		logger.info("Track done " + (System.currentTimeMillis() - startTime));
+	
+		keyFieldLatch.countDown();
+		logger.info("Track request send done " + (System.currentTimeMillis() - startTime) + " ms");
 		try {
 			for (int i = 0; i < dumpThreads.length; ++i) {
 				dumpThreads[i].join();
 			}
 		} catch (InterruptedException e) {
-			logger.error("Thread interrupted");
+			logger.error("Thread interrupted.");
 		}
 
 		logger.info("Run main thread "
@@ -256,8 +279,11 @@ public class ObserverPlugin extends IPlugin {
 							logger.error("DB thread interrupted.");
 						}
 					}
+					if (!trackQueue.isEmpty()) {
+						continue;
+					}
 					try {
-						if (keyFieldLatch.await(100, TimeUnit.MILLISECONDS)) {
+						if (keyFieldLatch.await(10, TimeUnit.MILLISECONDS)) {
 							break;
 						}
 					} catch (InterruptedException e) {

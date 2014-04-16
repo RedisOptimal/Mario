@@ -70,7 +70,7 @@
 			</if>
 		</where>
 		order by
-		path
+		state_version, path
 	</select>
 
 	<select id="findTotalNum" parameterType="Mario_node_state"
