@@ -15,8 +15,6 @@
  */
 package com.renren.Wario.plugin.test;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 public class PluginContextTest {

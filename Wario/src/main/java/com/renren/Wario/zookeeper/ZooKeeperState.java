@@ -17,8 +17,6 @@ package com.renren.Wario.zookeeper;
 
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -66,9 +64,11 @@ public class ZooKeeperState {
 				} else if (line.startsWith("Sent:")) {
 					sent = Long.parseLong(getStringValueFromLine(line));
 				} else if (line.startsWith("Outstanding:")) {
-					outStanding = Integer.parseInt(getStringValueFromLine(line));
+					outStanding = Integer
+							.parseInt(getStringValueFromLine(line));
 				} else if (line.startsWith("Zxid:")) {
-					zxid = Long.parseLong(getStringValueFromLine(line).substring(2), 16);
+					zxid = Long.parseLong(getStringValueFromLine(line)
+							.substring(2), 16);
 				} else if (line.startsWith("Mode:")) {
 					mode = getStringValueFromLine(line);
 				} else if (line.startsWith("Node count:")) {
@@ -84,12 +84,13 @@ public class ZooKeeperState {
 			while (scannerForWchs.hasNext()) {
 				String line = scannerForWchs.nextLine();
 				if (line.startsWith("Total watches:")) {
-					totalWatches = Integer.parseInt(getStringValueFromLine(line));
+					totalWatches = Integer
+							.parseInt(getStringValueFromLine(line));
 				}
 			}
 			scannerForWchs.close();
 		}
-		
+
 		String consText = cmd("cons");
 		if (!"".equals(consText)) {
 			Scanner scannerForCons = new Scanner(consText);
@@ -162,8 +163,8 @@ public class ZooKeeperState {
 	}
 
 	private String getStringValueFromLine(String line) {
-		return line.substring(line.indexOf(":") + 1, line.length()).replaceAll(
-				" ", "").trim();
+		return line.substring(line.indexOf(":") + 1, line.length())
+				.replaceAll(" ", "").trim();
 	}
 
 	private class SendThread extends Thread {
