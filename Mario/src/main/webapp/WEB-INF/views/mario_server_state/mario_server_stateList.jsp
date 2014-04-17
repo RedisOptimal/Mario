@@ -20,11 +20,11 @@
     <div class="row">
         <form class="form-inline" action="" id="form">
             <div class="form-group">
-                <label for="search_server_id">server_id：</label> 
+                <label for="search_server_id">Server id：</label> 
                 <input type="text" id="search_server_id" name="search_server_id" class="form-control" style="width: 150px;" value="${param.search_server_id}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_mode">mode：</label> 
+                <label for="search_mode">Mode：</label> 
                 <input type="text" id="search_mode" name="search_mode" class="form-control" style="width: 150px;" value="${param.search_mode}" placeholder="" />
             </div>
             <button type="submit" class="btn btn-default pull-right">查询</button>
@@ -34,19 +34,19 @@
         <table id="contentTable" class="table table-striped table-bordered table-condensed table-hover">
             <thead>
                 <tr>
-                <th>server_id</th>
-                <th>min_latency</th>
-                <th>ave_latency</th>
-                <th>max_latency</th>
-                <th>received</th>
-                <th>sent</th>
-                <th>outstanding</th>
-                <th>zxid</th>
-                <th>mode</th>
-                <th>node_count</th>
-                <th>total_watches</th>
-                <th>client_number</th>
-                <th>time_stamp</th>
+                <th>Server Id</th>
+                <th>Min latency</th>
+                <th>Ave latency</th>
+                <th>Max latency</th>
+                <th>Received</th>
+                <th>Sent</th>
+                <th>Outstanding</th>
+                <th>Zxid</th>
+                <th>Mode</th>
+                <th>Node count</th>
+                <th>Total watches</th>
+                <th>Client number</th>
+                <th>Date</th>
                 </tr>
             </thead>
             <tbody>

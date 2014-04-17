@@ -23,7 +23,7 @@
             <legend><small>管理</small></legend>
             <div id="messageBox" class="alert alert-error input-large controls" style="display:none">输入有误，请先更正。</div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">zk_id:</label>
+                <label for="name" class="col-sm-2 control-label">Zookeeper cluster:</label>
                 <div class="col-sm-10">
                     <select type="text" name="zk_id" class="form-control required">
                         <c:forEach items="${mario_zk_infos.content}" var="mario_zk_info">
@@ -33,14 +33,14 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">host:</label>
+                <label for="name" class="col-sm-2 control-label">Host:</label>
                 <div class="col-sm-10">
                     <input type="text" id="host" name="host"  value="${mario_server_info.host}" class="form-control required"/>
                     <form:errors path="host" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">port:</label>
+                <label for="name" class="col-sm-2 control-label">Port:</label>
                 <div class="col-sm-10">
                     <input type="text" id="port" name="port"  value="${mario_server_info.port}" class="form-control required"/>
                     <form:errors path="port" cssClass="error" />

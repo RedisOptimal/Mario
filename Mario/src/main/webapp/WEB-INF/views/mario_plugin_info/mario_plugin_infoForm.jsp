@@ -23,14 +23,18 @@
             <legend><small>管理</small></legend>
             <div id="messageBox" class="alert alert-error input-large controls" style="display:none">输入有误，请先更正。</div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">plugin_name:</label>
+                <label for="name" class="col-sm-2 control-label">Plugin name:</label>
                 <div class="col-sm-10">
-                    <input type="text" id="plugin_name" name="plugin_name"  value="${mario_plugin_info.plugin_name}" class="form-control required"/>
+                    <select type="text" name="plugin_name" class="form-control required">
+                        <c:forEach items="${mario_plugin_infos.content}" var="mario_plugin_info">
+                            <option value="${mario_plugin_info.plugin_name}" title="${mario_plugin_info.plugin_name}">${mario_plugin_info.plugin_name}</option>
+                        </c:forEach>
+                    </select>
                     <form:errors path="plugin_name" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">zk_id:</label>
+                <label for="name" class="col-sm-2 control-label">Zookeeper cluster:</label>
                 <div class="col-sm-10">
                     <select type="text" id="zk_id" name="zk_id" class="form-control required">
                         <c:forEach items="${mario_zk_infos.content}" var="mario_zk_info">
@@ -40,39 +44,39 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">msg_sender:</label>
+                <label for="name" class="col-sm-2 control-label">Msg sender:</label>
                 <div class="col-sm-10">
                     <input type="text" id="msg_sender" name="msg_sender"  value="${mario_plugin_info.msg_sender}" class="form-control required"/>
                     <form:errors path="msg_sender" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">mail_sender:</label>
+                <label for="name" class="col-sm-2 control-label">Mail sender:</label>
                 <div class="col-sm-10">
                     <input type="text" id="mail_sender" name="mail_sender"  value="${mario_plugin_info.mail_sender}" class="form-control required"/>
                     <form:errors path="mail_sender" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">phone_number:</label>
+                <label for="name" class="col-sm-2 control-label">Phone number:</label>
                 <div class="col-sm-10">
                     <input type="text" id="phone_number" name="phone_number"  value="${mario_plugin_info.phone_number}" class="form-control "/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">email_address:</label>
+                <label for="name" class="col-sm-2 control-label">Email address:</label>
                 <div class="col-sm-10">
                     <input type="text" id="email_address" name="email_address"  value="${mario_plugin_info.email_address}" class="form-control "/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">args:</label>
+                <label for="name" class="col-sm-2 control-label">Args:</label>
                 <div class="col-sm-10">
                     <input type="text" id="args" name="args"  value="${mario_plugin_info.args}" class="form-control "/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">commit:</label>
+                <label for="name" class="col-sm-2 control-label">Comment:</label>
                 <div class="col-sm-10">
                     <input type="text" id="commit" name="commit"  value="${mario_plugin_info.commit}" class="form-control "/>
                 </div>

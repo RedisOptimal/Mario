@@ -23,27 +23,27 @@
             <legend><small>管理</small></legend>
             <div id="messageBox" class="alert alert-error input-large controls" style="display:none">输入有误，请先更正。</div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">zk_name:</label>
+                <label for="name" class="col-sm-2 control-label">Zookeeper cluster:</label>
                 <div class="col-sm-10">
                     <input type="text" id="zk_name" name="zk_name"  value="${mario_zk_info.zk_name}" class="form-control required"/>
                     <form:errors path="zk_name" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">session_timeout:</label>
+                <label for="name" class="col-sm-2 control-label">Session timeout:</label>
                 <div class="col-sm-10">
                     <input type="text" id="session_timeout" name="session_timeout"  value="${mario_zk_info.session_timeout}" class="form-control required"/>
                     <form:errors path="session_timeout" cssClass="error" />
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">observer:</label>
+                <label for="name" class="col-sm-2 control-label">Observer:</label>
                 <div class="col-sm-10">
                     <input type="text" id="observer" name="observer"  value="${mario_zk_info.observer}" class="form-control "/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">observer_auth:</label>
+                <label for="name" class="col-sm-2 control-label">Observer auth:</label>
                 <div class="col-sm-10">
                     <input type="text" id="observer_auth" name="observer_auth"  value="${mario_zk_info.observer_auth}" class="form-control "/>
                 </div>
