@@ -21,19 +21,19 @@
     <div class="row">
         <form class="form-inline" action="" id="form">
             <div class="form-group">
-                <label for="search_plugin_name">plugin_name：</label> 
+                <label for="search_plugin_name">Plugin name：</label> 
                 <input type="text" id="search_plugin_name" name="search_plugin_name" class="form-control" style="width: 150px;" value="${param.search_plugin_name}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_zk_id">zk_id：</label> 
+                <label for="search_zk_id">Zookeeper cluster：</label> 
                 <input type="text" id="search_zk_id" name="search_zk_id" class="form-control" style="width: 150px;" value="${param.search_zk_id}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_msg_sender">msg_sender：</label> 
+                <label for="search_msg_sender">Msg sender：</label> 
                 <input type="text" id="search_msg_sender" name="search_msg_sender" class="form-control" style="width: 150px;" value="${param.search_msg_sender}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_mail_sender">mail_sender：</label> 
+                <label for="search_mail_sender">Mail sender：</label> 
                 <input type="text" id="search_mail_sender" name="search_mail_sender" class="form-control" style="width: 150px;" value="${param.search_mail_sender}" placeholder="" />
             </div>
             <button type="submit" class="btn btn-default pull-right">查询</button>
@@ -43,14 +43,14 @@
         <table id="contentTable" class="table table-striped table-bordered table-condensed table-hover">
             <thead>
                 <tr>
-                <th>plugin_name</th>
-                <th>zk_id</th>
-                <th>msg_sender</th>
-                <th>mail_sender</th>
-                <th>phone_number</th>
-                <th>email_address</th>
-                <th>args</th>
-                <th>commit</th>
+                <th>Plugin name</th>
+                <th>Zookeeper cluster</th>
+                <th>Msg sender</th>
+                <th>Mail sender</th>
+                <th>Phone number</th>
+                <th>Email address</th>
+                <th>Args</th>
+                <th>Comment</th>
                 <th>管理</th>
                 </tr>
             </thead>

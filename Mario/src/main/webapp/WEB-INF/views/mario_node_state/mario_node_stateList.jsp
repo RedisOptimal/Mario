@@ -21,15 +21,15 @@
     <div class="row">
         <form class="form-inline" action="" id="form">
             <div class="form-group">
-                <label for="search_zk_id">zk_id：</label> 
+                <label for="search_zk_id">Zookeeper cluster：</label> 
                 <input type="text" id="search_zk_id" name="search_zk_id" class="form-control" style="width: 150px;" value="${param.search_zk_id}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_path">path：</label> 
+                <label for="search_path">Path：</label> 
                 <input type="text" id="search_path" name="search_path" class="form-control" style="width: 150px;" value="${param.search_path}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_data">data：</label> 
+                <label for="search_data">Data：</label> 
                 <input type="text" id="search_data" name="search_data" class="form-control" style="width: 150px;" value="${param.search_data}" placeholder="" />
             </div>
             <button type="submit" class="btn btn-default pull-right">查询</button>
@@ -39,12 +39,12 @@
         <table id="contentTable" class="table table-striped table-bordered table-condensed table-hover">
             <thead>
                 <tr>
-                <th>zk_id</th>
-                <th>path</th>
-                <th>data</th>
-                <th>data_length</th>
-                <th>num_children</th>
-                <th>state_time</th>
+                <th>Zookeeper cluster</th>
+                <th>Path</th>
+                <th>Data</th>
+                <th>Data length</th>
+                <th>Num children</th>
+                <th>Date</th>
                 </tr>
             </thead>
             <tbody>

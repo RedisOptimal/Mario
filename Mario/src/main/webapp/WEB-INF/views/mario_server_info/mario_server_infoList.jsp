@@ -21,15 +21,15 @@
     <div class="row">
         <form class="form-inline" action="" id="form">
             <div class="form-group">
-                <label for="search_zk_id">zk_id：</label> 
+                <label for="search_zk_id">Zookeeper name：</label> 
                 <input type="text" id="search_zk_id" name="search_zk_id" class="form-control" style="width: 150px;" value="${param.search_zk_id}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_host">host：</label> 
+                <label for="search_host">Host：</label> 
                 <input type="text" id="search_host" name="search_host" class="form-control" style="width: 150px;" value="${param.search_host}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_port">port：</label> 
+                <label for="search_port">Port：</label> 
                 <input type="text" id="search_port" name="search_port" class="form-control" style="width: 150px;" value="${param.search_port}" placeholder="" />
             </div>
             <button type="submit" class="btn btn-default pull-right">查询</button>
@@ -39,10 +39,10 @@
         <table id="contentTable" class="table table-striped table-bordered table-condensed table-hover">
             <thead>
                 <tr>
-                <th>id</th>
-                <th>zk_id</th>
-                <th>host</th>
-                <th>port</th>
+                <th>ID</th>
+                <th>Zookeeper cluster</th>
+                <th>Host</th>
+                <th>Port</th>
                 <th>管理</th>
                 </tr>
             </thead>

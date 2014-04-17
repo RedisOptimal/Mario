@@ -21,11 +21,6 @@
 		<property name="securityManager" ref="securityManager" />
 		<property name="loginUrl" value="/login" />
 		<property name="successUrl" value="/" />
-		<property name="filters">
-			<map>
-				<entry key="rememberMe" value-ref="rememberMeFilter" />
-			</map>
-		</property>
 		<property name="filterChainDefinitions">
 			<value>
 				/login = authc
@@ -34,15 +29,11 @@
 				/api/** = anon
 				/register/** = anon
 				/admin/** = roles[admin]
-				/** = user, rememberMe
+				/** = user
 			</value>
 		</property>
 	</bean>
 	
-	<!-- remember me filter, add session info if user checked remember me -->
-	<bean id="rememberMeFilter" class="com.renren.infra.xweb.util.sso.RembermeFilter" depends-on="userMybatisDao">
-		<property name="accountService" ref="accountService"/>
-	</bean>
 	
 	<!-- 用户授权信息Cache, 采用EhCache -->
 	<bean id="shiroEhcacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">

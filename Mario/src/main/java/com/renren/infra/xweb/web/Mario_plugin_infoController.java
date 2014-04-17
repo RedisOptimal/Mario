@@ -1,6 +1,7 @@
 package com.renren.infra.xweb.web;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,26 @@ public class Mario_plugin_infoController {
 
 	@RequestMapping(value = "create", method = RequestMethod.GET)
 	public String createForm(Model model) {
+		List<Mario_plugin_info> mario_plugin_infoList = new ArrayList<Mario_plugin_info>();
+		Mario_plugin_info mario_plugin_info = null;
+		mario_plugin_info = new Mario_plugin_info();
+		mario_plugin_info.setplugin_name("DBPlugin");
+		mario_plugin_infoList.add(mario_plugin_info);
+		mario_plugin_info = new Mario_plugin_info();
+		mario_plugin_info.setplugin_name("DefaultPlugin");
+		mario_plugin_infoList.add(mario_plugin_info);
+		mario_plugin_info = new Mario_plugin_info();
+		mario_plugin_info.setplugin_name("ReadWriteTestPlugin");
+		mario_plugin_infoList.add(mario_plugin_info);
+		mario_plugin_info = new Mario_plugin_info();
+		mario_plugin_info.setplugin_name("ObserverPlugin");
+		mario_plugin_infoList.add(mario_plugin_info);
+		Page<Mario_plugin_info> mario_plugin_infos = new PageImpl<Mario_plugin_info>(
+				mario_plugin_infoList,
+				new PageRequest(0, mario_plugin_infoList.size()),
+				mario_plugin_infoList.size());
+		model.addAttribute("mario_plugin_infos", mario_plugin_infos);
+		
 		List<Mario_zk_info> mario_zk_infoList = zkInfoService
 				.getAllMario_zk_info();
 		Page<Mario_zk_info> mario_zk_infos = new PageImpl<Mario_zk_info>(
@@ -98,8 +119,15 @@ public class Mario_plugin_infoController {
 	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
 	public String updateForm(@PathVariable("id") Integer id, Model model) {
 		Mario_plugin_info mario_plugin_info = service.getMario_plugin_info(id);
-		model.addAttribute("mario_plugin_info",
-				mario_plugin_info);
+		model.addAttribute("mario_plugin_info", mario_plugin_info);
+		
+		List<Mario_plugin_info> mario_plugin_infoList = new ArrayList<Mario_plugin_info>();
+		mario_plugin_infoList.add(mario_plugin_info);
+		Page<Mario_plugin_info> mario_plugin_infos = new PageImpl<Mario_plugin_info>(
+				mario_plugin_infoList,
+				new PageRequest(0, mario_plugin_infoList.size()),
+				mario_plugin_infoList.size());
+		model.addAttribute("mario_plugin_infos", mario_plugin_infos);
 		
 		Mario_zk_info mario_zk_info = zkInfoService.getMario_zk_info(mario_plugin_info.getzk_id());
 		List<Mario_zk_info> mario_zk_infoList = new ArrayList<Mario_zk_info>();
@@ -121,6 +149,13 @@ public class Mario_plugin_infoController {
 			BindingResult result, Model model,
 			RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
+			List<Mario_plugin_info> mario_plugin_infoList = new ArrayList<Mario_plugin_info>();
+			mario_plugin_infoList.add(mario_plugin_info);
+			Page<Mario_plugin_info> mario_plugin_infos = new PageImpl<Mario_plugin_info>(
+					mario_plugin_infoList,
+					new PageRequest(0, mario_plugin_infoList.size()),
+					mario_plugin_infoList.size());
+			model.addAttribute("mario_plugin_infos", mario_plugin_infos);
 			
 			Mario_zk_info mario_zk_info = zkInfoService.getMario_zk_info(mario_plugin_info.getzk_id());
 			List<Mario_zk_info> mario_zk_infoList = new ArrayList<Mario_zk_info>();

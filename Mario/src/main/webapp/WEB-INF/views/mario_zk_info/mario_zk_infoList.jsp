@@ -21,19 +21,19 @@
     <div class="row">
         <form class="form-inline" action="" id="form">
             <div class="form-group">
-                <label for="search_zk_name">zk_name：</label> 
+                <label for="search_zk_name">Zookeeper cluster：</label> 
                 <input type="text" id="search_zk_name" name="search_zk_name" class="form-control" style="width: 150px;" value="${param.search_zk_name}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_session_timeout">session_timeout：</label> 
+                <label for="search_session_timeout">Session timeout：</label> 
                 <input type="text" id="search_session_timeout" name="search_session_timeout" class="form-control" style="width: 150px;" value="${param.search_session_timeout}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_observer">observer：</label> 
+                <label for="search_observer">Observer：</label> 
                 <input type="text" id="search_observer" name="search_observer" class="form-control" style="width: 150px;" value="${param.search_observer}" placeholder="" />
             </div>
             <div class="form-group">
-                <label for="search_observer_auth">observer_auth：</label> 
+                <label for="search_observer_auth">Observer auth：</label> 
                 <input type="text" id="search_observer_auth" name="search_observer_auth" class="form-control" style="width: 150px;" value="${param.search_observer_auth}" placeholder="" />
             </div>
             <button type="submit" class="btn btn-default pull-right">查询</button>

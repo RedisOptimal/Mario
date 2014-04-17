@@ -22,97 +22,97 @@
             <legend><small>管理</small></legend>
             <div id="messageBox" class="alert alert-error input-large controls" style="display:none">输入有误，请先更正。</div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">zk_id:</label>
+                <label for="name" class="col-sm-2 control-label">Zookeeper cluster:</label>
                 <div class="col-sm-10">
                     <input type="text" id="zk_id" name="zk_id"  value="${mario_node_state.zk_id}" class="form-control required" readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">path:</label>
+                <label for="name" class="col-sm-2 control-label">Path:</label>
                 <div class="col-sm-10">
                     <input type="text" id="path" name="path"  value="${mario_node_state.path}" class="form-control required" readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">data:</label>
+                <label for="name" class="col-sm-2 control-label">Data:</label>
                 <div class="col-sm-10">
                     <input type="text" id="data" name="data"  value="${mario_node_state.data}" class="form-control required" readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">data_length:</label>
+                <label for="name" class="col-sm-2 control-label">Data length:</label>
                 <div class="col-sm-10">
                     <input type="text" id="data_length" name="data_length"  value="${mario_node_state.data_length}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">num_children:</label>
+                <label for="name" class="col-sm-2 control-label">Num children:</label>
                 <div class="col-sm-10">
                     <input type="text" id="num_children" name="num_children"  value="${mario_node_state.num_children}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">version:</label>
+                <label for="name" class="col-sm-2 control-label">Version:</label>
                 <div class="col-sm-10">
                     <input type="text" id="version" name="version"  value="${mario_node_state.version}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">aversion:</label>
+                <label for="name" class="col-sm-2 control-label">Aversion:</label>
                 <div class="col-sm-10">
                     <input type="text" id="aversion" name="aversion"  value="${mario_node_state.aversion}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">cversion:</label>
+                <label for="name" class="col-sm-2 control-label">Cversion:</label>
                 <div class="col-sm-10">
                     <input type="text" id="cversion" name="cversion"  value="${mario_node_state.cversion}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">ctime:</label>
+                <label for="name" class="col-sm-2 control-label">Ctime:</label>
                 <div class="col-sm-10">
                     <input type="text" id="ctime" name="ctime"  value="${mario_node_state.ctimeString}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">mtime:</label>
+                <label for="name" class="col-sm-2 control-label">Mtime:</label>
                 <div class="col-sm-10">
                     <input type="text" id="mtime" name="mtime"  value="${mario_node_state.mtimeString}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">czxid:</label>
+                <label for="name" class="col-sm-2 control-label">Czxid:</label>
                 <div class="col-sm-10">
                     <input type="text" id="czxid" name="czxid"  value="${mario_node_state.czxid}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">mzxid:</label>
+                <label for="name" class="col-sm-2 control-label">Mzxid:</label>
                 <div class="col-sm-10">
                     <input type="text" id="mzxid" name="mzxid"  value="${mario_node_state.mzxid}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">pzxid:</label>
+                <label for="name" class="col-sm-2 control-label">Pzxid:</label>
                 <div class="col-sm-10">
                     <input type="text" id="pzxid" name="pzxid"  value="${mario_node_state.pzxid}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">ephemeral_owner:</label>
+                <label for="name" class="col-sm-2 control-label">Ephemeral owner:</label>
                 <div class="col-sm-10">
                     <input type="text" id="ephemeral_owner" name="ephemeral_owner"  value="${mario_node_state.ephemeral_owner}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">state_version:</label>
+                <label for="name" class="col-sm-2 control-label">State version:</label>
                 <div class="col-sm-10">
                     <input type="text" id="state_version" name="state_version"  value="${mario_node_state.state_version}" class="form-control " readOnly="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">state_time:</label>
+                <label for="name" class="col-sm-2 control-label">State time:</label>
                 <div class="col-sm-10">
                     <input type="text" id="state_time" name="state_time"  value="${mario_node_state.state_time}" class="form-control " readOnly="true"/>
                 </div>
