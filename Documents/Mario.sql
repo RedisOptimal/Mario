@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.6.16, for osx10.9 (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.35, for debian-linux-gnu (i686)
 --
--- Host: localhost    Database: xweb
+-- Host: 127.0.0.1    Database: xweb
 -- ------------------------------------------------------
--- Server version	5.6.16
+-- Server version	5.1.73-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -81,6 +81,39 @@ CREATE TABLE `mario_plugin_info` (
 LOCK TABLES `mario_plugin_info` WRITE;
 /*!40000 ALTER TABLE `mario_plugin_info` DISABLE KEYS */;
 /*!40000 ALTER TABLE `mario_plugin_info` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `mario_rule_info`
+--
+
+DROP TABLE IF EXISTS `mario_rule_info`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mario_rule_info` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `zk_id` int(10) unsigned NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `type` varchar(45) NOT NULL,
+  `min_children_number` int(10) unsigned DEFAULT NULL,
+  `max_children_number` int(10) unsigned DEFAULT NULL,
+  `phone_number` varchar(128) DEFAULT NULL,
+  `email_address` varchar(128) DEFAULT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `enable` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `USERIDINDEX` (`user_id`),
+  KEY `ZKIDINDEX` (`zk_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mario_rule_info`
+--
+
+LOCK TABLES `mario_rule_info` WRITE;
+/*!40000 ALTER TABLE `mario_rule_info` DISABLE KEYS */;
+/*!40000 ALTER TABLE `mario_rule_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -191,7 +224,7 @@ CREATE TABLE `xweb_menu` (
   `permission` varchar(200) DEFAULT NULL COMMENT '权限',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UQ_xweb_menu_id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='菜单表;';
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COMMENT='菜单表;';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -200,7 +233,7 @@ CREATE TABLE `xweb_menu` (
 
 LOCK TABLES `xweb_menu` WRITE;
 /*!40000 ALTER TABLE `xweb_menu` DISABLE KEYS */;
-INSERT INTO `xweb_menu` VALUES (1,0,'0,','顶级菜单',NULL,0,'1',NULL),(6,1,'0,1,','服务器','',0,'1',''),(7,6,'0,1,6,','集群管理','/mario_zk_info/',0,'1',''),(8,6,'0,1,6,','服务器管理','/mario_server_info',0,'1',''),(9,6,'0,1,6,','服务器状态信息','/mario_server_state',0,'1',''),(10,1,'0,1,','节点','',2,'1',''),(11,10,'0,1,10,','节点状态','/mario_node_state',0,'1',''),(12,1,'0,1,','插件','',1,'1',''),(13,12,'0,1,12,','插件管理','/mario_plugin_info',0,'1','');
+INSERT INTO `xweb_menu` VALUES (1,0,'0,','顶级菜单',NULL,0,'1',NULL),(6,1,'0,1,','服务器','',0,'1',''),(7,6,'0,1,6,','集群管理','/mario_zk_info',0,'1',''),(8,6,'0,1,6,','服务器管理','/mario_server_info',0,'1',''),(9,6,'0,1,6,','服务器状态信息','/mario_server_state',0,'1',''),(10,1,'0,1,','节点','',2,'1',''),(11,10,'0,1,10,','节点状态','/mario_node_state',0,'1',''),(12,1,'0,1,','插件','',1,'1',''),(13,12,'0,1,12,','插件管理','/mario_plugin_info',0,'1',''),(14,1,'0,1,','规则','',0,'1',''),(15,14,'0,1,14,','规则管理','/mario_rule_info',0,'1','');
 /*!40000 ALTER TABLE `xweb_menu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -250,7 +283,7 @@ CREATE TABLE `xweb_role_menu` (
 
 LOCK TABLES `xweb_role_menu` WRITE;
 /*!40000 ALTER TABLE `xweb_role_menu` DISABLE KEYS */;
-INSERT INTO `xweb_role_menu` VALUES (1,1),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(1,13),(2,1),(2,6),(2,9),(2,10),(2,11);
+INSERT INTO `xweb_role_menu` VALUES (1,1),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(1,13),(1,14),(1,15),(2,1),(2,6),(2,9),(2,10),(2,11),(2,14),(2,15);
 /*!40000 ALTER TABLE `xweb_role_menu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -266,7 +299,7 @@ CREATE TABLE `xweb_test` (
   `msg` varchar(200) NOT NULL,
   `detail` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='测试表';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='测试表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -299,7 +332,7 @@ CREATE TABLE `xweb_user` (
   `mobile` varchar(128) DEFAULT NULL COMMENT '手机号',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UQ_xweb_user_id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='用户表';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='用户表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -345,4 +378,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-04-10 17:17:50
+-- Dump completed on 2014-04-17 19:16:26
