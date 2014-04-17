@@ -73,8 +73,8 @@
             </div>
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">enable:</label>
-                <div class="col-sm-10">
-                    <select type="text" name="enable" value="${mario_rule_info.enable}" class="form-control required">
+                <div class="col-sm-10"> 
+                    <select type="text" name="enable" class="form-control required">
                         <option value="true" title="true">True</option>
                         <option value="false" title="false">False</option>
                     </select>
