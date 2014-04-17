@@ -143,7 +143,6 @@ public class ObserverPlugin extends IPlugin {
 			String path = null;
 			try {
 				path = trackQueue.poll(10, TimeUnit.MILLISECONDS);
-				// path = trackQueue.take();
 			} catch (InterruptedException e) {
 				logger.warn("Thread interrupted.");
 			}
@@ -296,21 +295,20 @@ public class ObserverPlugin extends IPlugin {
 					PathAndStat node = null;
 					while (!saveQueue.isEmpty()) {
 						try {
-							synchronized (saveQueue) {
-								if (!saveQueue.isEmpty()) {
-									node = saveQueue.take();
-								} else {
-									continue;
-								}
-							}
-							try {
-								writeToDB(node);
-							} catch (SQLException e) {
-								logger.error("Execute sql failed! "
-										+ e.toString());
-							}
+							node = saveQueue.poll(10, TimeUnit.MILLISECONDS);
 						} catch (InterruptedException e) {
-							logger.error("DB thread interrupted.");
+							logger.warn("Thread interrupted.");
+						}
+						
+						if (node == null) {
+							continue;
+						}
+						
+						try {
+							writeToDB(node);
+						} catch (SQLException e) {
+							logger.error("Execute sql failed! "
+						+ e.toString());
 						}
 					}
 					if (!trackQueue.isEmpty()) {
