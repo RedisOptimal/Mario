@@ -1,4 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
 
 <!DOCTYPE html>
 
@@ -16,238 +19,68 @@
 	<meta content="" name="author" />
 </head>
 <body>
-<!-- BEGIN SAMPLE PORTLET CONFIGURATION MODAL FORM-->               
-			<div class="modal fade" id="portlet-config" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-							<h4 class="modal-title">Modal title</h4>
-						</div>
-						<div class="modal-body">
-							Widget settings form goes here
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn blue">Save changes</button>
-							<button type="button" class="btn default" data-dismiss="modal">Close</button>
-						</div>
-					</div>
-					<!-- /.modal-content -->
+	<c:forEach items="${zk_states}" var="zk_state">
+    	<div class="portlet box blue">
+    		<div class="portlet-title">
+				<div class="caption">
+					<i class="fa fa-thumb-tack"></i>${zk_state.zkInfo.zk_name}
 				</div>
-				<!-- /.modal-dialog -->
-			</div>
-			<!-- /.modal -->
-			<!-- END SAMPLE PORTLET CONFIGURATION MODAL FORM-->
-			<!-- BEGIN STYLE CUSTOMIZER -->
-			<div class="theme-panel hidden-xs hidden-sm">
-				<div class="toggler"></div>
-				<div class="toggler-close"></div>
-				<div class="theme-options">
-					<div class="theme-option theme-colors clearfix">
-						<span>THEME COLOR</span>
-						<ul>
-							<li class="color-black current color-default" data-style="default"></li>
-							<li class="color-blue" data-style="blue"></li>
-							<li class="color-brown" data-style="brown"></li>
-							<li class="color-purple" data-style="purple"></li>
-							<li class="color-grey" data-style="grey"></li>
-							<li class="color-white color-light" data-style="light"></li>
-						</ul>
-					</div>
-					<div class="theme-option">
-						<span>Layout</span>
-						<select class="layout-option form-control input-small">
-							<option value="fluid" selected="selected">Fluid</option>
-							<option value="boxed">Boxed</option>
-						</select>
-					</div>
-					<div class="theme-option">
-						<span>Header</span>
-						<select class="header-option form-control input-small">
-							<option value="fixed" selected="selected">Fixed</option>
-							<option value="default">Default</option>
-						</select>
-					</div>
-					<div class="theme-option">
-						<span>Sidebar</span>
-						<select class="sidebar-option form-control input-small">
-							<option value="fixed">Fixed</option>
-							<option value="default" selected="selected">Default</option>
-						</select>
-					</div>
-					<div class="theme-option">
-						<span>Footer</span>
-						<select class="footer-option form-control input-small">
-							<option value="fixed">Fixed</option>
-							<option value="default" selected="selected">Default</option>
-						</select>
-					</div>
+				<div class="tools">
+					<a href class="collapse">
+					</a>
+					<!-- <a href class="reload">
+					</a> -->
 				</div>
 			</div>
-			<!-- END BEGIN STYLE CUSTOMIZER -->  
-			<!-- BEGIN PAGE HEADER-->
-			<div class="row">
-				<div class="col-md-12">
-					<!-- BEGIN PAGE TITLE & BREADCRUMB-->
-					<h3 class="page-title">
-						Dashboard <small>statistics and more</small>
-					</h3>
-					<ul class="page-breadcrumb breadcrumb">
-						<li>
-							<i class="fa fa-home"></i>
-							<a href="index.html">Home</a> 
-							<i class="fa fa-angle-right"></i>
-						</li>
-						<li><a href="#">Dashboard</a></li>
-						<li class="pull-right">
-							<div id="dashboard-report-range" class="dashboard-date-range tooltips" data-placement="top" data-original-title="Change dashboard date range">
-								<i class="fa fa-calendar"></i>
-								<span></span>
-								<i class="fa fa-angle-down"></i>
-							</div>
-						</li>
-					</ul>
-					<!-- END PAGE TITLE & BREADCRUMB-->
+			<div class="portlet-body">
+				<div class="table-responsive">
+					<table class="table table-striped table-hover table-bordered">
+						<thead>
+							<tr>
+								<th colspan="3">Info</th>
+								<th colspan="7">State</th>
+							</tr>
+							<tr>
+								<th>Server Id</th>
+								<th>Host</th>
+								<th>Port</th>
+								<th>Mode</th>
+								<th>OutStanding</th>
+								<th>Zxid</th>
+								<th>Node Count</th>
+								<th>Total Wactches</th>
+								<th>Client Number</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach items="${zk_state.serverStates}" var="serverState">
+							<tr>
+								<td><a href="#">${serverState.info.id}</a></td>
+								<td>${serverState.info.host}</td>
+								<td>${serverState.info.port}</td>
+								<td>${serverState.state.mode}</td>
+								<td>${serverState.outStanding}</td>
+								<td>
+									<script type="text/javascript">
+			                            var zkid = ${serverState.zxid};
+			                            document.write("0x" + zkid.toString(16))
+			                        </script>
+								</td>
+								<td>${serverState.state.node_count}</td>
+								<td>${serverState.state.total_watches}</td>
+								<td>${serverState.state.client_number}</td>
+								<td>
+									<c:if test="${serverState.ruok=='imok'}"><span class="label label-success">IMOK</span></c:if>
+									<c:if test="${serverState.ruok!='imok'}"><span class="label label-danger">DOWN</span></c:if>
+								</td>
+							</tr>
+							</c:forEach>
+						</tbody>
+					</table>
 				</div>
-			</div>
-			<!-- END PAGE HEADER-->
-			<!-- BEGIN DASHBOARD STATS -->
-			<div class="row">
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-					<div class="dashboard-stat blue">
-						<div class="visual">
-							<i class="fa fa-comments"></i>
-						</div>
-						<div class="details">
-							<div class="number">
-								1349
-							</div>
-							<div class="desc">                           
-								New Feedbacks
-							</div>
-						</div>
-						<a class="more" href="#">
-						View more <i class="m-icon-swapright m-icon-white"></i>
-						</a>                 
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-					<div class="dashboard-stat green">
-						<div class="visual">
-							<i class="fa fa-shopping-cart"></i>
-						</div>
-						<div class="details">
-							<div class="number">549</div>
-							<div class="desc">New Orders</div>
-						</div>
-						<a class="more" href="#">
-						View more <i class="m-icon-swapright m-icon-white"></i>
-						</a>                 
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-					<div class="dashboard-stat purple">
-						<div class="visual">
-							<i class="fa fa-globe"></i>
-						</div>
-						<div class="details">
-							<div class="number">+89%</div>
-							<div class="desc">Brand Popularity</div>
-						</div>
-						<a class="more" href="#">
-						View more <i class="m-icon-swapright m-icon-white"></i>
-						</a>                 
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-					<div class="dashboard-stat yellow">
-						<div class="visual">
-							<i class="fa fa-bar-chart-o"></i>
-						</div>
-						<div class="details">
-							<div class="number">12,5M$</div>
-							<div class="desc">Total Profit</div>
-						</div>
-						<a class="more" href="#">
-						View more <i class="m-icon-swapright m-icon-white"></i>
-						</a>                 
-					</div>
-				</div>
-			</div>
-			<!-- END DASHBOARD STATS -->
-			<div class="clearfix"></div>
-			<div class="row">
-				<div class="col-md-6 col-sm-6">
-					<!-- BEGIN PORTLET-->
-					<div class="portlet solid bordered light-grey">
-						<div class="portlet-title">
-							<div class="caption"><i class="fa fa-bar-chart-o"></i>Site Visits</div>
-							<div class="tools">
-								<div class="btn-group" data-toggle="buttons">
-									<label class="btn default btn-sm active">
-									<input type="radio" name="options" class="toggle" id="option1">Users
-									</label>
-									<label class="btn default btn-sm">
-									<input type="radio" name="options" class="toggle" id="option2">Feedbacks
-									</label>
-								</div>
-							</div>
-						</div>
-						<div class="portlet-body">
-							<div id="site_statistics_loading">
-								<img src="${ctx}/static/bootstrap-metronic/template_content/assets/img/loading.gif" alt="loading"/>
-							</div>
-							<div id="site_statistics_content" class="display-none">
-								<div id="site_statistics" class="chart"></div>
-							</div>
-						</div>
-					</div>
-					<!-- END PORTLET-->
-				</div>
-				<div class="col-md-6 col-sm-6">
-					<!-- BEGIN PORTLET-->
-					<div class="portlet solid light-grey bordered">
-						<div class="portlet-title">
-							<div class="caption"><i class="fa fa-bullhorn"></i>Activities</div>
-							<div class="tools">
-								<div class="btn-group pull-right" data-toggle="buttons">
-									<a href="" class="btn blue btn-sm active">Users</a>
-									<a href="" class="btn blue btn-sm">Orders</a>
-								</div>
-							</div>
-						</div>
-						<div class="portlet-body">
-							<div id="site_activities_loading">
-								<img src="${ctx}/static/bootstrap-metronic/template_content/assets/img/loading.gif" alt="loading"/>
-							</div>
-							<div id="site_activities_content" class="display-none">
-								<div id="site_activities" style="height: 100px;"></div>
-							</div>
-						</div>
-					</div>
-					<!-- END PORTLET-->
-					<!-- BEGIN PORTLET-->
-					<div class="portlet solid bordered light-grey">
-						<div class="portlet-title">
-							<div class="caption"><i class="fa fa-signal"></i>Server Load</div>
-							<div class="tools">
-								<div class="btn-group pull-right" data-toggle="buttons">
-									<a href="" class="btn red btn-sm active">Database</a>
-									<a href="" class="btn red btn-sm">Web</a>
-								</div>
-							</div>
-						</div>
-						<div class="portlet-body">
-							<div id="load_statistics_loading">
-								<img src="${ctx}/static/bootstrap-metronic/template_content/assets/img/loading.gif" alt="loading" />
-							</div>
-							<div id="load_statistics_content" class="display-none">
-								<div id="load_statistics" style="height: 108px;"></div>
-							</div>
-						</div>
-					</div>
-					<!-- END PORTLET-->
-				</div>
-			</div>
+	        </div>
+	    </div>
+	</c:forEach>
 </body>
 </html>

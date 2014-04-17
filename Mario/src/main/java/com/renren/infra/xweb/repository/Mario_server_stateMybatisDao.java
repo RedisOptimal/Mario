@@ -1,4 +1,3 @@
-
 package com.renren.infra.xweb.repository;
 
 import java.util.List;
@@ -21,20 +20,23 @@ import com.renren.infra.xweb.entity.Mario_server_state;
 @MyBatisRepository
 public interface Mario_server_stateMybatisDao {
 
-    List<Mario_server_state> findAll();
+	List<Mario_server_state> findAll();
 
-    List<Mario_server_state> find(Map<String, Object> parameters);
+	List<Mario_server_state> find(Map<String, Object> parameters);
 
 	List<Mario_server_state> find(Map<String, Object> filterParams,
 			RowBounds buildRowBounds);
 
 	int findTotalNum(Map<String, Object> filterParams);
-	
+
 	Mario_server_state getMario_server_stateById(Integer id);
-	
+
 	List<Mario_server_state> findBetweenTimeStamp(
-			@Param(value = "server_id") int server_id,
+			@Param(value = "server_id") Integer server_id,
 			@Param(value = "start_time_stamp") Long start_time_stamp,
 			@Param(value = "end_time_stamp") Long end_time_stamp);
-	
+
+	Mario_server_state findLastStateByServerId(
+			@Param(value = "server_id") Integer server_id);
+
 }
