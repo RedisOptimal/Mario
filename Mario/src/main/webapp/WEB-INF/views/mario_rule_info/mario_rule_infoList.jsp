@@ -38,12 +38,12 @@
         <table id="contentTable" class="table table-striped table-bordered table-condensed table-hover">
             <thead>
                 <tr>
-                <th>id</th>
-                <th>zk_id</th>
-                <th>path</th>
-                <th>type</th>
-                <th>min_children_number</th>
-                <th>max_children_number</th>
+                <th>ID</th>
+                <th>Zookeeper cluster</th>
+                <th>Path</th>
+                <th>Type</th>
+                <th>Min children number</th>
+                <th>Max children number</th>
                 <th>enable</th>
                 <th>管理</th>
                 </tr>
@@ -58,7 +58,10 @@
                     <td>${mario_rule_info.type}</td>
                     <td>${mario_rule_info.min_children_number}</td>
                     <td>${mario_rule_info.max_children_number}</td>
-                    <td>${mario_rule_info.enable}</td>
+                    <td>
+                        <c:if test="${mario_rule_info.enable}"><span class="label label-success">ENABLE</span></c:if>
+                        <c:if test="${!mario_rule_info.enable}"><span class="label label-danger">DISABLE</span></c:if>
+                    </td>
                     <td><a href="${ctx}/mario_rule_info/delete/${mario_rule_info.id}">删除</a></td>
                 </tr>
             </c:forEach>

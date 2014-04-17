@@ -10,9 +10,27 @@
         $(document).ready(function() {
             //聚焦第一个输入框
             $("#loginName").focus();
+            if($('#rule-type').val() == "children number"){
+                $("#min-num").css("display","block");
+                $("#max-num").css("display","block");
+            }else{
+                $("#min-num").css("display","none");
+                $("#max-num").css("display","none");
+            }
         });
+
+        function selectEvent(ee){
+            if($(ee).val() == "children number"){
+                $("#min-num").css("display","block");
+                $("#max-num").css("display","block");
+            }else{
+                $("#min-num").css("display","none");
+                $("#max-num").css("display","none");
+            }
+        }
         
     </script>
+
 </head>
 
 <body>
@@ -22,7 +40,7 @@
             <legend><small>管理</small></legend>
             <div id="messageBox" class="alert alert-error input-large controls" style="display:none">输入有误，请先更正。</div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">zk_id:</label>
+                <label for="name" class="col-sm-2 control-label">Zookeeper cluster:</label>
                 <div class="col-sm-10">
                     <select type="text" name="zk_id" class="form-control required">
                         <c:forEach items="${mario_zk_infos.content}" var="mario_zk_info">
@@ -32,41 +50,41 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">path:</label>
+                <label for="name" class="col-sm-2 control-label">Path:</label>
                 <div class="col-sm-10">
                     <input type="text" id="path" name="path"  value="${mario_rule_info.path}" class="form-control required"/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">type:</label>
+                <label for="name" class="col-sm-2 control-label">Type:</label>
                 <div class="col-sm-10">
-                    <select type="text" name="type" class="form-control required">
-                            <option value="node exists" title="node exists">node exists</option>
-                            <option value="children number" title="children number">children number</option>
-                            <option value="data changed" title="data changed">data changed</option>
+                    <select id="rule-type" type="text" name="type" class="form-control required" onchange = "selectEvent(this);">
+                            <option value="children number" title="children number" <c:if test="${mario_rule_info.type=='children number'}"> selected="selected"</c:if>>children number</option>
+                            <option value="node exists" title="node exists" <c:if test="${mario_rule_info.type=='node exists'}"> selected="selected"</c:if>>node exists</option>
+                            <option value="data changed" title="data changed" <c:if test="${mario_rule_info.type=='data changed'}"> selected="selected"</c:if>>data changed</option>
                     </select>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">min_children_number:</label>
+            <div id = "min-num" class="form-group">
+                <label for="name" class="col-sm-2 control-label">Min children number:</label>
                 <div class="col-sm-10">
                     <input type="text" id="min_children_number" name="min_children_number"  value="${mario_rule_info.min_children_number}" class="form-control "/>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">max_children_number:</label>
+            <div id = "max-num" class="form-group">
+                <label for="name" class="col-sm-2 control-label">Max children number:</label>
                 <div class="col-sm-10">
                     <input type="text" id="max_children_number" name="max_children_number"  value="${mario_rule_info.max_children_number}" class="form-control "/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">phone_number:</label>
+                <label for="name" class="col-sm-2 control-label">Phone number:</label>
                 <div class="col-sm-10">
                     <input type="text" id="phone_number" name="phone_number"  value="${mario_rule_info.phone_number}" class="form-control "/>
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">email_address:</label>
+                <label for="name" class="col-sm-2 control-label">Email address:</label>
                 <div class="col-sm-10">
                     <input type="text" id="email_address" name="email_address"  value="${mario_rule_info.email_address}" class="form-control "/>
                 </div>
@@ -75,8 +93,8 @@
                 <label for="name" class="col-sm-2 control-label">enable:</label>
                 <div class="col-sm-10"> 
                     <select type="text" name="enable" class="form-control required">
-                        <option value="true" title="true">True</option>
-                        <option value="false" title="false">False</option>
+                        <option value="true" title="true" <c:if test="${mario_rule_info.enable}"> selected="selected"</c:if>>True</option>
+                        <option value="false" title="false" <c:if test="${!mario_rule_info.enable}"> selected="selected"</c:if>>False</option>
                     </select>
                 </div>
             </div>
