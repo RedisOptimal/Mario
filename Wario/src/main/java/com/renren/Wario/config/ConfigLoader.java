@@ -18,7 +18,9 @@ package com.renren.Wario.config;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -72,89 +74,155 @@ public class ConfigLoader {
 
 			loadPluginConfig();
 			
-		} catch (ClassNotFoundException e) {
-			logger.error("Load config failed! " + e.toString());
-		} catch (SQLException e) {
-			logger.error("Load config failed! " + e.toString());
 		} catch (JSONException e) {
 			logger.error("Load config failed! " + e.toString());
 		} 
 	}
 
-	private void loadServerConfig() throws ClassNotFoundException, SQLException, JSONException {
+	private void loadServerConfig() throws JSONException {
 
 		Map<Integer, JSONObject> tmpServerObjects = new HashMap<Integer, JSONObject>();
 		MySQLHelper helper = new MySQLHelper();
 		String sql = "select id, zk_name, session_timeout, observer, observer_auth from mario_zk_info";
-		helper.open();
-		ResultSet rs = helper.executeQuery(sql);
-		while (rs.next()) {
-			int id = rs.getInt("id");
-			JSONArray serverIPList = getserverIPList(id);
-			int sessionTimeout = rs.getInt("session_timeout");
-			String observer = rs.getString("observer");
-			String observerAuth = rs.getString("observer_auth");
+		try {
+			helper.open();
+			ResultSet rs = helper.executeQuery(sql);
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				JSONArray serverIPList = getserverIPList(id);
+				int sessionTimeout = rs.getInt("session_timeout");
+				String observer = rs.getString("observer");
+				String observerAuth = rs.getString("observer_auth");
 
-			JSONObject serverObject = new JSONObject();
-			serverObject.put("serverIPList", serverIPList);
-			serverObject.put("sessionTimeout", sessionTimeout);
-			serverObject.put("observer", observer);
-			serverObject.put("observerAuth", observerAuth);
+				JSONObject serverObject = new JSONObject();
+				serverObject.put("serverIPList", serverIPList);
+				serverObject.put("sessionTimeout", sessionTimeout);
+				serverObject.put("observer", observer);
+				serverObject.put("observerAuth", observerAuth);
 
-			tmpServerObjects.put(id, serverObject);
+				tmpServerObjects.put(id, serverObject);
+			}
+		} catch (SQLException e) {
+			logger.error("MysqlHelper open failed or execute sql " + sql
+					+ " failed! " + e.toString());
+		} catch (ClassNotFoundException e) {
+			logger.error("MysqlHelper open failed! " + e.toString());
+		} finally {
+			try {
+				helper.close();
+			} catch (SQLException e) {
+				logger.error("MysqlHelper close failed! " + e.toString());
+			}
 		}
-		helper.close();
 		serverObjects = tmpServerObjects;
 	}
 
-	private JSONArray getserverIPList(int zkId) throws ClassNotFoundException, SQLException {
+	private JSONArray getserverIPList(int zkId) {
 		JSONArray serverIPList = new JSONArray();
 		MySQLHelper helper = new MySQLHelper();
 		String sql = "select id, host, port from mario_server_info "
 				+ "where zk_id = " + zkId;
-		helper.open();
-		ResultSet rs = helper.executeQuery(sql);
-		while (rs.next()) {
-			String host = rs.getString("host");
-			int port = rs.getInt("port");
-			serverIPList.put(host + ":" + port);
+		try {
+			helper.open();
+			ResultSet rs = helper.executeQuery(sql);
+			while (rs.next()) {
+				String host = rs.getString("host");
+				int port = rs.getInt("port");
+				serverIPList.put(host + ":" + port);
+			}
+		} catch (SQLException e) {
+			logger.error("MysqlHelper open failed or execute sql " + sql
+					+ " failed! " + e.toString());
+		} catch (ClassNotFoundException e) {
+			logger.error("MysqlHelper open failed! " + e.toString());
+		} finally {
+			try {
+				helper.close();
+			} catch (SQLException e) {
+				logger.error("MysqlHelper close failed! " + e.toString());
+			}
 		}
-		helper.close();
 		return serverIPList;
 	}
 
-	private void loadPluginConfig() throws ClassNotFoundException, SQLException, JSONException {
+	private void loadPluginConfig() throws JSONException {
 		Map<String, JSONArray> tmpPluginObjects = new HashMap<String, JSONArray>();
 		MySQLHelper helper = new MySQLHelper();
 		String sql = "select distinct plugin_name from mario_plugin_info";
-		helper.open();
-		ResultSet rs = helper.executeQuery(sql);
-		while (rs.next()) {
-			String pluginName = rs.getString("plugin_name");
-			tmpPluginObjects.put(pluginName, getJSONArray(pluginName));
+		try {
+			helper.open();
+			ResultSet rs = helper.executeQuery(sql);
+			while (rs.next()) {
+				String pluginName = rs.getString("plugin_name");
+				tmpPluginObjects.put(pluginName, getZKArrayRunsOnPlugin(pluginName));
+			}
+			// Run DBPlugin and RulePlugin on all zk.
+			JSONArray allZKArray = getAllZKArray();
+			tmpPluginObjects.put("DBPlugin", allZKArray);
+			tmpPluginObjects.put("RulePlugin", allZKArray);
+		} catch (SQLException e) {
+			logger.error("MysqlHelper open failed or execute sql " + sql
+					+ " failed! " + e.toString());
+		} catch (ClassNotFoundException e) {
+			logger.error("MysqlHelper open failed! " + e.toString());
+		} finally {
+			try {
+				helper.close();
+			} catch (SQLException e) {
+				logger.error("MysqlHelper close failed! " + e.toString());
+			}
 		}
-		helper.close();
 		pluginObjects = tmpPluginObjects;
 	}
 
-	private JSONArray getJSONArray(String pluginName) throws ClassNotFoundException, SQLException, JSONException {
+	private JSONArray getZKArrayRunsOnPlugin(String pluginName) throws JSONException {
 		JSONArray arrary = new JSONArray();
 		MySQLHelper helper = new MySQLHelper();
 		String sql = "select zk_id, msg_sender, mail_sender, phone_number, email_address, args, commit from mario_plugin_info where plugin_name = '" + pluginName + "'";
-		helper.open();
-		ResultSet rs = helper.executeQuery(sql);
-		while(rs.next()) {
+		try {
+			helper.open();
+			ResultSet rs = helper.executeQuery(sql);
+			while (rs.next()) {
+				JSONObject object = new JSONObject();
+				object.put("zkId", rs.getInt("zk_id"));
+				object.put("msgSender", rs.getString("msg_sender"));
+				object.put("mailSender", rs.getString("mail_sender"));
+				object.put("phoneNumber", rs.getString("phone_number"));
+				object.put("emailAddress", rs.getString("email_address"));
+				object.put("args", rs.getString("args"));
+				object.put("commit", rs.getString("commit"));
+				arrary.put(object);
+			}
+		} catch (SQLException e) {
+			logger.error("MysqlHelper open failed or execute sql " + sql
+					+ " failed! " + e.toString());
+		} catch (ClassNotFoundException e) {
+			logger.error("MysqlHelper open failed! " + e.toString());
+		} finally {
+			try {
+				helper.close();
+			} catch (SQLException e) {
+				logger.error("MysqlHelper close failed! " + e.toString());
+			}
+		}
+		return arrary;
+	}
+
+	private JSONArray getAllZKArray() throws JSONException {
+		JSONArray arrary = new JSONArray();
+		Iterator<Entry<Integer, JSONObject>> it = serverObjects.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<Integer, JSONObject> entry = it.next();
 			JSONObject object = new JSONObject();
-			object.put("zkId", rs.getInt("zk_id"));
-			object.put("msgSender", rs.getString("msg_sender"));
-			object.put("mailSender", rs.getString("mail_sender"));
-			object.put("phoneNumber", rs.getString("phone_number"));
-			object.put("emailAddress", rs.getString("email_address"));
-			object.put("args", rs.getString("args"));
-			object.put("commit", rs.getString("commit"));
+			object.put("zkId", entry.getKey());
+			object.put("msgSender", "DebugMsgSender");
+			object.put("mailSender", "DebugMailSender");
+			object.put("phoneNumber", "");
+			object.put("emailAddress", "");
+			object.put("args", "");
+			object.put("commit", "");
 			arrary.put(object);
 		}
-		helper.close();
 		return arrary;
 	}
 }

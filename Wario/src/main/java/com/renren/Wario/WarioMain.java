@@ -75,35 +75,47 @@ public class WarioMain extends Thread {
 	@Override
 	public void run() {
 		while (!isInterrupted()) {
-
+			long start = System.currentTimeMillis();
+			
 			configLoader.loadConfig();
+			Map<Integer, JSONObject> serverObjects = configLoader.getServerObjects();
+			Map<String, JSONArray> pluginObjects = configLoader.getPluginObjects();
+			
+			removeUselessClusters(serverObjects);
+			
+			removeUselessContexts(pluginObjects);
+			
+			updateServerConfig(serverObjects);
 
-			Set<Integer> uselessClusters = WarioUtilTools
-					.getDifferenceByInteger(clusters.keySet(), configLoader
-							.getServerObjects().keySet());
-			Iterator<Integer> it = uselessClusters.iterator();
-			while (it.hasNext()) {
-				int zkId = it.next();
-				ZooKeeperCluster cluster = clusters.get(zkId);
-				cluster.close();
-				clusters.remove(zkId);
-			}
-
-			Set<String> uselessContexts = WarioUtilTools
-					.getDifference(contexts.keySet(), configLoader
-							.getPluginObjects().keySet());
-			contexts.entrySet().removeAll(uselessContexts);
-
-			updateServerConfig(configLoader.getServerObjects());
-
-			try {
-				sleep(10 << 10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-			runPlugins();
+			runPlugins(pluginObjects);
+			
+			do {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					
+				}
+			} while(System.currentTimeMillis() - start < 60 * 1000);
 		}
+	}
+	
+	private void removeUselessClusters(Map<Integer, JSONObject> serverObjects) {
+		Set<Integer> uselessClusters = WarioUtilTools
+				.getDifferenceByInteger(clusters.keySet(), serverObjects.keySet());
+		Iterator<Integer> it = uselessClusters.iterator();
+		while (it.hasNext()) {
+			int zkId = it.next();
+			ZooKeeperCluster cluster = clusters.get(zkId);
+			cluster.close();
+			clusters.remove(zkId);
+		}
+	}
+	
+	private void removeUselessContexts(Map<String, JSONArray> pluginObjects) {
+		Set<String> uselessContexts = WarioUtilTools
+				.getDifference(contexts.keySet(), pluginObjects.keySet());
+		contexts.entrySet().removeAll(uselessContexts);
+
 	}
 
 	private void updateServerConfig(Map<Integer, JSONObject> serverObjects) {
@@ -139,39 +151,65 @@ public class WarioMain extends Thread {
 	}
 
 	/**
-	 * Run plugins on every cluseter.
+	 * Run every plugin.
 	 */
-	private void runPlugins() {
-		Iterator<Entry<String, JSONArray>> it = configLoader.getPluginObjects()
-				.entrySet().iterator();
+	private void runPlugins(Map<String, JSONArray> pluginObjects) {
+		JSONArray observerPluginArray = null;
+		JSONArray rulePluginArray = null;
+		Iterator<Entry<String, JSONArray>> it = pluginObjects.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<String, JSONArray> entry = it.next();
 
 			String pluginName = entry.getKey();
-			JSONArray arrary = entry.getValue();
+			JSONArray array = entry.getValue();
+			
 			if (!contexts.containsKey(pluginName)) {
 				contexts.put(pluginName, new TreeMap<Integer, byte[]>());
 			}
+			
+			if ("ObserverPlugin".equals(pluginName)) {
+				observerPluginArray = array;
+			} else if ("RulePlugin".equals(pluginName)) {
+				rulePluginArray = array;
+			} else {
+				runPluginOnClusters(pluginName, array);
+			}
+		}
 
-			for (int i = 0; i < arrary.length(); ++i) {
-				try {
-					JSONObject object = arrary.getJSONObject(i);
-					if ("ObserverPlugin".equals(pluginName)) {
-						processObserverPlugin(pluginName, object);
-					} else {
-						processPlugin(pluginName, object);
-					}
-				} catch (JSONException e) {
-					logger.error("Failed to process json string : "
-							+ pluginName + " " + i + "th line. " + e.toString());
+		// Make sure RulePlugin runs before ObserverPlugin
+		if(rulePluginArray != null) {
+			runPluginOnClusters("RulePlugin", rulePluginArray);
+		}
+		if(observerPluginArray != null) {
+			runPluginOnClusters("ObserverPlugin", observerPluginArray);
+		} 
+	}
+	
+	/**
+	 * Run plugin on every cluster.
+	 * @param pluginName
+	 * @param clusters
+	 */
+	private void runPluginOnClusters(String pluginName, JSONArray clusters) {
+		for (int i = 0; i < clusters.length(); ++i) {
+			try {
+				JSONObject object = clusters.getJSONObject(i);
+				if ("ObserverPlugin".equals(pluginName)) {
+					processPluginOnObserver(pluginName, object);
+				} else if ("RulePlugin".equals(pluginName)) {
+					processPluginOnObserver(pluginName, object);
+				} else {
+					processPlugin(pluginName, object);
 				}
+			} catch (JSONException e) {
+				logger.error("Failed to process json string : "
+						+ pluginName + " " + i + "th line. " + e.toString());
 			}
 		}
 	}
 
 	/**
 	 * Process the plugin on every client of the cluster except the observer.
-	 * 
 	 * @param pluginName
 	 * @param object
 	 * @throws JSONException
@@ -212,13 +250,12 @@ public class WarioMain extends Thread {
 	}
 
 	/**
-	 * Process ObserverPlugin on the observer client.
-	 * 
+	 * Process plugin on the observer client.
 	 * @param pluginName
 	 * @param object
 	 * @throws JSONException
 	 */
-	private void processObserverPlugin(String pluginName, JSONObject object)
+	private void processPluginOnObserver(String pluginName, JSONObject object)
 			throws JSONException {
 		int zkId = object.getInt("zkId");
 		ZooKeeperCluster cluster = null;

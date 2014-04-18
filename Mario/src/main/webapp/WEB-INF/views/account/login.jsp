@@ -47,7 +47,7 @@
 	<div class="content">
 		<!-- BEGIN LOGIN FORM -->
 		<form id="loginForm" action="${ctx}/login" method="post" class="form-horizontal login-form">
-			<h2 class="form-title">XWEB展示系统</h2>
+			<h2 class="form-title">ZooKeeper监控平台</h2>
 			<%
 			    String error = (String) request
 			            .getAttribute(FormAuthenticationFilter.DEFAULT_ERROR_KEY_ATTRIBUTE_NAME);
