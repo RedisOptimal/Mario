@@ -184,10 +184,10 @@ public class ObserverPlugin extends IPlugin {
 	}
 
 	private int getNextStateVersion() {
-		int maxVersion = 0;
+		int maxVersion = 0; 
 		if (clusterContext[0] == '#' && clusterContext[5] == '#') {
 			for (int i = 1; i <= 4; ++i) {
-				maxVersion = maxVersion << 8 + (short) clusterContext[i];
+				maxVersion = (maxVersion << 8) | (clusterContext[i] & 0xff);
 			}
 		} else {
 			maxVersion = getMaxStateVersionFromDB();
@@ -207,7 +207,7 @@ public class ObserverPlugin extends IPlugin {
 	private int getMaxStateVersionFromDB() {
 		int maxVersion = 0;
 		MySQLHelper helper = new MySQLHelper();
-		String sql = "select max(state_version) from mario_node_state";
+		String sql = "select max(state_version) from mario_node_state where zk_id = " + client.getZkId();
 		try {
 			helper.open();
 			ResultSet rs = helper.executeQuery(sql);
