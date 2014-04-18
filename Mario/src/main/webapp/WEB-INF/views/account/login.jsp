@@ -76,9 +76,9 @@
 				</div>
 			</div>
 			<div class="form-actions">
-				<label class="checkbox" for="rememberMe">
+				<!-- <label class="checkbox" for="rememberMe">
 				    <input type="checkbox" id="rememberMe" name="rememberMe" /> 记住我
-				</label>
+				</label> -->
 				<button type="submit" class="btn green pull-right">
 				登录 <i class="m-icon-swapright m-icon-white"></i>
 				</button>            
