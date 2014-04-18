@@ -60,9 +60,6 @@ public class Mario_plugin_infoController {
 		List<Mario_plugin_info> mario_plugin_infoList = new ArrayList<Mario_plugin_info>();
 		Mario_plugin_info mario_plugin_info = null;
 		mario_plugin_info = new Mario_plugin_info();
-		mario_plugin_info.setplugin_name("DBPlugin");
-		mario_plugin_infoList.add(mario_plugin_info);
-		mario_plugin_info = new Mario_plugin_info();
 		mario_plugin_info.setplugin_name("DefaultPlugin");
 		mario_plugin_infoList.add(mario_plugin_info);
 		mario_plugin_info = new Mario_plugin_info();
