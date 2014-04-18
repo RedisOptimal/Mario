@@ -34,6 +34,7 @@ public final class DebugMsgSender implements IMsgSender {
 	 */
 	@Override
 	public void sendMessage(String number, String message) {
+		System.err.println("Send message \"" + message + "\" to " + number);
 		logger.warn("Send message \"" + message + "\" to " + number);
 	}
 

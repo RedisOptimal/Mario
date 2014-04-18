@@ -32,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.renren.Wario.config.ApplicationProperties;
 import com.renren.Wario.config.ConfigLoader;
 import com.renren.Wario.mailsender.IMailSender;
 import com.renren.Wario.msgsender.IMsgSender;
@@ -55,6 +56,8 @@ public class WarioMain extends Thread {
 	// <pluginName, <zkId, context> >
 	private final Map<String, Map<Integer, byte[]>> contexts;
 
+	private static int SLEEPSECOND;
+	
 	public WarioMain() {
 		if (System.getProperty("default.plugin.path") == null) {
 			pluginPathPrefix = "./plugins/";
@@ -64,6 +67,7 @@ public class WarioMain extends Thread {
 		configLoader = ConfigLoader.getInstance();
 		clusters = new HashMap<Integer, ZooKeeperCluster>();
 		contexts = new TreeMap<String, Map<Integer, byte[]>>();
+		SLEEPSECOND = ApplicationProperties.getDefaultSleep();
 	}
 
 	public void init() {
@@ -95,7 +99,7 @@ public class WarioMain extends Thread {
 				} catch (InterruptedException e) {
 					
 				}
-			} while(System.currentTimeMillis() - start < 60 * 1000);
+			} while(System.currentTimeMillis() - start < SLEEPSECOND * 1000);
 		}
 	}
 	
