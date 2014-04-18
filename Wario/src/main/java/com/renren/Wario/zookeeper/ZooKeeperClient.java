@@ -175,12 +175,12 @@ public class ZooKeeperClient {
 	public void exists(String path, boolean watch, StatCallback cb, Object ctx) {
 		zk.exists(path, watch, cb, ctx);
 	}
-	
+
 	public byte[] getData(String path, Stat stat) throws KeeperException,
 			InterruptedException {
 		return zk.getData(path, false, stat);
 	}
-	
+
 	public void getData(String path, boolean watch, DataCallback cb, Object ctx) {
 		zk.getData(path, watch, cb, ctx);
 	}
@@ -190,10 +190,16 @@ public class ZooKeeperClient {
 		return zk.getChildren(path, false);
 	}
 
-	public void getChildren(String path, boolean watch, ChildrenCallback cb, Object ctx) {
+	public List<String> getChildren(String path, Stat stat)
+			throws KeeperException, InterruptedException {
+		return zk.getChildren(path, false, stat);
+	}
+
+	public void getChildren(String path, boolean watch, ChildrenCallback cb,
+			Object ctx) {
 		zk.getChildren(path, watch, cb, ctx);
 	}
-	
+
 	public Stat testExists(String path) throws KeeperException,
 			InterruptedException {
 		return zk.exists(ZK_PATH + path, false);
