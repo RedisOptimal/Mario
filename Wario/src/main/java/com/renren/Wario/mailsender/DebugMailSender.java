@@ -30,6 +30,7 @@ public final class DebugMailSender implements IMailSender {
 	 */
 	@Override
 	public void sendMail(String address, String message) {
+		System.err.println("Send mail \"" + message + "\" to " + address);
 		logger.warn("Send mail \"" + message + "\" to " + address);
 	}
 

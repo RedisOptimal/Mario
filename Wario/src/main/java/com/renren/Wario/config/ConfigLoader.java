@@ -35,6 +35,9 @@ public class ConfigLoader {
 	private static Logger logger = LogManager.getLogger(ConfigLoader.class
 			.getName());
 
+	private static String MAILSENDER;
+	private static String MSGSENDER;
+	
 	// used for singleton
 	private static ConfigLoader configLoader = null;
 
@@ -56,7 +59,8 @@ public class ConfigLoader {
 	}
 
 	private ConfigLoader() {
-
+		MAILSENDER = ApplicationProperties.getDefaultMailsender();
+		MSGSENDER = ApplicationProperties.getDefaultMsgsender();
 	}
 
 	public static synchronized ConfigLoader getInstance() {
@@ -215,8 +219,8 @@ public class ConfigLoader {
 			Entry<Integer, JSONObject> entry = it.next();
 			JSONObject object = new JSONObject();
 			object.put("zkId", entry.getKey());
-			object.put("msgSender", "DebugMsgSender");
-			object.put("mailSender", "DebugMailSender");
+			object.put("msgSender", MSGSENDER);
+			object.put("mailSender", MAILSENDER);
 			object.put("phoneNumber", "");
 			object.put("emailAddress", "");
 			object.put("args", "");

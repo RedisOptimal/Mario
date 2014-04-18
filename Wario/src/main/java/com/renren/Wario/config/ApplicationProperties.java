@@ -89,6 +89,18 @@ public class ApplicationProperties implements Serializable {
 		return getProperty("jdbc.password");
 	}
 
+	public static String getDefaultMailsender() {
+		return getProperty("default.mailsender");
+	}
+	
+	public static String getDefaultMsgsender() {
+		return getProperty("default.msgsender");
+	}
+	
+	public static int getDefaultSleep() {
+		return Integer.parseInt(getProperty("default.sleep"));
+	}
+	
 	public static Properties getProperties() {
 		if (properties == null) {
 			properties = initializeProperties(FILE_NAME);
