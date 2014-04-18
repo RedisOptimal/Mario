@@ -56,7 +56,7 @@
 						<tbody>
 							<c:forEach items="${zk_state.serverStates}" var="serverState">
 							<tr>
-								<td><a href="#">${serverState.info.id}</a></td>
+								<td><a href="${ctx}/graph/server_state?server_id=${serverState.info.id}">${serverState.info.id}</a></td>
 								<td>${serverState.info.host}</td>
 								<td>${serverState.info.port}</td>
 								<td>${serverState.state.mode}</td>
