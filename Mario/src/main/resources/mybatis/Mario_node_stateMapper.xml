@@ -11,7 +11,7 @@
 		mtime , czxid , mzxid , pzxid , ephemeral_owner,
 		state_version ,
 		state_time from mario_node_state
-		order by path
+		order by path, state_version desc
 	</select>
 
 	<select id="find" parameterType="map" resultType="Mario_node_state">
@@ -70,7 +70,7 @@
 			</if>
 		</where>
 		order by
-		state_version, path
+		path, state_version desc
 	</select>
 
 	<select id="findTotalNum" parameterType="Mario_node_state"
