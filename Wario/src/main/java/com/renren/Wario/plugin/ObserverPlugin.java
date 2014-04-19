@@ -42,7 +42,7 @@ public class ObserverPlugin extends IPlugin {
 			.getLogger(ObserverPlugin.class.getName());
 
 	private static final int MAX_THREAD_NUM = 2;
-	private Thread[] dumpThreads = new Thread[MAX_THREAD_NUM];
+	private DBWriter[] dumpThreads = new DBWriter[MAX_THREAD_NUM];
 
 	private class PathAndStat {
 		private final String path;
@@ -80,8 +80,8 @@ public class ObserverPlugin extends IPlugin {
 	private final BlockingQueue<String> trackQueue = new LinkedBlockingQueue<String>();
 	private final BlockingQueue<PathAndStat> saveQueue = new LinkedBlockingQueue<PathAndStat>();
 
-	private final CountDownLatch keyFieldLatch = new CountDownLatch(1);
-
+    private final AtomicInteger inQueue = new AtomicInteger(1);
+    private final AtomicInteger inTrack = new AtomicInteger(0);
 	@Override
 	public void run() {
 		if (client == null) {
@@ -103,82 +103,103 @@ public class ObserverPlugin extends IPlugin {
 		}
 		PathAndStat root = new PathAndStat("/", data, stat);
 		saveQueue.offer(root);
-		final AtomicInteger inQueue = new AtomicInteger(1);
 		client.getChildren("/", false, new ChildrenCallback() {
 
 			@Override
 			public void processResult(int rc, String path, Object ctx,
 					List<String> children) {
-				inQueue.decrementAndGet();
-				Code cd = KeeperException.Code.get(rc);
-				switch (cd) {
-				case OK:
-					break;
-				default:
-					logger.warn("GetChildren on path " + path
-							+ " with SESSIONEXPIRED event.");
-					return;
-				}
-				trackQueue.offer(path);
-				Iterator<String> iterator = children.iterator();
-				while (iterator.hasNext()) {
-					String child = iterator.next();
-					String son = (path.endsWith("/") ? path : path + "/")
-							+ child;
-					inQueue.incrementAndGet();
-
-					client.getChildren(son, false, this, null);
-				}
+			    synchronized (inQueue) {
+    				inQueue.decrementAndGet();
+    				Code cd = KeeperException.Code.get(rc);
+    				switch (cd) {
+    				case OK:
+    					break;
+    				default:
+    					logger.warn("GetChildren on path " + path
+    							+ " with SESSIONEXPIRED event.");
+    					return;
+    				}
+    				trackQueue.offer(path);
+    				Iterator<String> iterator = children.iterator();
+    				while (iterator.hasNext()) {
+    					String child = iterator.next();
+    					String son = (path.endsWith("/") ? path : path + "/")
+    							+ child;
+    					inQueue.incrementAndGet();
+    
+    					client.getChildren(son, false, this, null);
+    				}
+			    }
 			}
 		}, null);
 
 		for (int i = 0; i < dumpThreads.length; ++i) {
-			dumpThreads[i] = new Thread(new DBWriter(stateVersion));
+			dumpThreads[i] = new DBWriter(stateVersion);
 			dumpThreads[i].start();
 		}
 		logger.info("Init finished " + (System.currentTimeMillis() - startTime)
 				+ " ms");
 
-		while (inQueue.intValue() != 0 || !trackQueue.isEmpty()) {
+		while (true) {
+		    if (trackQueue.isEmpty()) {
+		        synchronized (inQueue) {
+                    if (inQueue.intValue() == 0) {
+                        break;
+                    }
+                }
+		    }
 			String path = null;
 			try {
 				path = trackQueue.poll(10, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				logger.warn("Thread interrupted.");
+				return;
 			}
-			if (path != null) {
-				client.getData(path, false, new DataCallback() {
+			if (path == null) {
+			     continue;
+			}
+			inTrack.incrementAndGet();
+			client.getData(path, false, new DataCallback() {
 
-					@Override
-					public void processResult(int rc, String path, Object ctx,
-							byte[] data, Stat stat) {
-						Code cd = Code.get(rc);
-						switch (cd) {
-						case OK:
-							break;
-						default:
-							logger.warn("GetData on path " + path
-									+ " with SESSIONEXPIRED event.");
-							return;
-						}
-						PathAndStat node = new PathAndStat(path, data, stat);
-						saveQueue.offer(node);
+				@Override
+				public void processResult(int rc, String path, Object ctx,
+						byte[] data, Stat stat) {
+				    inTrack.decrementAndGet();
+					Code cd = Code.get(rc);
+					switch (cd) {
+					case OK:
+						break;
+					default:
+						logger.warn("GetData on path " + path
+								+ " with SESSIONEXPIRED event.");
+						return;
 					}
-				}, null);
-			}
+					PathAndStat node = new PathAndStat(path, data, stat);
+					saveQueue.offer(node);
+				}
+			}, null);
 		}
 
-		keyFieldLatch.countDown();
 		logger.info("Track request send done "
 				+ (System.currentTimeMillis() - startTime) + " ms");
-		try {
-			for (int i = 0; i < dumpThreads.length; ++i) {
-				dumpThreads[i].join();
-			}
-		} catch (InterruptedException e) {
-			logger.error("Thread interrupted.");
+		
+		for (int i = 0; i < dumpThreads.length; ++i) {
+		    try {
+                dumpThreads[i].join(10000);  // wait db write for 10 seconds
+                if (dumpThreads[i].isAlive()) {
+                    dumpThreads[i].interrupt();
+                    logger.warn("Dump thread " + i + " may be hang.\n" +
+                            "Dump data :\n" + 
+                            "TrackQueue : " + trackQueue.size() + "\n" + 
+                            "SaveQueue : " + saveQueue.size() + "\n" + 
+                            "inQueue : " + inQueue.toString() + "\n" +
+                            "inTrack : " + inTrack.toString());
+                }
+            } catch (InterruptedException e) {
+                logger.warn("Interrupt when join DBWrite thread " + i);
+                return;
+            }
 		}
-
 		logger.info("Run main thread "
 				+ (System.currentTimeMillis() - startTime) + " ms");
 	}
@@ -249,7 +270,7 @@ public class ObserverPlugin extends IPlugin {
 		}
 	}
 
-	private class DBWriter implements Runnable {
+	private class DBWriter extends Thread {
 
 		private MySQLHelper helper = new MySQLHelper();
 		private final int nextStatVersion;
@@ -291,34 +312,27 @@ public class ObserverPlugin extends IPlugin {
 		@Override
 		public void run() {
 			try {
-				while (true) {
+				while (!this.isInterrupted()) {
+				    if (inTrack.intValue() == 0) {
+				        break;
+				    }
 					PathAndStat node = null;
-					while (!saveQueue.isEmpty()) {
-						try {
-							node = saveQueue.poll(10, TimeUnit.MILLISECONDS);
-						} catch (InterruptedException e) {
-							logger.warn("Thread interrupted.");
-						}
-						
-						if (node == null) {
-							continue;
-						}
-						
-						try {
-							writeToDB(node);
-						} catch (SQLException e) {
-							logger.error("Execute sql failed! "
-						+ e.toString());
-						}
+					try {
+						node = saveQueue.poll(10, TimeUnit.MILLISECONDS);
+					} catch (InterruptedException e) {
+						logger.warn("Thread interrupted.");
+						return;
 					}
-					if (!trackQueue.isEmpty()) {
+					
+					if (node == null) {
 						continue;
 					}
+					
 					try {
-						if (keyFieldLatch.await(10, TimeUnit.MILLISECONDS)) {
-							break;
-						}
-					} catch (InterruptedException e) {
+						writeToDB(node);
+					} catch (SQLException e) {
+						logger.error("Execute sql failed! "
+					+ e.toString());
 					}
 				}
 			} finally {

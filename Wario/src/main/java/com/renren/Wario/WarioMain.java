@@ -278,7 +278,17 @@ public class WarioMain extends Thread {
 			byte[] context = contexts.get(pluginName).get(zkId);
 			try {
 				IPlugin plugin = createPlugin(pluginName, object, client, context);
-				plugin.run();
+				Thread pluginThread = new Thread(plugin);
+				pluginThread.start();
+				try {
+                    pluginThread.join(150 * 1000);
+                    if (pluginThread.isAlive()) {
+                        pluginThread.interrupt();
+                        logger.error(pluginName + " have run out of times. " + 
+                                   "It may be hang and must be killed.");
+                    }
+                } catch (InterruptedException e) {
+                }
 				logger.info(pluginName + " runs at " + client.getConnectionString()
 						+ " successfully!");
 			} catch (Exception e) {
