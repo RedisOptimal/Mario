@@ -57,7 +57,9 @@ public class Mario_rule_infoController {
 
 		Page<Mario_rule_info> mario_rule_infos = service.getMario_rule_info(
 				searchParams, pageNumber, Const.PAGE_SIZE);
-
+		for (Mario_rule_info mario_rule_info : mario_rule_infos) {
+		    mario_rule_info.setCluster_name(zkInfoService.getMario_zk_info(mario_rule_info.getZk_id()).getzk_name());
+		}
 		model.addAttribute("mario_rule_infos", mario_rule_infos);
 		model.addAttribute("searchParams", Servlets
 				.encodeParameterStringWithPrefix(searchParams, "search_"));

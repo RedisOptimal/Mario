@@ -53,7 +53,7 @@
                 <tr>
                     <tr>
                     <td><a href="${ctx}/mario_rule_info/update/${mario_rule_info.id}">${mario_rule_info.id}</a></td>
-                    <td>${mario_rule_info.zk_id}</td>
+                    <td>${mario_rule_info.cluster_name}</td>
                     <td>${mario_rule_info.path}</td>
                     <td>${mario_rule_info.type}</td>
                     <td>${mario_rule_info.min_children_number}</td>

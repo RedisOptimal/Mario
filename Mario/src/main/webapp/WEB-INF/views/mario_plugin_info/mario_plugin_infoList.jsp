@@ -59,7 +59,7 @@
                 <tr>
                     <tr>
                     <td><a href="${ctx}/mario_plugin_info/update/${mario_plugin_info.id}">${mario_plugin_info.plugin_name}</a></td>
-                    <td>${mario_plugin_info.zk_id}</td>
+                    <td>${mario_plugin_info.cluster_name}</td>
                     <td>${mario_plugin_info.msg_sender}</td>
                     <td>${mario_plugin_info.mail_sender}</td>
                     <td>${mario_plugin_info.phone_number}</td>

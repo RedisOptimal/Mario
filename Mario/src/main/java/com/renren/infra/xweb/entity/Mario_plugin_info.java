@@ -31,6 +31,10 @@ public class Mario_plugin_info {
     /**
     * 
     */
+    private String cluster_name;
+    /**
+     * 
+     */
     private String msg_sender;
     /**
     * 
@@ -112,6 +116,22 @@ public class Mario_plugin_info {
     public void setzk_id(Integer zk_id){
         this.zk_id = zk_id;
     }
+    
+    /**
+     * @return the cluster_name
+     */
+    public String getCluster_name() {
+        return cluster_name;
+    }
+
+    
+    /**
+     * @param cluster_name the cluster_name to set
+     */
+    public void setCluster_name(String cluster_name) {
+        this.cluster_name = cluster_name;
+    }
+
     /**
     *
     * get方法

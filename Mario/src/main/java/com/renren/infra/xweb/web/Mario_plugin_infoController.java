@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springside.modules.web.Servlets;
 
 import com.renren.infra.xweb.entity.Mario_plugin_info;
+import com.renren.infra.xweb.entity.Mario_rule_info;
 import com.renren.infra.xweb.entity.Mario_zk_info;
 import com.renren.infra.xweb.service.Mario_plugin_infoService;
 import com.renren.infra.xweb.service.Mario_zk_infoService;
@@ -47,7 +48,10 @@ public class Mario_plugin_infoController {
 				request, "search_");
 		Page<Mario_plugin_info> mario_plugin_infos = service
 				.getMario_plugin_info(searchParams, pageNumber, Const.PAGE_SIZE);
-
+        for (Mario_plugin_info mario_plugin_info : mario_plugin_infos) {
+            mario_plugin_info.setCluster_name(zkInfoService.getMario_zk_info(
+                mario_plugin_info.getzk_id()).getzk_name());
+        }
 		model.addAttribute("mario_plugin_infos", mario_plugin_infos);
 		model.addAttribute("searchParams", Servlets
 				.encodeParameterStringWithPrefix(searchParams, "search_"));

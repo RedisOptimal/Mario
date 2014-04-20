@@ -51,7 +51,7 @@
             <c:forEach items="${mario_node_states.content}" var="mario_node_state">
                 <tr>
                     <tr>
-                    <td>${mario_node_state.zk_id}</td>
+                    <td>${mario_node_state.cluster_name}</td>
                     <td>${mario_node_state.path}</td>
                     <td>${mario_node_state.data}</td>
                     <td>${mario_node_state.data_length}</td>

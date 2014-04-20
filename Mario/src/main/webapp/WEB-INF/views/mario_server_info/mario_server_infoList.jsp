@@ -51,7 +51,7 @@
                 <tr>
                     <tr>
                     <td><a href="${ctx}/mario_server_info/update/${mario_server_info.id}">${mario_server_info.id}</a></td>
-                    <td>${mario_server_info.zk_id}</td>
+                    <td>${mario_server_info.cluster_name}</td>
                     <td>${mario_server_info.host}</td>
                     <td>${mario_server_info.port}</td>
                     <td><a href="${ctx}/mario_server_info/delete/${mario_server_info.id}">删除</a></td>

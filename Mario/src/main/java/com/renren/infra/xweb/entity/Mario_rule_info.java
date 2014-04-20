@@ -24,6 +24,10 @@ public class Mario_rule_info {
     /**
     * 
     */
+    private String cluster_name;
+    /**
+     * 
+     */
     private String path;
     /**
     * 
@@ -93,6 +97,15 @@ public class Mario_rule_info {
     */
     public void setzk_id(Integer zk_id){
         this.zk_id = zk_id;
+    }
+    
+    public String getCluster_name() {
+        return cluster_name;
+    }
+
+    
+    public void setCluster_name(String cluster_name) {
+        this.cluster_name = cluster_name;
     }
     /**
     *

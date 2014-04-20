@@ -43,11 +43,11 @@
         <table id="contentTable" class="table table-striped table-bordered table-condensed table-hover">
             <thead>
                 <tr>
-                <th>id</th>
-                <th>zk_name</th>
-                <th>session_timeout</th>
-                <th>observer</th>
-                <th>observer_auth</th>
+                <th>ID</th>
+                <th>Zookeeper Cluster</th>
+                <th>Session timeout</th>
+                <th>Observer</th>
+                <th>Observer auth</th>
                 <th>管理</th>
                 </tr>
             </thead>
