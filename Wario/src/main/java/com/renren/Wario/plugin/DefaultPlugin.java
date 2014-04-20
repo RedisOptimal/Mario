@@ -55,10 +55,10 @@ public class DefaultPlugin extends IPlugin {
 
 		if (!"".equals(message)) {
 			for (String number : numbers) {
-				msgSender.sendMessage(number, message);
+				msgSender.sendMessage(number.trim(), message);
 			}
 			for (String address : addresses) {
-				mailSender.sendMail(address, message);
+				mailSender.sendMail(address.trim(), message);
 			}
 		}
 

@@ -64,15 +64,15 @@ public class ZooKeeperClient {
 
 	public ZooKeeperClient(String connectionString, int sessionTimeout,
 			String mode, String auth, int zkId) {
-		this.connectionString = connectionString;
+		this.connectionString = connectionString.trim();
 		this.sessionTimeout = sessionTimeout;
 		this.mode = mode;
-		this.auth = auth;
+		this.auth = auth.trim();
 		this.zkId = zkId;
 		isAvailable = false;
-		ZK_PATH = "/god_damn_zookeeper_" + connectionString;
+		ZK_PATH = "/god_damn_zookeeper_" + this.connectionString;
 		if (!"observer".equals(mode)) {
-			state = new ZooKeeperState(connectionString);
+			state = new ZooKeeperState(this.connectionString);
 		}
 	}
 

@@ -41,9 +41,16 @@ public class RulePlugin extends IPlugin {
 					.getPreparedStatement("select mzxid from mario_node_state where zk_id = ? and path = ? and mzxid = ? ");
 			ResultSet rs = helper.executeQuery(sql);
 			while (rs.next()) {
-
-				numbers = rs.getString("phone_number").split(",");
-				addresses = rs.getString("email_address").split(",");
+			    if (rs.getString("phone_number") != null) {
+			        numbers = rs.getString("phone_number").split(",");
+			    } else {
+			        numbers = null;
+			    }
+			    if (rs.getString("email_address") != null) {
+			        addresses = rs.getString("email_address").split(",");
+			    } else {
+			        addresses = null;
+			    }
 
 				String type = rs.getString("type");
 				if ("node exists".equals(type)) {
@@ -129,12 +136,16 @@ public class RulePlugin extends IPlugin {
 	}
 
 	private void alert(String message) {
-		for (String number : numbers) {
-			msgSender.sendMessage(number, message);
-		}
-		for (String address : addresses) {
-			mailSender.sendMail(address, message);
-		}
+	    if (numbers != null) {
+    		for (String number : numbers) {
+    			msgSender.sendMessage(number.trim(), message);
+    		}
+	    }
+	    if (addresses != null) {
+    		for (String address : addresses) {
+    			mailSender.sendMail(address.trim(), message);
+    		}
+	    }
 	}
 
 }

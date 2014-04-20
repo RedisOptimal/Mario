@@ -41,7 +41,7 @@ public class ZooKeeperState {
 
 	public ZooKeeperState(String connectionString) {
 		String host = connectionString.substring(0,
-				connectionString.indexOf(':'));
+				connectionString.indexOf(':')).trim();
 		int port = Integer.parseInt(connectionString.substring(connectionString
 				.indexOf(':') + 1));
 		this.host = host;
