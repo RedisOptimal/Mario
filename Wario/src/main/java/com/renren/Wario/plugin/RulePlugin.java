@@ -129,11 +129,15 @@ public class RulePlugin extends IPlugin {
 	}
 
 	private void alert(String message) {
-		for (String number : numbers) {
-			msgSender.sendMessage(number, message);
+		if (numbers != null) {
+			for (String number : numbers) {
+				msgSender.sendMessage(number, message);
+			}
 		}
-		for (String address : addresses) {
-			mailSender.sendMail(address, message);
+		if (addresses != null) {
+			for (String address : addresses) {
+				mailSender.sendMail(address, message);
+			}
 		}
 	}
 
