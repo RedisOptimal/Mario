@@ -1,7 +1,6 @@
 package com.renren.infra.xweb.web;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
