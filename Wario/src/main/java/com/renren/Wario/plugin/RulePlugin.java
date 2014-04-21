@@ -66,15 +66,15 @@ public class RulePlugin extends IPlugin {
 			}
 		} catch (SQLException e) {
 			logger.error("MysqlHelper open failed or get prepared statement failed or execute sql "
-					+ sql + " failed! " + e.toString());
+					+ sql + " failed! ", e);
 		} catch (ClassNotFoundException e) {
-			logger.error("MysqlHelper open failed! " + e.toString());
+			logger.error("MysqlHelper open failed! ", e);
 		} finally {
 			try {
 				selectPs.close();
 				helper.close();
 			} catch (SQLException e) {
-				logger.error("MysqlHelper close failed! " + e.toString());
+				logger.error("MysqlHelper close failed! ", e);
 			}
 		}
 	}
@@ -107,12 +107,12 @@ public class RulePlugin extends IPlugin {
 			}
 		} catch (KeeperException e) {
 			logger.error("Get children failed on " + path + " at zk " + zk_id
-					+ "! " + e.toString());
+					+ "! ", e);
 		} catch (InterruptedException e) {
 			logger.error("Get children failed on " + path + " at zk " + zk_id
-					+ "! " + e.toString());
+					+ "! ", e);
 		} catch (SQLException e) {
-			logger.error("Prepared statement set value failed! " + e.toString());
+			logger.error("Prepared statement set value failed! ", e);
 		}
 	}
 
@@ -128,10 +128,10 @@ public class RulePlugin extends IPlugin {
 			}
 		} catch (KeeperException e) {
 			logger.error("Get children failed on " + path + " at zk " + zk_id
-					+ "! " + e.toString());
+					+ "! ", e);
 		} catch (InterruptedException e) {
 			logger.error("Get children failed on " + path + " at zk " + zk_id
-					+ "! " + e.toString());
+					+ "! ", e);
 		}
 	}
 

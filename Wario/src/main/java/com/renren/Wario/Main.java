@@ -42,7 +42,7 @@ public class Main {
 			warioMain.join();
 			logger.error("WarioMain exited and Main thread will exit.");
 		} catch (InterruptedException e) {
-			logger.error("WarioMain interrupted with " + e.toString());
+			logger.error("WarioMain interrupted", e);
 		}
 	}
 

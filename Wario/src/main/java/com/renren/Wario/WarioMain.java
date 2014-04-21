@@ -139,7 +139,7 @@ public class WarioMain extends Thread {
 				try {
 					cluster.init();
 				} catch (JSONException e) {
-					logger.error(zkId + " init failed! " + e.toString());
+					logger.error(zkId + " init failed! " , e);
 				}
 				clusters.put(zkId, cluster);
 			} else {
@@ -148,7 +148,7 @@ public class WarioMain extends Thread {
 					cluster.updateClients(object);
 				} catch (JSONException e) {
 					logger.error(cluster.getZkId() + " update failed! "
-							+ e.toString());
+							, e);
 				}
 			}
 		}
@@ -207,7 +207,7 @@ public class WarioMain extends Thread {
 				}
 			} catch (JSONException e) {
 				logger.error("Failed to process json string : "
-						+ pluginName + " " + i + "th line. " + e.toString());
+						+ pluginName + " " + i + "th line. " , e);
 			}
 		}
 	}
@@ -248,7 +248,7 @@ public class WarioMain extends Thread {
 			} catch (Exception e) {
 				logger.error(pluginName + " runs at "
 						+ client.getConnectionString() + " failed! "
-						+ e.toString());
+						, e);
 			}
 		}
 	}
@@ -280,20 +280,18 @@ public class WarioMain extends Thread {
 				IPlugin plugin = createPlugin(pluginName, object, client, context);
 				Thread pluginThread = new Thread(plugin);
 				pluginThread.start();
-				try {
-                    pluginThread.join(150 * 1000);
-                    if (pluginThread.isAlive()) {
-                        pluginThread.interrupt();
-                        logger.error(pluginName + " have run out of times. " + 
-                                   "It may be hang and must be killed.");
-                    }
-                } catch (InterruptedException e) {
+                pluginThread.join(30 * 1000);
+                if (pluginThread.isAlive()) {
+                    pluginThread.interrupt();
+                    logger.error(pluginName + " have run out of times. " + 
+                               "It may be hang and must be killed.");
+                } else {
+                    logger.info(pluginName + " runs at " + client.getConnectionString()
+                        + " successfully!");
                 }
-				logger.info(pluginName + " runs at " + client.getConnectionString()
-						+ " successfully!");
 			} catch (Exception e) {
 				logger.error(pluginName + " runs at "
-						+ client.getConnectionString() + " failed! " + e.toString());
+						+ client.getConnectionString() + " failed! " , e);
 			}
 		} else {
 			logger.warn(pluginName + " must run on observer, please config observer address.");
@@ -319,7 +317,7 @@ public class WarioMain extends Thread {
 				+ mailSenderName + ".jar").toURI().toURL();
 		URL[] urls = new URL[] { pluginUrl, msgSenderUrl, mailSenderUrl };
 
-		ClassLoader classLoader = new URLClassLoader(urls);
+		ClassLoader classLoader = new URLClassLoader(urls, ClassLoader.getSystemClassLoader());
 		plugin = (IPlugin) classLoader.loadClass(pluginPackage + pluginName)
 				.newInstance();
 		plugin.msgSender = (IMsgSender) classLoader.loadClass(

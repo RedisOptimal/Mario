@@ -53,10 +53,10 @@ public class DefaultMsgSender implements IMsgSender {
 					+ ret + ".");
 		} catch (MalformedURLException e) {
 			logger.warn("Number:" + number + " Message:" + message
-					+ " send failed!\n" + e.toString());
+					+ " send failed!", e);
 		} catch (IOException e) {
 			logger.warn("Number:" + number + " Message:" + message
-					+ " send failed!\n" + e.toString());
+					+ " send failed!", e);
 		}
 	}
 
