@@ -49,6 +49,7 @@
                 <th>Data</th>
                 <th>Data length</th>
                 <th>Num children</th>
+                <th>Create time</th>
                 <th>Date</th>
                 </tr>
             </thead>
@@ -61,6 +62,7 @@
                     <td>${mario_node_state.data}</td>
                     <td>${mario_node_state.data_length}</td>
                     <td>${mario_node_state.num_children}</td>
+                    <td>${mario_node_state.ctime}</td>
                     <td>${mario_node_state.state_time}</td>
                 </tr>
             </c:forEach>
