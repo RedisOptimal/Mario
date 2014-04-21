@@ -39,6 +39,9 @@ public class Mario_node_stateController {
     	model.addAttribute("mario_zk_infos", mario_zk_infos);
     	
         Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
+        if(searchParams.containsKey("path")) {
+        	searchParams.put("path", searchParams.get("path").toString().trim());
+        }
         Page<Mario_node_state> mario_node_states = service.getMario_node_state(searchParams, pageNumber, Const.PAGE_SIZE);
         for (Mario_node_state mario_node_state : mario_node_states) {
             mario_node_state.setCluster_name(zkInfoService.getMario_zk_info(mario_node_state.getzk_id()).getzk_name());
