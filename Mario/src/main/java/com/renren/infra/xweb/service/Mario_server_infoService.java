@@ -106,4 +106,8 @@ public class Mario_server_infoService {
     	mario_server_infoDao.deleteByZkid(zk_id);
     }
     
+    public List<Mario_server_info> getMario_server_infoByZkid(Integer zk_id) {
+    	return mario_server_infoDao.findByZkid(zk_id);
+    }
+    
 }
