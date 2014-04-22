@@ -82,6 +82,9 @@ public class IndexController {
     	private String ruok = "";
 		private int outStanding = -1;
 		private long zxid = -1;
+		private String mode = "";
+		private int nodeCount = -1;
+		private int totalWatches = -1;
 		
     	private Mario_server_info info;
     	private Mario_server_state state;
@@ -94,6 +97,15 @@ public class IndexController {
 		}
 		public long getZxid() {
 			return zxid;
+		}
+		public String getMode() {
+			return mode;
+		}
+		public int getNodeCount() {
+			return nodeCount;
+		}
+		public int getTotalWatches() {
+			return totalWatches;
 		}
 		public Mario_server_info getInfo() {
 			return info;
@@ -109,7 +121,7 @@ public class IndexController {
 		}
 
 		public void update() {
-			ruok = cmd("ruok").replace("\n", "");
+			ruok = cmd("ruok").replace("\n", "");			
 			String statText = cmd("srvr");
 			if (!"".equals(statText)) {
 				Scanner scannerForStat = new Scanner(statText);
@@ -121,9 +133,26 @@ public class IndexController {
 					} else if (line.startsWith("Zxid:")) {
 						zxid = Long.parseLong(getStringValueFromLine(line)
 								.substring(2), 16);
+					} else if (line.startsWith("Mode:")) {
+						mode = getStringValueFromLine(line);
+					} else if (line.startsWith("Node count:")) {
+						nodeCount = Integer.parseInt(getStringValueFromLine(line));
 					}
 				}
 				scannerForStat.close();
+			}
+
+			String wchsText = cmd("wchs");
+			if (!"".equals(wchsText)) {
+				Scanner scannerForWchs = new Scanner(wchsText);
+				while (scannerForWchs.hasNext()) {
+					String line = scannerForWchs.nextLine();
+					if (line.startsWith("Total watches:")) {
+						totalWatches = Integer
+								.parseInt(getStringValueFromLine(line));
+					}
+				}
+				scannerForWchs.close();
 			}
 		}
 
@@ -153,7 +182,7 @@ public class IndexController {
 		}
 
 		private String cmd(String cmd) {
-			final int waitTimeout = 5;
+			final int waitTimeout = 1;
 			SendThread sendThread = new SendThread(cmd);
 			sendThread.start();
 			try {

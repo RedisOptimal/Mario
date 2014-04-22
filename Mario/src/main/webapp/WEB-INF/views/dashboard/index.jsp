@@ -59,7 +59,7 @@
 								<td><a href="${ctx}/graph/server_state?server_id=${serverState.info.id}">${serverState.info.id}</a></td>
 								<td>${serverState.info.host}</td>
 								<td>${serverState.info.port}</td>
-								<td>${serverState.state.mode}</td>
+								<td>${serverState.mode}</td>
 								<td>${serverState.outStanding}</td>
 								<td>
 									<script type="text/javascript">
@@ -67,8 +67,8 @@
 			                            document.write("0x" + zkid.toString(16))
 			                        </script>
 								</td>
-								<td>${serverState.state.node_count}</td>
-								<td>${serverState.state.total_watches}</td>
+								<td>${serverState.nodeCount}</td>
+								<td>${serverState.totalWatches}</td>
 								<td>${serverState.state.client_number}</td>
 								<td>
 									<c:if test="${serverState.ruok=='imok'}"><span class="label label-success">IMOK</span></c:if>
