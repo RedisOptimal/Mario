@@ -23,7 +23,7 @@
     	<div class="portlet box blue">
     		<div class="portlet-title">
 				<div class="caption">
-					<i class="fa fa-thumb-tack"></i>${zk_state.zkInfo.zk_name}
+					<i class="fa fa-thumb-tack"></i><a href="${ctx}/graph/zk_state?zk_id=${zk_state.zkInfo.id}">${zk_state.zkInfo.zk_name}</a>
 				</div>
 				<div class="tools">
 					<a href class="collapse">

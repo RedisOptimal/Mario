@@ -11,6 +11,13 @@
         id = #{id}        
     </select>
 
+	<select id="findByZkid" resultType="Mario_server_info">
+        select 
+        id        , zk_id        , host        , port        from mario_server_info
+        where 
+        zk_id = #{zk_id}        
+    </select>
+
     <select id="findAll" resultType="Mario_server_info">
            select 
         id        , zk_id        , host        , port        from mario_server_info

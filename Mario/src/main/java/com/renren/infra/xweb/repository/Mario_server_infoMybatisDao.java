@@ -35,4 +35,6 @@ public interface Mario_server_infoMybatisDao {
     void delete(Integer id);
     
     void deleteByZkid(Integer zk_id);
+    
+    List<Mario_server_info> findByZkid(Integer zk_id);
 }
