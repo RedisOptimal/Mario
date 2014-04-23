@@ -26,4 +26,6 @@ public interface Mario_node_stateMybatisDao {
 
     int findTotalNum(Map<String, Object> filterParams);
     
+    Integer findMaxStateVersion(Integer zk_id);
+    
 }

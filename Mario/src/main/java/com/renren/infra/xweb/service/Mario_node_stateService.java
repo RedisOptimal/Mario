@@ -47,6 +47,11 @@ public class Mario_node_stateService {
     public List<Mario_node_state> getAllMario_node_state() {
         return mario_node_stateDao.findAll();
     }
+    
+    public int getMaxStateVersion(Integer zk_id) {
+    	Integer res = mario_node_stateDao.findMaxStateVersion(zk_id);
+    	return res == null ? -1 : res;
+    }
 
     /**
      * 创建分页请求.

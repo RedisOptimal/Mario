@@ -23,7 +23,7 @@
             <div class="form-group">
                 <label for="search_zk_id">Zookeeper cluster：</label> 
                 <select type="text" id="search_zk_id" name="search_zk_id" class="form-control required" style="width: 150px;">
-                    <option value="" title="">no selected</option>
+                    <!-- <option value="" title="">no selected</option> -->
                     <c:forEach items="${mario_zk_infos}" var="mario_zk_info">
                         <option value="${mario_zk_info.id}" title="${mario_zk_info.id}"<c:if test="${param.search_zk_id==mario_zk_info.id}"> selected="selected"</c:if>>${mario_zk_info.zk_name}</option>
                     </c:forEach>
@@ -63,7 +63,7 @@
                     <td>${mario_node_state.data_length}</td>
                     <td>${mario_node_state.num_children}</td>
                     <td>${mario_node_state.ctime}</td>
-                    <td>${mario_node_state.state_time}</td>
+                    <td <c:if test='${mario_node_state.state_version == maxStateVersion}'>class="success"</c:if>>${mario_node_state.state_time}</td>
                 </tr>
             </c:forEach>
             </tbody>
