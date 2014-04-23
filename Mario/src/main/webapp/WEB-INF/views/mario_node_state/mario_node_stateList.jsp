@@ -11,6 +11,12 @@
     $(document).ready(function(){
     
     });
+    
+    function do_jump(cluster_name, path) {
+    	$("#search_zk_id").find("option[value='cluster_name']").attr("selected", true);
+    	$("#search_path").val(path);
+    	$("#form").submit();
+    }
     </script>
 </head>
 
@@ -58,7 +64,7 @@
                 <tr>
                     <tr>
                     <td>${mario_node_state.cluster_name}</td>
-                    <td>${mario_node_state.path}</td>
+                    <td><a href="javascript:void(0)" onclick="do_jump('${mario_node_state.cluster_name}', '${mario_node_state.path}')">${mario_node_state.path}</a></td>
                     <td>${mario_node_state.data}</td>
                     <td>${mario_node_state.data_length}</td>
                     <td>${mario_node_state.num_children}</td>
