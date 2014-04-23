@@ -82,4 +82,8 @@
 		delete from mario_node_state
 		where zk_id = #{zk_id}
 	</delete>
+	
+	<select id="findMaxStateVersion" parameterType="Integer" resultType="int">
+		select max(state_version) from mario_node_state where zk_id = #{zk_id}
+	</select>
 </mapper> 
