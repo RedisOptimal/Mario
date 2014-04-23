@@ -258,7 +258,7 @@ public class ObserverPlugin extends IPlugin {
     private void deleteExpiredData(int nextStateVersion) {
         MySQLHelper helper = new MySQLHelper();
         String sql =
-                "delete from mario_node_state where zk_id = " + client.getZkId() + " state_version < "
+                "delete from mario_node_state where zk_id = " + client.getZkId() + " and state_version < "
                         + (nextStateVersion - 12 * 24 * 3);
         try {
             helper.open();
