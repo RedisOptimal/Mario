@@ -173,7 +173,7 @@ public class IndexController {
 			@Override
 			public void run() {
 				try {
-					ret = FourLetterWordMain.send4LetterWord(info.gethost(), info.getport(), cmd);
+					ret = FourLetterWordMain.send4LetterWord(info.gethost().trim(), info.getport(), cmd);
 				} catch (IOException e) {
 					return;
 				}
