@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springside.modules.web.Servlets;
 
-import com.renren.infra.xweb.entity.Mario_node_state;
 import com.renren.infra.xweb.entity.Mario_server_info;
 import com.renren.infra.xweb.entity.Mario_zk_info;
 import com.renren.infra.xweb.service.Mario_server_infoService;
