@@ -59,10 +59,10 @@ public class DefaultMailSender implements IMailSender {
 			sendAndCc(from, to, copyto, subject, content);
 		} catch (AddressException e) {
 			logger.error("Address:" + address + " Message:" + message
-					+ " send failed!\n" + e.toString());
+					+ " send failed!", e);
 		} catch (MessagingException e) {
 			logger.error("Address:" + address + " Message:" + message
-					+ " send failed!\n" + e.toString());
+					+ " send failed!", e);
 		}
 	}
 

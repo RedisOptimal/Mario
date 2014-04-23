@@ -79,7 +79,7 @@ public class ConfigLoader {
 			loadPluginConfig();
 			
 		} catch (JSONException e) {
-			logger.error("Load config failed! " + e.toString());
+			logger.error("Load config failed! ", e);
 		} 
 	}
 
@@ -95,8 +95,8 @@ public class ConfigLoader {
 				int id = rs.getInt("id");
 				JSONArray serverIPList = getserverIPList(id);
 				int sessionTimeout = rs.getInt("session_timeout");
-				String observer = rs.getString("observer");
-				String observerAuth = rs.getString("observer_auth");
+				String observer = rs.getString("observer").trim();
+				String observerAuth = rs.getString("observer_auth").trim();
 
 				JSONObject serverObject = new JSONObject();
 				serverObject.put("serverIPList", serverIPList);
@@ -108,14 +108,14 @@ public class ConfigLoader {
 			}
 		} catch (SQLException e) {
 			logger.error("MysqlHelper open failed or execute sql " + sql
-					+ " failed! " + e.toString());
+					+ " failed! ", e);
 		} catch (ClassNotFoundException e) {
-			logger.error("MysqlHelper open failed! " + e.toString());
+			logger.error("MysqlHelper open failed! ", e);
 		} finally {
 			try {
 				helper.close();
 			} catch (SQLException e) {
-				logger.error("MysqlHelper close failed! " + e.toString());
+				logger.error("MysqlHelper close failed! ", e);
 			}
 		}
 		serverObjects = tmpServerObjects;
@@ -130,20 +130,20 @@ public class ConfigLoader {
 			helper.open();
 			ResultSet rs = helper.executeQuery(sql);
 			while (rs.next()) {
-				String host = rs.getString("host");
+				String host = rs.getString("host").trim();
 				int port = rs.getInt("port");
 				serverIPList.put(host + ":" + port);
 			}
 		} catch (SQLException e) {
 			logger.error("MysqlHelper open failed or execute sql " + sql
-					+ " failed! " + e.toString());
+					+ " failed! ", e);
 		} catch (ClassNotFoundException e) {
-			logger.error("MysqlHelper open failed! " + e.toString());
+			logger.error("MysqlHelper open failed! " , e);
 		} finally {
 			try {
 				helper.close();
 			} catch (SQLException e) {
-				logger.error("MysqlHelper close failed! " + e.toString());
+				logger.error("MysqlHelper close failed! " , e);
 			}
 		}
 		return serverIPList;
@@ -166,14 +166,14 @@ public class ConfigLoader {
 			tmpPluginObjects.put("RulePlugin", allZKArray);
 		} catch (SQLException e) {
 			logger.error("MysqlHelper open failed or execute sql " + sql
-					+ " failed! " + e.toString());
+					+ " failed! " , e);
 		} catch (ClassNotFoundException e) {
-			logger.error("MysqlHelper open failed! " + e.toString());
+			logger.error("MysqlHelper open failed! " , e);
 		} finally {
 			try {
 				helper.close();
 			} catch (SQLException e) {
-				logger.error("MysqlHelper close failed! " + e.toString());
+				logger.error("MysqlHelper close failed! " , e);
 			}
 		}
 		pluginObjects = tmpPluginObjects;
@@ -193,20 +193,20 @@ public class ConfigLoader {
 				object.put("mailSender", rs.getString("mail_sender"));
 				object.put("phoneNumber", rs.getString("phone_number"));
 				object.put("emailAddress", rs.getString("email_address"));
-				object.put("args", rs.getString("args"));
-				object.put("commit", rs.getString("commit"));
+				object.put("args", rs.getString("args").trim());
+				object.put("commit", rs.getString("commit").trim());
 				arrary.put(object);
 			}
 		} catch (SQLException e) {
 			logger.error("MysqlHelper open failed or execute sql " + sql
-					+ " failed! " + e.toString());
+					+ " failed! " , e);
 		} catch (ClassNotFoundException e) {
-			logger.error("MysqlHelper open failed! " + e.toString());
+			logger.error("MysqlHelper open failed! " , e);
 		} finally {
 			try {
 				helper.close();
 			} catch (SQLException e) {
-				logger.error("MysqlHelper close failed! " + e.toString());
+				logger.error("MysqlHelper close failed! " , e);
 			}
 		}
 		return arrary;
