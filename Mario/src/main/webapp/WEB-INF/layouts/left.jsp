@@ -1,5 +1,6 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
@@ -32,9 +33,18 @@
 						<span class="arrow "></span>
 						</a>
 						<ul class="sub-menu">
+							<c:set var="prefix" value="http://" />
 							<c:forEach items="${menuList}" var="menuChild">
+								<c:set var="string" value="${menuChild.href}" />
 								<c:if test="${menuChild.parentId eq menu.id}">
-									<li><a href="${ctx}${menuChild.href}">${menuChild.name}</a></li>
+									<li>
+										<c:if test="${fn:startsWith(string, prefix)}">
+											<a href="${menuChild.href}" target="_blank">${menuChild.name}</a>
+										</c:if>
+										<c:if test="${!fn:startsWith(string, prefix)}">
+											<a href="${ctx}${menuChild.href}" target="_blank">${menuChild.name}</a>
+										</c:if>
+									</li>
 								</c:if>
 							</c:forEach>
 						</ul>
