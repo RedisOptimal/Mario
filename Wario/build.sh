@@ -1,4 +1,4 @@
 #!/bin/bash
 rm -rf ./target
-mvn assembly:assembly
-mvn install
+mvn assembly:assembly -DskipTests
+mvn install -DskipTests
