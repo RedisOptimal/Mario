@@ -21,10 +21,11 @@
 #zkdata derectory
 **/zk_test_data
 
-#
+#Wario running file
 Wario.out
 Wario_Daemon.pid
 
 #xweb
 xweb/FTL_helloworld.txt
 xweb/root
+
