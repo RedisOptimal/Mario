@@ -31,60 +31,104 @@
         <h1>
 <a name="mario" class="anchor" href="#mario"><span class="octicon octicon-link"></span></a>Mario</h1>
 
-<p>A ZooKeeper monitor platform.
+<hr><p>A ZooKeeper monitor platform.
 一个ZooKeeper的监控报警平台</p>
 
-<p>首先需要安装maven环境和jetty服务器</p>
-
-<p>检出项目
-<code>git clone https://github.com/x841122987/Mario.git</code></p>
-
-<p>导入数据库表结构和基础数据
-<code>mysql -u root -p db_name &lt; Mario.sql</code></p>
-
 <h2>
-<a name="xweb%E5%B7%A5%E7%A8%8B" class="anchor" href="#xweb%E5%B7%A5%E7%A8%8B"><span class="octicon octicon-link"></span></a>xweb工程</h2>
+<a name="%E5%A6%82%E6%9E%9C%E9%83%A8%E7%BD%B2%E7%9B%91%E6%8E%A7%E5%B9%B3%E5%8F%B0" class="anchor" href="#%E5%A6%82%E6%9E%9C%E9%83%A8%E7%BD%B2%E7%9B%91%E6%8E%A7%E5%B9%B3%E5%8F%B0"><span class="octicon octicon-link"></span></a>如果部署监控平台</h2>
 
-<p>修改数据库配置文件</p>
-
-<pre><code>xweb/src/main/resources/application.properties
+<ul>
+<li>部署<a href="http://maven.apache.org/">maven</a>环境</li>
+<li>得到一个<a href="http://www.eclipse.org/jetty/">jetty</a>或<a href="http://www.eclipse.org/jetty/">tomcat</a>服务器</li>
+<li>配置Mysql服务器</li>
+<li>检出项目
+<code>git clone https://github.com/ZheYuan/Mario.git</code>
+</li>
+<li>导入数据库表结构和基础数据<br>
+</li>
+</ul><pre><code>cd Mario   
+mysql -u root -p xweb &lt; Documents/Mario.sql
 </code></pre>
 
-<p>将工程打成war包</p>
+<h2>
+<a name="%E7%BC%96%E8%AF%91%E4%BD%BF%E7%94%A8mario%E5%B7%A5%E7%A8%8B" class="anchor" href="#%E7%BC%96%E8%AF%91%E4%BD%BF%E7%94%A8mario%E5%B7%A5%E7%A8%8B"><span class="octicon octicon-link"></span></a>编译使用Mario工程</h2>
 
-<pre><code>cd xweb
+<p>Mario工程是ZooKeeper监控的展示和配置系统。</p>
+
+<ul>
+<li>此工程依赖<a href="https://github.com/springside/springside4">springside</a>项目的4.0.0GA版本，位于thirdparty目录下。<br>
+编译springside<br>
+</li>
+</ul><pre><code>cd Mario/Mario/thirdparty   
+unzip springside4-4.0.0.GA.zip   
+cd springside4-4.0.0.GA   
+mvn install
+</code></pre>
+
+<ul>
+<li>修改数据库配置文件</li>
+</ul><pre><code>vim Mario/Mario/src/main/resources/application.properties
+</code></pre>
+
+<ul>
+<li>将工程打成war包，目前请先跳过测试</li>
+</ul><pre><code>cd Mario/Mario
 mvn package -Dmaven.test.skip=true
 </code></pre>
 
-<p>运行</p>
+<ul>
+<li>发布运行<br>
+</li>
+</ul><pre><code>cp -v Mario/Mario/target/Mario.jar $JETTY_HOME/webapps/Mario.jar   
+$JETTY_HOME/bin/jetty.sh start
+</code></pre>
 
-<pre><code>cd xweb
-cp target/xweb.jar $JETTY_HOME/webapps/xweb.jar
-$JETTY_HOME/bin/jetty.sh restart
+<ul>
+<li>默认用户名和密码<br><code>admin:admin</code>
+</li>
+</ul><h2>
+<a name="wario%E5%B7%A5%E7%A8%8B" class="anchor" href="#wario%E5%B7%A5%E7%A8%8B"><span class="octicon octicon-link"></span></a>Wario工程</h2>
+
+<p>Wario工程是ZooKeeper的监控报警系统。</p>
+
+<ul>
+<li>修改数据库配置文件<br>
+</li>
+</ul><pre><code>vim Mario/Wario/src/main/resources/application.properties
+</code></pre>
+
+<ul>
+<li>修改<code>DefaultMsgSender/DefaultMailSender</code>或添加扩展的报警类或使用调试的类<code>DebugMsgSender/DebugMailSender</code>
+</li>
+<li>编译工程<br>
+</li>
+</ul><pre><code>./Mario/Wario/build.sh
+</code></pre>
+
+<ul>
+<li>运行<br>
+</li>
+</ul><pre><code>./Mario/Wario/run.sh start
 </code></pre>
 
 <h2>
-<a name="wario%E5%B7%A5%E7%A8%8B" class="anchor" href="#wario%E5%B7%A5%E7%A8%8B"><span class="octicon octicon-link"></span></a>Wario工程</h2>
+<a name="%E8%87%AA%E5%AE%9A%E4%B9%89%E6%89%A9%E5%B1%95%E6%8F%92%E4%BB%B6" class="anchor" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%89%A9%E5%B1%95%E6%8F%92%E4%BB%B6"><span class="octicon octicon-link"></span></a>自定义扩展插件</h2>
 
-<p>修改数据库配置文件</p>
+<ul>
+<li>先编译Wario项目</li>
+<li>导入WarioSample的maven工程</li>
+<li>实现<code>IPlugin</code>接口</li>
+<li>将写好的插件导出为jar包放入<code>Mario/Wario/plugins/</code>路径，插件将采用反射的方式被载入</li>
+</ul><h2>
+<a name="%E6%8F%92%E4%BB%B6%E8%AF%B4%E6%98%8E" class="anchor" href="#%E6%8F%92%E4%BB%B6%E8%AF%B4%E6%98%8E"><span class="octicon octicon-link"></span></a>插件说明</h2>
 
-<pre><code>Wario/src/main/resources/application.properties
-</code></pre>
-
-<p>编译工程</p>
-
-<pre><code>cd Wario
-./build.sh
-</code></pre>
-
-<p>运行</p>
-
-<pre><code>cd Wario
-./run.sh start
-</code></pre>
-
-<h3>
-<a name="%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%89%A9%E5%B1%95%E6%8F%92%E4%BB%B6" class="anchor" href="#%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%89%A9%E5%B1%95%E6%8F%92%E4%BB%B6"><span class="octicon octicon-link"></span></a>添加自定义扩展插件</h3>
+<ul>
+<li>RulePlugin用来处理报警的规则。默认运行于集群所有集群上，通过<code>DefaultMsgSender</code>和<code>DefaultMailSender</code>类发送报警</li>
+<li>DBPlugin用来将集群的基本信息写入数据库。默认运行于集群的所有机器上，无报警</li>
+<li>ObserverPlugin用来将集群中的数据定期写入数据库，用来做历史记录查询。只运行于集群的Observer上，如果不配置Observer或者不加此插件将不会运行，无报警</li>
+<li>DefaultPlugin用来监控集群的监控状态并发送报警。运行于配置集群的每一个服务器上，报警通过配置的接口发送</li>
+<li>ReadWriteTestPlugin用来测试服务的可用性并发送报警。运行于配置集群的每一个服务器上，报警通过配置的接口发送</li>
+</ul>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/ZheYuan">ZheYuan</a></p>
