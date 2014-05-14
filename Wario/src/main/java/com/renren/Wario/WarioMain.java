@@ -19,6 +19,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -230,6 +231,7 @@ public class WarioMain extends Thread {
 		}
 		if (!contexts.get(pluginName).containsKey(zkId)) {
 			contexts.get(pluginName).put(zkId, new byte[1 << 20]); // 1M
+			Arrays.fill(contexts.get(pluginName).get(zkId), (byte) 0);
 		}
 
 		Iterator<Entry<String, ZooKeeperClient>> it = cluster.getClients()
@@ -271,6 +273,7 @@ public class WarioMain extends Thread {
 		}
 		if (!contexts.get(pluginName).containsKey(zkId)) {
 			contexts.get(pluginName).put(zkId, new byte[1 << 20]); // 1M
+			Arrays.fill(contexts.get(pluginName).get(zkId), (byte) 0);
 		}
 
 		ZooKeeperClient client = cluster.getObserverClient();

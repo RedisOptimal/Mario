@@ -15,32 +15,50 @@
  */
 package com.renren.Wario.plugin;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 public class DefaultPlugin extends IPlugin {
-	
+	private static Logger logger = LogManager.getLogger(DefaultPlugin.class
+			.getName());
 	private final int maxOutStanding = 30;
-	
+
 	private String mode;
 	private int outStanding;
 
 	@Override
 	public void run() {
-		readContext();
+		logger.info("Get context : " + new String(clusterContext).trim());
+		try {
+			readContext();
+		} catch (UnsupportedEncodingException e) {
+			logger.error("Error when decoder ", e);
+		}
 
 		String message = "";
 
 		if (!client.state.ruok()) {
 			message += "ZooKeeper " + client.getConnectionString()
 					+ " is down!\n";
+			logger.error(message);
 		}
 
 		client.state.update();
 		String newMode = client.state.getMode();
-		if (mode != null && !mode.equals(newMode)) {
+		if (newMode == null || "".equals(newMode.trim())) {
+			message += "Can't get zookeeper " + client.getConnectionString()
+					+ "'s status. Maybe down!!\n";
+			logger.error(message);
+		} else if (mode != null && !"".equals(mode) && !mode.equals(newMode)) {
 			message += "ZooKeeper " + client.getConnectionString()
 					+ " has changed mode from " + mode + " to " + newMode
 					+ ".\n";
+			mode = newMode;
+			logger.error(message);
+		} else if ("".equals(mode)) {
 			mode = newMode;
 		}
 
@@ -62,23 +80,37 @@ public class DefaultPlugin extends IPlugin {
 			}
 		}
 
-		writeContext();
+		try {
+			writeContext();
+		} catch (UnsupportedEncodingException e) {
+			logger.error("Error when encoder ", e);
+		}
+		logger.info("Set context : " + new String(clusterContext).trim());
 	}
 
 	/**
-	 * clusterContext: 
-	 * connectionString1#Mode#OutStanding 
-	 * connectionString2#Mode#OutStanding
-	 * connectionString3#Mode#OutStanding
+	 * clusterContext: [ connectionString1#Mode#OutStanding\n
+	 * connectionString2#Mode#OutStanding\n ]
+	 * 
+	 * @throws UnsupportedEncodingException
 	 */
-	private void readContext() {
-		String text = new String(clusterContext);
-		boolean exists = false;
-		Scanner scanner = new Scanner(text);
+	private void readContext() throws UnsupportedEncodingException {
+		String context = new String(clusterContext, "UTF-8").trim();
+		if (!context.startsWith("[") || !context.endsWith("]")) {
+			logger.info("Init " + client.getConnectionString()
+					+ "'s context once here.");
+			System.arraycopy("[]".getBytes(), 0, clusterContext, 0,
+					"[]".length());
+			context = new String(clusterContext, "UTF-8").trim();
+		}
+		boolean exist = false;
+		Scanner scanner = new Scanner(
+				context.substring(1, context.length() - 1));
+		scanner.useDelimiter("\n");
 		while (scanner.hasNext()) {
 			String line = scanner.next();
 			if (line.startsWith(client.getConnectionString())) {
-				exists = true;
+				exist = true;
 				String[] contexts = line.split("#");
 				mode = contexts[1];
 				outStanding = Integer.parseInt(contexts[2]);
@@ -86,31 +118,40 @@ public class DefaultPlugin extends IPlugin {
 		}
 		scanner.close();
 
-		if (!exists) {
-			mode = client.state.getMode();
-			outStanding = client.state.getOutStanding();
-			String newLine = client.getConnectionString() + "#" + mode + "#"
+		if (!exist) {
+			mode = "";
+			outStanding = 0;
+			String newItem = client.getConnectionString() + "#" + mode + "#"
 					+ outStanding + "\n";
-			text += newLine;
-			clusterContext = text.getBytes();
+			context = context.substring(0, context.length() - 1) + newItem
+					+ "]";
+			System.arraycopy(context.getBytes(), 0, clusterContext, 0,
+					context.getBytes().length);
 		}
 	}
 
-	private void writeContext() {
-		String res = "";
-		String text = new String(clusterContext);
-		Scanner scanner = new Scanner(text);
+	private void writeContext() throws UnsupportedEncodingException {
+		String newContext = "[";
+		String context = new String(clusterContext, "UTF-8").trim();
+		if (!context.startsWith("[") || !context.endsWith("]")) {
+			logger.error("Decode on " + client.getConnectionString());
+			return;
+		}
+		Scanner scanner = new Scanner(
+				context.substring(1, context.length() - 1));
 		while (scanner.hasNext()) {
 			String line = scanner.next();
 			if (line.startsWith(client.getConnectionString())) {
 				String newLine = client.getConnectionString() + "#" + mode
-						+ "#" + outStanding + "\n";
-				res += newLine;
+						+ "#" + outStanding;
+				newContext += newLine + "\n";
 			} else {
-				res += line;
+				newContext += line + "\n";
 			}
 		}
 		scanner.close();
-		clusterContext = res.getBytes();
+		newContext += "]";
+		System.arraycopy(newContext.getBytes(), 0, clusterContext, 0,
+				newContext.getBytes().length);
 	}
 }
