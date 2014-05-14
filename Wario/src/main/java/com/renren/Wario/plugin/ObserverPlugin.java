@@ -67,6 +67,11 @@ public class ObserverPlugin extends IPlugin {
         public Stat getStat() {
             return stat;
         }
+        
+        @Override
+        public String toString() {
+        	return "Path : " + path + " " + stat.toString();
+        }
     }
 
     private final BlockingQueue<PathAndStat> saveQueue =
@@ -198,7 +203,8 @@ public class ObserverPlugin extends IPlugin {
             try {
                 writeToDB(node, stateVersion);
             } catch (SQLException e) {
-                logger.error("Execute sql failed!", e);
+            	logger.error(node.toString());
+                logger.error("Execute sql failed!" , e);
             }
         }
         
