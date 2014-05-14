@@ -42,22 +42,22 @@ public class RulePlugin extends IPlugin {
 			ResultSet rs = helper.executeQuery(sql);
 			while (rs.next()) {
 			    if (rs.getString("phone_number") != null) {
-			        numbers = rs.getString("phone_number").split(",");
+			        numbers = rs.getString("phone_number").trim().split(",");
 			    } else {
 			        numbers = null;
 			    }
 			    if (rs.getString("email_address") != null) {
-			        addresses = rs.getString("email_address").split(",");
+			        addresses = rs.getString("email_address").trim().split(",");
 			    } else {
 			        addresses = null;
 			    }
 
-				String type = rs.getString("type");
+				String type = rs.getString("type").trim();
 				if ("node exists".equals(type)) {
 					processNodeExists(client.getZkId(), rs.getString("path"));
 				} else if ("children number".equals(type)) {
 					processChildrenNumber(client.getZkId(),
-							rs.getString("path"),
+							rs.getString("path").trim(),
 							rs.getInt("min_children_number"),
 							rs.getInt("max_children_number"));
 				} else if ("data changed".equals(type)) {
