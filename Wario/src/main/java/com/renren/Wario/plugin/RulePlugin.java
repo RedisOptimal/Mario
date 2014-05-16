@@ -40,6 +40,8 @@ public class RulePlugin extends IPlugin {
 			selectPs = helper
 					.getPreparedStatement("select mzxid from mario_node_state where zk_id = ? and path = ? and mzxid = ? ");
 			ResultSet rs = helper.executeQuery(sql);
+			logger.info(sql);
+			logger.info("Get " + rs.getFetchSize() + "'s items on " + client.getZkId() + " .");
 			while (rs.next()) {
 			    if (rs.getString("phone_number") != null) {
 			        numbers = rs.getString("phone_number").trim().split(",");
@@ -80,18 +82,20 @@ public class RulePlugin extends IPlugin {
 	}
 
 	private void processNodeExists(int zk_id, String path) {
+		logger.info("Run node exist test " + path + " at zk " + zk_id);
 		try {
 			if (client.exists(path) == null) {
 				alert("Node " + path + " at zk " + zk_id + " is not exist!");
 			}
 		} catch (KeeperException e) {
-
+			logger.error("Exist failed on " + path + " at " + zk_id, e);
 		} catch (InterruptedException e) {
 
 		}
 	}
 
 	private void processDataChanged(int zk_id, String path) {
+		logger.info("Run node data changed test " + path + " at zk " + zk_id);
 		Stat stat = new Stat();
 		try {
 			client.getChildren(path, stat);
@@ -99,9 +103,6 @@ public class RulePlugin extends IPlugin {
 			selectPs.setString(2, path);
 			selectPs.setLong(3, stat.getMzxid());
 			ResultSet rs = selectPs.executeQuery();
-//			while(rs.next()) {
-//				System.err.println(rs.getLong("mzxid"));
-//			}
 			if (!rs.next()) {
 				alert("Data changed on node " + path + " at zk " + zk_id + ".");
 			}
@@ -118,6 +119,7 @@ public class RulePlugin extends IPlugin {
 
 	private void processChildrenNumber(int zk_id, String path,
 			int minChildrenNumber, int maxChildrenNumber) {
+		logger.info("Run node children number test " + path + " at zk " + zk_id);
 		try {
 			int childrenNumber = client.getChildren(path).size();
 			if (childrenNumber < minChildrenNumber
@@ -136,6 +138,7 @@ public class RulePlugin extends IPlugin {
 	}
 
 	private void alert(String message) {
+		logger.error(message);
 	    if (numbers != null) {
     		for (String number : numbers) {
     			msgSender.sendMessage(number.trim(), message);

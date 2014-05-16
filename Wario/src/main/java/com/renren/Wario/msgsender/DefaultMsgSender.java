@@ -36,7 +36,7 @@ public class DefaultMsgSender implements IMsgSender {
 
 	@Override
 	public void sendMessage(String number, String message) {
-		System.err.println(number + ":" + message);
+		logger.info("MSG " + number + ":" + message);
 		String ret = "";
 		try {
 			String url = generateUrl(number, message);

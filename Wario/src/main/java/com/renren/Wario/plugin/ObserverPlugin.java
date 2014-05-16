@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.AsyncCallback.ChildrenCallback;
-import org.apache.zookeeper.AsyncCallback.DataCallback;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.data.Stat;

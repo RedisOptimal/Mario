@@ -48,7 +48,7 @@ public class DefaultMailSender implements IMailSender {
 
 	@Override
 	public void sendMail(String address, String message) {
-		System.err.println(address + ":" + message);
+		logger.info("Mail " + address + ":" + message);
 		String from = username;
 		String to = address;
 		String copyto = "";
