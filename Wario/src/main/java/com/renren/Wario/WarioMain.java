@@ -201,8 +201,6 @@ public class WarioMain extends Thread {
 				JSONObject object = clusters.getJSONObject(i);
 				if ("ObserverPlugin".equals(pluginName)) {
 					processPluginOnObserver(pluginName, object);
-				} else if ("RulePlugin".equals(pluginName)) {
-					processPluginOnObserver(pluginName, object);
 				} else {
 					processPlugin(pluginName, object);
 				}
