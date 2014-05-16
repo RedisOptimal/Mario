@@ -131,7 +131,7 @@ public class ZooKeeperCluster {
 			String connectionString = it.next();
 			if (!clients.containsKey(connectionString)) {
 				ZooKeeperClient client = new ZooKeeperClient(connectionString,
-						sessionTimeout);
+						sessionTimeout, "", "", zkId);
 				clients.put(connectionString, client);
 				AddClient add = new AddClient(client);
 				new Thread(add).start();
