@@ -40,8 +40,6 @@ public class RulePlugin extends IPlugin {
 			selectPs = helper
 					.getPreparedStatement("select mzxid from mario_node_state where zk_id = ? and path = ? and mzxid = ? ");
 			ResultSet rs = helper.executeQuery(sql);
-			logger.info(sql);
-			logger.info("Get " + rs.getFetchSize() + "'s items on " + client.getZkId() + " .");
 			while (rs.next()) {
 			    if (rs.getString("phone_number") != null) {
 			        numbers = rs.getString("phone_number").trim().split(",");
@@ -125,7 +123,7 @@ public class RulePlugin extends IPlugin {
 			if (childrenNumber < minChildrenNumber
 					|| maxChildrenNumber < childrenNumber) {
 				alert("Children number on node " + path + " at zk " + zk_id
-						+ " is out of range [" + minChildrenNumber + ", "
+						+ " is " + childrenNumber + " out of range [" + minChildrenNumber + ", "
 						+ maxChildrenNumber + "].");
 			}
 		} catch (KeeperException e) {
