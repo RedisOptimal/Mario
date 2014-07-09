@@ -54,6 +54,35 @@
     
     <select id="findTotalNum" parameterType="Mario_plugin_info" resultType="int">
         select count(1) from mario_plugin_info
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="plugin_name != null and plugin_name != ''">
+                and plugin_name = #{plugin_name}
+            </if>
+            <if test="zk_id != null and zk_id != ''">
+                and zk_id = #{zk_id}
+            </if>
+            <if test="msg_sender != null and msg_sender != ''">
+                and msg_sender = #{msg_sender}
+            </if>
+            <if test="mail_sender != null and mail_sender != ''">
+                and mail_sender = #{mail_sender}
+            </if>
+            <if test="phone_number != null and phone_number != ''">
+                and phone_number = #{phone_number}
+            </if>
+            <if test="email_address != null and email_address != ''">
+                and email_address = #{email_address}
+            </if>
+            <if test="args != null and args != ''">
+                and args = #{args}
+            </if>
+            <if test="commit != null and commit != ''">
+                and commit = #{commit}
+            </if>
+        </where>
     </select>
 
     <insert id="insert" parameterType="Mario_plugin_info">
