@@ -42,6 +42,23 @@
     
     <select id="findTotalNum" parameterType="Mario_zk_info" resultType="int">
         select count(1) from mario_zk_info
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="zk_name != null and zk_name != ''">
+                and zk_name = #{zk_name}
+            </if>
+            <if test="session_timeout != null and session_timeout != ''">
+                and session_timeout = #{session_timeout}
+            </if>
+            <if test="observer != null and observer != ''">
+                and observer = #{observer}
+            </if>
+            <if test="observer_auth != null and observer_auth != ''">
+                and observer_auth = #{observer_auth}
+            </if>
+        </where>
     </select>
 
     <insert id="insert" parameterType="Mario_zk_info">

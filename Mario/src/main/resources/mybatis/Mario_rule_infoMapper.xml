@@ -68,7 +68,7 @@
     </insert>
 
     <update id="update" parameterType="Mario_rule_info">
-        update mario_rule_info		set         zk_id = #{zk_id}        , path = #{path}        , type = #{type}        , min_children_number = #{min_children_number}        , max_children_number = #{max_children_number}        , phone_number = #{phone_number}        , email_address = #{email_address}        , user_id = #{user_id}        , enable = #{enable}		where         id = #{id}        
+        update mario_rule_info		set         zk_id = #{zk_id}        , path = #{path}        , type = #{type}        , min_children_number = #{min_children_number}        , max_children_number = #{max_children_number}        , phone_number = #{phone_number}        , email_address = #{email_address}        , enable = #{enable}		where         id = #{id}        
     </update>
 
     <delete id="delete" parameterType="Mario_rule_info">
