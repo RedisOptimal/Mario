@@ -74,3 +74,15 @@ vim Mario/Wario/src/main/resources/application.properties
 * ObserverPlugin用来将集群中的数据定期写入数据库，用来做历史记录查询。只运行于集群的Observer上，如果不配置Observer或者不加此插件将不会运行，无报警
 * DefaultPlugin用来监控集群的监控状态并发送报警。运行于配置集群的每一个服务器上，报警通过配置的接口发送
 * ReadWriteTestPlugin用来测试服务的可用性并发送报警。运行于配置集群的每一个服务器上，报警通过配置的接口发送
+
+##系统截图
+
+![dashboard](Mario/snapshot/Screen_Shot_2014-05-08_at_5_17_54_PM.png)
+
+![节点监控](Mario/snapshot/Screen_Shot_2014-05-08_at_5_18_14_PM.png)
+
+![节点监控2](Mario/snapshot/Screen_Shot_2014-05-08_at_5_18_39_PM.png)
+
+![报警规则](Mario/snapshot/Screen_Shot_2014-05-08_at_5_57_11_PM.png)
+
+![报警规则管理](Mario/snapshot/Screen_Shot_2014-05-08_at_5_58_15_PM.png)
