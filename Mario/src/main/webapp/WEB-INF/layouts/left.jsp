@@ -42,7 +42,7 @@
 											<a href="${menuChild.href}" target="_blank">${menuChild.name}</a>
 										</c:if>
 										<c:if test="${!fn:startsWith(string, prefix)}">
-											<a href="${ctx}${menuChild.href}" target="_blank">${menuChild.name}</a>
+											<a href="${ctx}${menuChild.href}">${menuChild.name}</a>
 										</c:if>
 									</li>
 								</c:if>
