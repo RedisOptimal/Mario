@@ -1,7 +1,9 @@
 # Mario
 - - -
 A ZooKeeper monitor platform.
-一个ZooKeeper的监控报警平台
+一个ZooKeeper的监控报警平台   
+[在线预览](http://mario.zipc.me/)   
+[Online Demo](http://mario.zipc.me/)   
 
 ##如果部署监控平台
 * 部署[maven](http://maven.apache.org/)环境
