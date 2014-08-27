@@ -1,5 +1,6 @@
 package com.renren.infra.xweb.web;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import javax.servlet.ServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,21 +52,25 @@ public class Mario_node_stateController {
 				break;
 			}
 		}
-
-		Integer zk_id = Integer.parseInt((String)searchParams.get("zk_id"));
-		model.addAttribute("maxStateVersion", service.getMaxStateVersion(zk_id));
 		
-		Page<Mario_node_state> mario_node_states = service.getMario_node_state(
-				searchParams, pageNumber, Const.PAGE_SIZE);
-		for (Mario_node_state mario_node_state : mario_node_states) {
-			mario_node_state.setCluster_name(zkInfoService.getMario_zk_info(
-					mario_node_state.getzk_id()).getzk_name());
+		if (searchParams.get("zk_id") != null) {
+			Integer zk_id = Integer.parseInt((String)searchParams.get("zk_id"));
+			model.addAttribute("maxStateVersion", service.getMaxStateVersion(zk_id));
+		
+			Page<Mario_node_state> mario_node_states = service.getMario_node_state(
+					searchParams, pageNumber, Const.PAGE_SIZE);
+			for (Mario_node_state mario_node_state : mario_node_states) {
+				mario_node_state.setCluster_name(zkInfoService.getMario_zk_info(
+						mario_node_state.getzk_id()).getzk_name());
+			}
+	
+			model.addAttribute("mario_node_states", mario_node_states);
+			model.addAttribute("searchParams", Servlets
+					.encodeParameterStringWithPrefix(searchParams, "search_"));
+		} else {
+			model.addAttribute("maxStateVersion", 0);
+			model.addAttribute("mario_node_states",new PageImpl<Mario_node_state>(Collections.EMPTY_LIST));
 		}
-
-		model.addAttribute("mario_node_states", mario_node_states);
-		model.addAttribute("searchParams", Servlets
-				.encodeParameterStringWithPrefix(searchParams, "search_"));
-
 		return "mario_node_state/mario_node_stateList";
 	}
 }
