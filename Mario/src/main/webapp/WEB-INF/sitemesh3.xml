@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    <!-- 默认装饰器 -->
+    <mapping decorator="/WEB-INF/layouts/default.jsp" />
+
+    <!-- 排除路径-->
+    <mapping path="/login" exclue="true" />
+    <mapping path="/static/*" exclue="true" />
+    <mapping path="/api/*" exclue="true" />
+
+    <!-- 指明满足“/*”的页面，将被“/WEB-INF/views/decorators/decorator.html”所装饰 -->
+    <mapping path="/*" decorator="/WEB-INF/layouts/default.jsp" />
+
+    <!-- 指明满足“/exclude.jsp*”的页面，将被排除，不被装饰 -->
+    <mapping path="/exclude.jsp*" exclue="true" />
+</sitemesh>

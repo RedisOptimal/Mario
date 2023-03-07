@@ -139,10 +139,9 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>opensymphony</groupId>
+			<groupId>org.sitemesh</groupId>
 			<artifactId>sitemesh</artifactId>
-			<version>${sitemesh.version}</version>
-			<scope>runtime</scope>
+			<version>3.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -531,39 +530,6 @@
 				</configuration>
 			</plugin>
 			
-			<!-- enforcer插件, 设定环境与依赖的规则 -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>1.1.1</version>
-				<executions>
-					<execution>
-						<id>enforce-banned-dependencies</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-                				<requireJavaVersion>
-                  					<version>1.6</version>
-                				</requireJavaVersion>
-								<bannedDependencies>
-									<searchTransitive>true</searchTransitive>
-									<!-- 避免引入过期的jar包 -->
-									<excludes>
-										<exclude>commons-logging</exclude>
-										<exclude>aspectj:aspectj*</exclude>
-										<exclude>org.springframework:2.*</exclude>
-										<exclude>org.springframework:3.0.*</exclude>
-									</excludes>
-								</bannedDependencies>
-							</rules>
-							<fail>true</fail>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			
 			<!-- jetty插件, 设定context path与spring profile -->
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
@@ -618,20 +584,6 @@
 				<version>2.5.1</version>
 			</plugin>
 			
-			<!-- tomcat打包部署插件 -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>tomcat-maven-plugin</artifactId>
-				<version>1.1</version>
-				<configuration>
-					<url>http://127.0.0.1:8088/manager/text</url>
-					<username>tomcat</username>
-					<password>123456</password>
-					<!-- xweb 为部署stable version时的 path -->
-					<path>/${project.artifactId}</path>
-				</configuration>
-			</plugin>
-			
 			<!-- 模板archetype  -->
 			<plugin>  
 		        <groupId>org.apache.maven.plugins</groupId>  
@@ -639,12 +591,7 @@
 		         <version>2.2</version>
 		    </plugin>
 		    
-		    <!-- tomcat7 tomcat7:run启动 -->
-			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.1</version>
-			</plugin>
+
 
 			<!-- tattletale重复检查插件 
 			<plugin>
@@ -668,86 +615,4 @@
 		</plugins>
 	</build>
 
-	<profiles>
-		<!-- 执行functional test -->
-		<profile>
-			<id>functional-test</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<argLine>-Xmx256M -XX:MaxPermSize=128m</argLine>
-							<includes>
-								<include>**/*FT.java</include>
-							</includes>
-							<!-- 支持taglib tld文件查找的必要设置 -->
-							<useSystemClassLoader>false</useSystemClassLoader>
-							<!-- 将mvn命令行传入的selenium driver参数传入surefire的JVM -->
-							<systemPropertyVariables>
-								<selenium.driver>${selenium.driver}</selenium.driver>
-							</systemPropertyVariables>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		
-		<!-- 执行@Category(Smoke.class)的TestCase -->
-		<profile>
-			<id>run-smoke</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includedGroups>org.springside.modules.test.category.Smoke</includedGroups>
-						</configuration>
-					</plugin>				
-				</plugins>
-			</build>
-		</profile>
-		
-		<!-- 忽略所有@Category(UnStable.class)的TestCase -->
-		<profile>
-			<id>skip-unstable</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<excludedGroups>org.springside.modules.test.category.UnStable</excludedGroups>
-						</configuration>
-					</plugin>				
-				</plugins>
-			</build>
-		</profile>
-		
-		<!-- 刷新开发环境数据库 -->
-		<profile>
-			<id>refresh-db</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<configuration>
-							<target>
-								<property file="src/main/resources/application.properties" />
-								<sql driver="${jdbc.driver}" url="${jdbc.url}" userid="${jdbc.username}" password="${jdbc.password}" onerror="continue">
-									<classpath refid="maven.test.classpath" />
-									<transaction src="src/main/resources/sql/mysql/schema.sql" />
-									<transaction src="src/test/resources/data/cleanup-data.sql" />
-									<transaction src="src/test/resources/data/import-data.sql" />
-								</sql>
-							</target>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

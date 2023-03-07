@@ -1,5 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
-<%@ taglib prefix="sitemesh" uri="http://www.opensymphony.com/sitemesh/decorator" %>  
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"%>
 
@@ -13,7 +12,7 @@
 <!-- BEGIN HEAD -->
 <head>
 	<meta charset="utf-8" />
-	<title>ZooKeeper监控平台-<sitemesh:title/></title>
+	<title>ZooKeeper监控平台-<sitemesh:write property='title'/></title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
 	<meta content="" name="description" />
@@ -65,7 +64,7 @@
 	<script src="${ctx}/static/jquery-ztree/3.5.14/js/jquery.ztree.core-3.5.min.js" type="text/javascript"></script>
 	<script src="${ctx}/static/jquery-ztree/3.5.14/js/jquery.ztree.excheck-3.5.min.js" type="text/javascript"></script>
 	<!-- END CORE PLUGINS -->
-	<sitemesh:head/>
+	<sitemesh:write property='head'/>
 </head>
 <!-- END HEAD -->
 <!-- BEGIN BODY -->
@@ -83,14 +82,11 @@
 		<!-- END SIDEBAR -->
 		<!-- BEGIN PAGE -->
 		<div class="page-content">
-			<sitemesh:body/>
+			<sitemesh:write property='body'/>
 		</div>
 		<!-- END PAGE -->
 	</div>
 	<!-- END CONTAINER -->
-	<!-- BEGIN FOOTER -->
-	<%@ include file="/WEB-INF/layouts/footer.jsp"%>
-	<!-- END FOOTER -->
 	<!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
 	<!-- BEGIN PAGE LEVEL PLUGINS -->
 	<script src="${ctx}/static/bootstrap-metronic/template_content/assets/plugins/jqvmap/jqvmap/jquery.vmap.js" type="text/javascript"></script>   
